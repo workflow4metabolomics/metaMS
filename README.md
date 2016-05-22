@@ -39,7 +39,7 @@ Dependencies using Conda
 ```
 #To install miniconda2
 #http://conda.pydata.org/miniconda.html
-#To install the IPO R library using conda:
+#To install the metaMS R library using conda:
 conda install r-metaMS r-batch
 #To set an environment:
 conda create -n r-metaMS r-batch`
