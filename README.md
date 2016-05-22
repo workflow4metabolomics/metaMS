@@ -1,7 +1,7 @@
 metaMS for Galaxy
 ===============
 
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/r-metaMS/README.html) [![Build Status](https://travis-ci.org/workflow4metabolomics/metaMS.svg?branch=master)](https://travis-ci.org/workflow4metabolomics/metaMS)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/bioconductor-metaMS/README.html) [![Build Status](https://travis-ci.org/workflow4metabolomics/metaMS.svg?branch=master)](https://travis-ci.org/workflow4metabolomics/metaMS)
 
 Our project
 -----------
