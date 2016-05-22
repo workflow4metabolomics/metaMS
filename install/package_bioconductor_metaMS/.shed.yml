@@ -1,0 +1,6 @@
+categories: [Metabolomics, Tool Dependency Packages]
+description: Contains a tool dependency definition that downloads and compiles the
+  R bioconductor package metaMS version 1.7.0
+homepage_url: http://workflow4metabolomics.org
+name: package_bioconductor_metaMS_1_7_0
+owner: yguitton
