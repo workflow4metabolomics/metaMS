@@ -5,6 +5,7 @@
     <requirements>
         <requirement type="package" version="1.8.0">bioconductor-metams</requirement>
         <requirement type="package" version="1.46.0">bioconductor-xcms</requirement>
+        <requirement type="package" version="1.1_4">r-batch</requirement>
     </requirements>
     
     <stdio>
@@ -19,15 +20,15 @@
         #elif $inputs.input == "xset":
                 xset  $inputs.xset
         #end if
-	
+
    		#if $settings.setting == "gcdefault":
-			settings "default"
-		#elif $settings.setting == "usersettings":
-			settings "User_defined"
-			fwhm $settings.fwhm
-			rtdiff $settings.rtdiff
-			minfeat $settings.minfeat
-			simthreshold $settings.simthreshold
+		    settings "default"
+	    #elif $settings.setting == "usersettings":
+		    settings "User_defined"
+		    fwhm $settings.fwhm
+		    rtdiff $settings.rtdiff
+		    minfeat $settings.minfeat
+		    simthreshold $settings.simthreshold
             minclassfraction $settings.minclassfraction
             minclasssize $settings.minclasssize
         #end if
@@ -52,10 +53,10 @@
         nSlaves \${GALAXY_SLOTS:-1}
         unkn "c($unkn)"
             
-</command>
+    </command>
     
     <inputs>
-		<conditional name="inputs">
+        <conditional name="inputs">
             <param name="input" type="select" label="Choose your inputs" help="Choose your input method" >
                 <option value="zip_file" selected="true">Zip file containing your chromatograms</option>
                 <option value="xset" >Rdata file from xcms.xcmsSet </option>
@@ -64,15 +65,15 @@
                 <param name="zip_file" type="data" format="no_unzip.zip,zip" label="Zip file" help="Zip file containing your chromatograms for analysis" />
             </when>
         	<when value="xset">
-				<param name="xset" type="data" format="rdata.xcms.raw,rdata.xcms.group,rdata.xcms.retcor,rdata" label="Rdata from xcms.xcmsSet" help="Rdata file containing a xset object" />
-			</when>
+			    <param name="xset" type="data" format="rdata.xcms.raw,rdata.xcms.group,rdata.xcms.retcor,rdata" label="Rdata from xcms.xcmsSet" help="Rdata file containing a xset object" />
+		    </when>
 
-		</conditional>
-		<conditional name="settings">
-			<param name="setting" type="select" label="Settings" help="Choose the settings used for finding peaks" >
-				<option value="gcdefault" selected="true">GC_Default</option>
-				<option value="usersettings" >User_Defined</option>
-			</param>
+	    </conditional>
+	    <conditional name="settings">
+            <param name="setting" type="select" label="Settings" help="Choose the settings used for finding peaks" >
+			    <option value="gcdefault" selected="true">GC_Default</option>
+			    <option value="usersettings" >User_Defined</option>
+		    </param>
             <when value="gcdefault">
                 <conditional name="options_rtrange">
                     <param name="option" type="select" label="RT range option " >
@@ -84,8 +85,9 @@
                             <validator type="empty_field"/> 
                         </param>
                     </when>
-               </conditional>
-               <conditional name="options_db">
+                    <when value="hide" />
+                </conditional>
+                <conditional name="options_db">
                     <param name="option" type="select" label="Use Personnal DataBase option " >
                         <option value="show">show</option>
                         <option value="hide" selected="true">hide</option>
@@ -93,19 +95,21 @@
                     <when value="show">
                         <param name="db_input" type="data" format="msp" label=" DB file" help="A database file as needed for DB option in runGC" />
                     </when>
-              </conditional>
-              <conditional name="options_ri">
-                <param name="option" type="select" label="Use RI option " >
-                    <option value="show">show</option>
-                    <option value="hide" selected="true">hide</option>
-                </param>
-                <when value="show">
-                    <param name="ri_input" type="data" format="csv,tsv" label=" RI file" help="A file with two column as needed for RI option in runGC" />
-                </when>
-            </conditional>
+                    <when value="hide" />
+                </conditional>
+                <conditional name="options_ri">
+                    <param name="option" type="select" label="Use RI option " >
+                        <option value="show">show</option>
+                        <option value="hide" selected="true">hide</option>
+                    </param>
+                    <when value="show">
+                        <param name="ri_input" type="data" format="csv,tsv" label=" RI file" help="A file with two column as needed for RI option in runGC" />
+                    </when>
+                    <when value="hide" />
+                </conditional>
             </when>
-			<when value="usersettings">
-				<param name="fwhm" type="integer" value="5" label="FWHM" help="The FWHM of your peaks (matchedFilter method is used)" />
+		    <when value="usersettings">
+			    <param name="fwhm" type="integer" value="5" label="FWHM" help="The FWHM of your peaks (matchedFilter method is used)" />
                 <conditional name="options_rtrange">
                     <param name="option" type="select" label="RT range option " >
                         <option value="show">show</option>
@@ -116,12 +120,13 @@
                             <validator type="empty_field"/> 
                         </param>
                     </when>
-               </conditional>
+                    <when value="hide" />
+                </conditional>
                
-				<param name="rtdiff" type="float" value="0.05" label="RT_Diff" help="The allowed RT shift between same molecule in different sample" />
-				<param name="minfeat" type="integer" value="5" label="Min_Features" help="The minimum number of ion in a mass spectra to consider it a molecule" />
-				<param name="simthreshold" type="float" value="0.70" label="similarity_threshold" help="The minimum similarity allowed between peaks mass spectra to be considered as equal" />
-				<param name="minclassfraction" type="float" value="0.5" label="min.class.fract" help="The fraction of samples in which a pseudospectrum is present before it is regarded as an unknown" />
+                <param name="rtdiff" type="float" value="0.05" label="RT_Diff" help="The allowed RT shift between same molecule in different sample" />
+                <param name="minfeat" type="integer" value="5" label="Min_Features" help="The minimum number of ion in a mass spectra to consider it a molecule" />
+                <param name="simthreshold" type="float" value="0.70" label="similarity_threshold" help="The minimum similarity allowed between peaks mass spectra to be considered as equal" />
+                <param name="minclassfraction" type="float" value="0.5" label="min.class.fract" help="The fraction of samples in which a pseudospectrum is present before it is regarded as an unknown" />
                 <param name="minclasssize" type="integer" value="3" label="min.class.size" help="The absolute number of samples in which a pseudospectrum is present before it is regarded as an unknown" />
                 <conditional name="options_db">
                     <param name="option" type="select" label="Use Personnal DataBase option " >
@@ -131,8 +136,8 @@
                     <when value="show">
                         <param name="db_input" type="data" format="msp" label=" DB file" help="A database file as needed for DB option in runGC" />
                     </when>
-              </conditional>
-              <conditional name="options_ri">
+                </conditional>
+                <conditional name="options_ri">
                     <param name="option" type="select" label="Use RI option " >
                         <option value="show">show</option>
                         <option value="hide" selected="true">hide</option>
@@ -140,14 +145,14 @@
                     <when value="show">
                         <param name="ri_input" type="data" format="csv" label=" RI file" help="A file with two column as needed for RI option in runGC" />
                     </when>
-              </conditional>
+                </conditional>
             
             </when>
-		 </conditional>
+	     </conditional>
          <param name="unkn" type="text" value="1:5" label="EIC_Unknown" help="vector of peaks number to be plotted, for example 1:5 (mean 1 to 5) or 1,4,12  means 1 4 and 12). For all EIC use 0" />
                  
-		 <!-- pour !is.null(DB) il faut un conditionnal avec un input type="text" pour charger la db au format msp et donc il faut définir un datatype (cf Misharl) -->
-	</inputs>
+	     <!-- pour !is.null(DB) il faut un conditionnal avec un input type="text" pour charger la db au format msp et donc il faut définir un datatype (cf Misharl) -->
+    </inputs>
     
     <outputs>
     
@@ -167,11 +172,23 @@
     </outputs>
     
     <tests>
+        <test>
+            <param name="inputs|input" value="zip_file" />
+            <param name="inputs|zip_file" value="W4M_GCMS_Dataset.zip"  ftype="zip" />
+            <param name="settings|setting" value="gcdefault" />
+            <param name="settings|options_rtrange|option" value="hide" />
+            <param name="settings|options_db|option" value="hide" />
+            <param name="settings|options_ri|option" value="hide" />
+            <param name="methods|peakwidth" value="20,50" />
+            <output name="sampleMetadata" file="sampleMetadata.tsv" />
+            <output name="variableMetadata" file="variableMetadata.tsv" />
+            <output name="dataMatrix" file="dataMatrix.tsv" lines_diff="6" />
+        </test>
     </tests>
     
     <help>
-		
-		
+	
+	
 .. class:: infomark
 
 **Author(s)**  Ron Wehrens (ron.wehrens@gmail.com), Georg Weingart, Fulvio Mattivi

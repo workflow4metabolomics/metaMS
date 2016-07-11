@@ -11,7 +11,7 @@ sink(log_file, type = "out")
 library(metaMS)
 library(batch) #necessary for parseCommandArgs function
 
-source_local <- function(fname){
+source_local <- function(fname) {
     argv <- commandArgs(trailingOnly = FALSE)
     base_dir <- dirname(substring(argv[grep("--file=", argv)], 8))
     source(paste(base_dir, fname, sep="/"))
@@ -50,9 +50,9 @@ if (DBarg!="NULL"){
 
 #for unknown EIC printing
 
-if(listArguments[["unkn"]]==0){
+if (listArguments[["unkn"]]!="NULL") {
     unknarg<-""
-}else{ 
+} else { 
     unknarg<-listArguments[["unkn"]]
 }
 
@@ -65,14 +65,6 @@ listArguments[["ri"]] <- NULL
 
 print(" step2")
 
-
-#saving the name of the function in a variable thefunction
-thefunction = listArguments[["xfunction"]]
-listArguments[["xfunction"]]=NULL #delete from the list of arguments
-
- 
-
- 
 #runGC accept either a list of files a zip folder or an xset object from xcms.xcmsSet tool
 
 #CASE 2  from zip file
@@ -96,7 +88,7 @@ if (!is.null(listArguments[["zipfile"]])){
     sampleMetadata<-xcms:::phenoDataFromPaths(samples)
     sampleMetadata<-cbind(sampleMetadata=rownames(sampleMetadata),sampleMetadata)
     row.names(sampleMetadata)<-NULL
-} else{
+} else {
 	metams_zip_file=""
 }
 
@@ -118,7 +110,7 @@ if (!is.null(listArguments[["xset"]])){
                 directory=unzip(zip_file)
                 print("CASE 3 from xset and with ZIP input")
                 
-            } else{
+            } else {
                 print("CASE 3 from xset and with LIBRARY input")
             }
         }
@@ -147,8 +139,7 @@ if (!is.null(listArguments[["xset"]])){
     sampleMetadata<-cbind(sampleMetadata=rownames(sampleMetadata),sampleMetadata)
     row.names(sampleMetadata)<-NULL
     samples<-xset@filepaths
-}
-else{
+} else {
    xsetparam<-NULL
 }     
 
@@ -161,9 +152,9 @@ source_local("lib_metams.r")
 # source_local("plotUnknown.r")
 
 #settings process
-if(listArguments[["settings"]]=="default"){
+if (listArguments[["settings"]]=="default") {
 	data(FEMsettings) 
-    if (listArguments[["rtrange"]][1]!="NULL"){
+    if (listArguments[["rtrange"]][1]!="NULL") {
         rtrange=listArguments[["rtrange"]]
     } else {
         rtrange=NULL
@@ -174,7 +165,7 @@ if(listArguments[["settings"]]=="default"){
 		DBarg <- createSTDdbGC(stdInfo = NULL, settings = TSQXLS.GC, manualDB = manual)
 	}
     nSlaves=listArguments[["nSlaves"]]
-    if(!metams_zip_file==""){
+    if(!metams_zip_file=="") {
         resGC<-runGC(files=samples,settings=TSQXLS.GC, rtrange=rtrange, DB= DBarg, removeArtefacts = TRUE, findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves) #default settings for GC from Wehrens et al
     }
     if(!is.null(xsetparam)){
@@ -194,7 +185,7 @@ if(listArguments[["settings"]]=="default"){
     }
 }
 
-if(listArguments[["settings"]]=="User_defined"){
+if (listArguments[["settings"]]=="User_defined") {
 	listArguments[["settings"]]=NULL #delete from the list of arguments
 	fwhmparam=listArguments[["fwhm"]]
 	rtdiffparam=listArguments[["rtdiff"]]
@@ -203,7 +194,7 @@ if(listArguments[["settings"]]=="User_defined"){
 	simthreshparam=listArguments[["simthreshold"]]
     minclassfractionparam=listArguments[["minclassfraction"]]
     minclasssizeparam=listArguments[["minclasssize"]]
-    if (listArguments[["rtrange"]]!="NULL"){
+    if (listArguments[["rtrange"]]!="NULL") {
         rtrange=listArguments[["rtrange"]]
         cat("rtrange= ",rtrange)
     } else {
@@ -259,13 +250,12 @@ if(listArguments[["settings"]]=="User_defined"){
 		manual <- read.msp(DBarg)
 		DBarg <- createSTDdbGC(stdInfo = NULL, settings = GALAXY.GC, manualDB = manual)
 	}
-    if(!metams_zip_file==""){
+    if (!metams_zip_file=="") {
         resGC<-runGC(files=samples,settings=GALAXY.GC,rtrange = rtrange, DB= DBarg , removeArtefacts = TRUE, findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
-       
     }
-    if(!is.null(xsetparam)){
+    if(!is.null(xsetparam)) {
         settingslist=GALAXY.GC
-        if (class(xset.l[[1]])!="xsAnnotate"){
+        if (class(xset.l[[1]])!="xsAnnotate") {
             print("Process xsAnnotate")
             xset<-lapply(xset.l,
                  function(x) {
