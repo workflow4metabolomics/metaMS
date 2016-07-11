@@ -113,7 +113,7 @@
                 <conditional name="options_rtrange">
                     <param name="option" type="select" label="RT range option " >
                         <option value="show">show</option>
-                        <option value="hide" selected="true">hide</option>
+		<option value="hide" selected="true">hide</option>
                     </param>
                     <when value="show">
                          <param name="rtrange" type="text" value="" label="RTrange" help="RT range to process in minutes, for example 5,25" >
@@ -136,6 +136,7 @@
                     <when value="show">
                         <param name="db_input" type="data" format="msp" label=" DB file" help="A database file as needed for DB option in runGC" />
                     </when>
+                    <when value="hide" />
                 </conditional>
                 <conditional name="options_ri">
                     <param name="option" type="select" label="Use RI option " >
@@ -145,6 +146,7 @@
                     <when value="show">
                         <param name="ri_input" type="data" format="csv" label=" RI file" help="A file with two column as needed for RI option in runGC" />
                     </when>
+                    <when value="hide" />
                 </conditional>
             
             </when>

@@ -3,6 +3,6 @@ description: '[W4M][GC-MS] metaMS R Package - GC-MS data preprocessing using met
 homepage_url: http://workflow4metabolomics.org
 long_description: 'Part of the W4M project: http://workflow4metabolomics.org metaMS:
   https://www.bioconductor.org/packages/release/bioc/html/metaMS.html MS-based metabolomics data processing and compound annotation pipeline.'
-name: idealg_metams_runGC
+name: idealg_metams_rungc
 owner: yguitton
 remote_repository_url: https://github.com/workflow4metabolomics/metaMS
