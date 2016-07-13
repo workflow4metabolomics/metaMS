@@ -64,10 +64,9 @@
             <when value="zip_file">
                 <param name="zip_file" type="data" format="no_unzip.zip,zip" label="Zip file" help="Zip file containing your chromatograms for analysis" />
             </when>
-        	<when value="xset">
-			    <param name="xset" type="data" format="rdata.xcms.raw,rdata.xcms.group,rdata.xcms.retcor,rdata" label="Rdata from xcms.xcmsSet" help="Rdata file containing a xset object" />
+            <when value="xset">
+                <param name="xset" type="data" format="rdata.xcms.raw,rdata.xcms.group,rdata.xcms.retcor,rdata" label="Rdata from xcms.xcmsSet" help="Rdata file containing a xset object" />
 		    </when>
-
 	    </conditional>
 	    <conditional name="settings">
             <param name="setting" type="select" label="Settings" help="Choose the settings used for finding peaks" >
@@ -93,7 +92,7 @@
                         <option value="hide" selected="true">hide</option>
                     </param>
                     <when value="show">
-                        <param name="db_input" type="data" format="msp" label=" DB file" help="A database file as needed for DB option in runGC" />
+                        <param name="db_input" type="data" format="msp,txt" label=" DB file" help="A database file as needed for DB option in runGC" />
                     </when>
                     <when value="hide" />
                 </conditional>
@@ -103,7 +102,7 @@
                         <option value="hide" selected="true">hide</option>
                     </param>
                     <when value="show">
-                        <param name="ri_input" type="data" format="csv,tsv" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
+                        <param name="ri_input" type="data" format="csv,tsv,gg" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
                     </when>
                     <when value="hide" />
                 </conditional>
@@ -113,7 +112,7 @@
                 <conditional name="options_rtrange">
                     <param name="option" type="select" label="RT range option " >
                         <option value="show">show</option>
-		<option value="hide" selected="true">hide</option>
+		                <option value="hide" selected="true">hide</option>
                     </param>
                     <when value="show">
                          <param name="rtrange" type="text" value="" label="RTrange" help="RT range to process in minutes, for example 5,25" >
@@ -134,7 +133,7 @@
                         <option value="hide" selected="true">hide</option>
                     </param>
                     <when value="show">
-                        <param name="db_input" type="data" format="msp" label=" DB file" help="A database file as needed for DB option in runGC" />
+                        <param name="db_input" type="data" format="msp,txt" label=" DB file" help="A database file as needed for DB option in runGC" />
                     </when>
                     <when value="hide" />
                 </conditional>
@@ -144,7 +143,7 @@
                         <option value="hide" selected="true">hide</option>
                     </param>
                     <when value="show">
-                        <param name="ri_input" type="data" format="csv,tsv" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
+                        <param name="ri_input" type="data" format="csv,tsv,gg" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
                     </when>
                     <when value="hide" />
                 </conditional>
