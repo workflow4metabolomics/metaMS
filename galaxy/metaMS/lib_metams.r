@@ -1,6 +1,7 @@
 # lib_metams.r version 0.99.6
 # R function for metaMS runGC under W4M
 # author Yann GUITTON CNRS IRISA/LINA Idealg project 2014-2015
+# Credit for base script Ralph http://www.metabolomics-forum.com/index.php?topic=122.msg236#msg236
 
 
 ##ADDITIONS FROM Y. Guitton
