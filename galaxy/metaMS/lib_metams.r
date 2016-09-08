@@ -252,13 +252,16 @@ plotUnknowns<-function(resGC, unkn=""){
     for (j in 1: length(resGC$xset)){
         test<-resGC$annotation[[j]]
         print(paste("j=",j))
-        for (i in 1:dim(test)[1]){
-            if (as.numeric(row.names(test)[i])>dim(mat)[1]){
-                next
-            } else {
-                mat[as.numeric(row.names(test)[i]),j]<-test[i,1]
-            }
-        }
+        
+        if(dim(test)[1]>0){ #bug correction if no peak found
+	        for (i in 1:dim(test)[1]){
+	            if (as.numeric(row.names(test)[i])>dim(mat)[1]){
+	                next
+	            } else {
+	                mat[as.numeric(row.names(test)[i]),j]<-test[i,1]
+	            }
+	        }
+	} #end bug correction if no peak found in a sample        
     }
     colnames(mat)<-colnames(resGC$PeakTable[,c((which(colnames(resGC$PeakTable)=="rt"|colnames(resGC$PeakTable)=="RI")[length(which(colnames(resGC$PeakTable)=="rt"|colnames(resGC$PeakTable)=="RI"))]+1):dim(resGC$PeakTable)[2])])
     
