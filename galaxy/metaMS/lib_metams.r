@@ -1,7 +1,8 @@
-# lib_metams.r version 0.99.6
+# lib_metams.r version 0.99.7
 # R function for metaMS runGC under W4M
 # author Yann GUITTON CNRS IRISA/LINA Idealg project 2014-2015
-# Credit for base script Ralph http://www.metabolomics-forum.com/index.php?topic=122.msg236#msg236
+# Credit for base script Ralph http://www.metabolomics-forum.com/index.php?topic=122.msg236#msg236 version 0.99.6
+# Bug correction when no peak detected in plotUnknown version 0.99.7
 
 
 ##ADDITIONS FROM Y. Guitton
