@@ -86,7 +86,7 @@ if (!is.null(listArguments[["zipfile"]])){
     # cat(samples) #debugg
     #create sampleMetadata, get sampleMetadata and class
     sampleMetadata<-xcms:::phenoDataFromPaths(samples)
-    sampleMetadata<-cbind(sampleMetadata=rownames(sampleMetadata),sampleMetadata)
+    sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
     row.names(sampleMetadata)<-NULL
 } else {
 	metams_zip_file=""
@@ -136,7 +136,7 @@ if (!is.null(listArguments[["xset"]])){
     }
     #create sampleMetadata, get sampleMetadata and class
     sampleMetadata<-xset@phenoData
-    sampleMetadata<-cbind(sampleMetadata=rownames(sampleMetadata),sampleMetadata)
+    sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
     row.names(sampleMetadata)<-NULL
     samples<-xset@filepaths
 } else {
