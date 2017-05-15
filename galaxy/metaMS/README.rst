@@ -1,6 +1,9 @@
 
 Changelog/News
 --------------
+**Version 2.0 - 15/05/2017**
+
+- RI option, better usage of ri filter and easier file reading for RI database
 
 **Version 1.1 - 11/07/2016**
 
