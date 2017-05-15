@@ -1,7 +1,7 @@
 #!/usr/local/public/bin/Rscript --vanilla --slave --no-site-file
-# metams.r version="0.99.9"
+# metams.r version="2.0"
 #created by Yann GUITTON 
-
+#use RI options
 
 #Redirect all stdout to the log file
 log_file=file("metams.log", open = "wt")
@@ -20,13 +20,23 @@ print("step1")
 
 
 listArguments = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
-print("new version 8")
+print("new version 2.0")
 
 
 print(listArguments)
- 
+
+
 if (listArguments[["ri"]]!="NULL"){
-    RIarg=read.table(listArguments[["ri"]], h=T)
+    RIarg=read.table(listArguments[["ri"]])
+	if (ncol(RIarg) < 2) RIarg=read.table(listArguments[["ri"]], h=T, sep=";")
+	if (ncol(RIarg) < 2) RIarg=read.table(listArguments[["ri"]], h=T, sep="\t")
+	if (ncol(RIarg) < 2) RIarg=read.table(listArguments[["ri"]], h=T, sep=",")
+	if (ncol(RIarg) < 2) {
+		error_message="Your RI file seems not well formatted. The column separators accepted are ; , and tabulation"
+		print(error_message)
+		stop(error_message)
+	}
+#to do check real column names
     colnames(RIarg)<-c("rt","RI")
     # print(RIarg)
 } else {
@@ -34,6 +44,13 @@ if (listArguments[["ri"]]!="NULL"){
     # cat("Ri= ",RIarg)
 }
 
+if (listArguments[["rishift"]]!="none"){
+    RIshift=listArguments[["rishift"]]
+   cat("Rishift used= ",RIshift)
+} else {
+    RIshift = "none"
+    cat("Rishift NONE= ",RIshift)
+}
 
 DBarg=listArguments[["db"]]
 # if (listArguments[["use_db"]]!="NULL"){
@@ -47,10 +64,9 @@ if (DBarg!="NULL"){
 
 
 
-
 #for unknown EIC printing
 
-if (listArguments[["unkn"]]!="NULL") {
+if (listArguments[["unkn"]][1]!="NULL") {
     unknarg<-""
 } else { 
     unknarg<-listArguments[["unkn"]]
@@ -62,6 +78,7 @@ print(paste("Unkn:",unknarg))
 listArguments[["unkn"]]<-NULL
 listArguments[["db"]] <- NULL
 listArguments[["ri"]] <- NULL
+listArguments[["rishift"]] <- NULL
 
 print(" step2")
 
@@ -86,7 +103,7 @@ if (!is.null(listArguments[["zipfile"]])){
     # cat(samples) #debugg
     #create sampleMetadata, get sampleMetadata and class
     sampleMetadata<-xcms:::phenoDataFromPaths(samples)
-    sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
+    sampleMetadata<-cbind(sampleMetadata=rownames(sampleMetadata),sampleMetadata)
     row.names(sampleMetadata)<-NULL
 } else {
 	metams_zip_file=""
@@ -136,7 +153,7 @@ if (!is.null(listArguments[["xset"]])){
     }
     #create sampleMetadata, get sampleMetadata and class
     sampleMetadata<-xset@phenoData
-    sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
+    sampleMetadata<-cbind(sampleMetadata=rownames(sampleMetadata),sampleMetadata)
     row.names(sampleMetadata)<-NULL
     samples<-xset@filepaths
 } else {
@@ -164,7 +181,18 @@ if (listArguments[["settings"]]=="default") {
 		manual <- read.msp(DBarg)
 		DBarg <- createSTDdbGC(stdInfo = NULL, settings = TSQXLS.GC, manualDB = manual)
 	}
+	
+	#use RI instead of rt for time comparison vs DB
+	if (RIshift!="none"){
+		TSQXLS.GC@match2DB.timeComparison<-"RI"
+		TSQXLS.GC@match2DB.RIdiff<-RIshift
+		TSQXLS.GC@betweenSamples.timeComparison<-"RI"
+		TSQXLS.GC@betweenSamples.RIdiff<-RIshift
+	}
+	
     nSlaves=listArguments[["nSlaves"]]
+	
+	
     if(!metams_zip_file=="") {
         resGC<-runGC(files=samples,settings=TSQXLS.GC, rtrange=rtrange, DB= DBarg, removeArtefacts = TRUE, findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves) #default settings for GC from Wehrens et al
     }
@@ -189,11 +217,11 @@ if (listArguments[["settings"]]=="User_defined") {
 	listArguments[["settings"]]=NULL #delete from the list of arguments
 	fwhmparam=listArguments[["fwhm"]]
 	rtdiffparam=listArguments[["rtdiff"]]
-	#RIdiffparam=listArguments[["RIdiff"]] #only if timeComparison = "RI"
 	minfeatparam=listArguments[["minfeat"]]
 	simthreshparam=listArguments[["simthreshold"]]
     minclassfractionparam=listArguments[["minclassfraction"]]
     minclasssizeparam=listArguments[["minclasssize"]]
+	
     if (listArguments[["rtrange"]]!="NULL") {
         rtrange=listArguments[["rtrange"]]
         cat("rtrange= ",rtrange)
@@ -201,6 +229,8 @@ if (listArguments[["settings"]]=="User_defined") {
         rtrange=NULL
         cat("rtrange= ",rtrange)
     }
+	
+	
     nSlaves=listArguments[["nSlaves"]]
 	
 	GALAXY.GC <- metaMSsettings("protocolName" = "GALAXY.GC",
@@ -227,13 +257,16 @@ if (listArguments[["settings"]]=="User_defined") {
 				rtdiff = rtdiffparam,
 				RIdiff = 5,
 				minfeat = minfeatparam)
-    #to be used when DB option will be available
-	# metaSetting(GALAXY.GC, "matchIrrelevants") <- list(
-				# irrelevantClasses = c("Bleeding", "Plasticizers"),
-				# timeComparison = "rt",
-				# RIdiff = 2,    
-				# rtdiff = rtdiffparam,
-				# simthresh = simthreshparam)
+				
+    #to used if contaminant filter
+	
+		# metaSetting(GALAXY.GC, "matchIrrelevants") <- list(
+					# irrelevantClasses = c("Bleeding", "Plasticizers"),
+					# timeComparison = "RI",
+					# RIdiff = RIdiffparam,    
+					# rtdiff = rtdiffparam,
+					# simthresh = simthreshparam)
+	
 	metaSetting(GALAXY.GC, "betweenSamples") <- list(
 				min.class.fraction = minclassfractionparam,
 				min.class.size = minclasssizeparam,
@@ -242,7 +275,13 @@ if (listArguments[["settings"]]=="User_defined") {
 				RIdiff = 2,    
 				simthresh = simthreshparam)
 
-	
+	#ONLY use RI instead of rt for time comparison vs DB or samples
+	if (RIshift!="none"){
+		GALAXY.GC@match2DB.timeComparison<-"RI"
+		GALAXY.GC@match2DB.RIdiff<-RIshift
+		GALAXY.GC@betweenSamples.timeComparison<-"RI"
+		GALAXY.GC@betweenSamples.RIdiff<-RIshift
+	}
         # files, xset, settings, rtrange = NULL, DB = NULL,
        # removeArtefacts = TRUE, findUnknowns = nexp > 1,
        # returnXset = FALSE, RIstandards = NULL, nSlaves = 0
@@ -302,6 +341,7 @@ c<-getBPC2s(files=samples, rt="raw", pdfname="BPCs_raw.pdf")
        
 print("Step QC plot")
 
+#to do check if no peaks found
 #Quality controls plots but only working in R (don't know why)
 a<-plotUnknowns(resGC=resGC, unkn=unknarg) #use unknparam value
 

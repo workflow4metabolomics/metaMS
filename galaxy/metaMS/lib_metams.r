@@ -1,8 +1,6 @@
-# lib_metams.r version 0.99.7
+# lib_metams.r version 0.99.6
 # R function for metaMS runGC under W4M
 # author Yann GUITTON CNRS IRISA/LINA Idealg project 2014-2015
-# Credit for base script Ralph http://www.metabolomics-forum.com/index.php?topic=122.msg236#msg236 version 0.99.6
-# Bug correction when no peak detected in plotUnknown version 0.99.7
 
 
 ##ADDITIONS FROM Y. Guitton
@@ -253,16 +251,13 @@ plotUnknowns<-function(resGC, unkn=""){
     for (j in 1: length(resGC$xset)){
         test<-resGC$annotation[[j]]
         print(paste("j=",j))
-        
-        if(dim(test)[1]>0){ #bug correction if no peak found
-	        for (i in 1:dim(test)[1]){
-	            if (as.numeric(row.names(test)[i])>dim(mat)[1]){
-	                next
-	            } else {
-	                mat[as.numeric(row.names(test)[i]),j]<-test[i,1]
-	            }
-	        }
-	} #end bug correction if no peak found in a sample        
+        for (i in 1:dim(test)[1]){
+            if (as.numeric(row.names(test)[i])>dim(mat)[1]){
+                next
+            } else {
+                mat[as.numeric(row.names(test)[i]),j]<-test[i,1]
+            }
+        }
     }
     colnames(mat)<-colnames(resGC$PeakTable[,c((which(colnames(resGC$PeakTable)=="rt"|colnames(resGC$PeakTable)=="RI")[length(which(colnames(resGC$PeakTable)=="rt"|colnames(resGC$PeakTable)=="RI"))]+1):dim(resGC$PeakTable)[2])])
     

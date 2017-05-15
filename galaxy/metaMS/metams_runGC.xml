@@ -1,4 +1,4 @@
- <tool id="metams_runGC" name="metaMS.runGC" version="1.1">
+ <tool id="metams_runGC" name="metaMS.runGC" version="2.0">
        
     <description>GC-MS data preprocessing using metaMS package</description>
     
@@ -20,7 +20,7 @@
         #elif $inputs.input == "xset":
                 xset  $inputs.xset
         #end if
-
+        
    		#if $settings.setting == "gcdefault":
 		    settings "default"
 	    #elif $settings.setting == "usersettings":
@@ -40,11 +40,17 @@
         #end if
         #if $settings.options_ri.option == "show":
         	ri $settings.options_ri.ri_input
-        #end if 
+		#end if 
         #if $settings.options_ri.option == "hide":
         	ri "NULL"
         #end if
-        #if $settings.options_db.option == "show":
+		#if $options_rifilter.option == "true":
+        	rishift $options_rifilter.ri_shift
+		#end if 
+        #if $options_rifilter.option == "false":
+        	rishift "none"
+        #end if
+		#if $settings.options_db.option == "show":
         	db $settings.options_db.db_input
         #end if 
         #if $settings.options_db.option == "hide":
@@ -52,7 +58,7 @@
         #end if
         nSlaves \${GALAXY_SLOTS:-1}
         unkn "c($unkn)"
-            
+         
     </command>
     
     <inputs>
@@ -103,10 +109,10 @@
                     </param>
                     <when value="show">
                         <param name="ri_input" type="data" format="csv,tsv,gg" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
-                    </when>
+				    </when>
                     <when value="hide" />
-                </conditional>
-            </when>
+			     </conditional>
+	        </when>
 		    <when value="usersettings">
 			    <param name="fwhm" type="integer" value="5" label="FWHM" help="The FWHM of your peaks (matchedFilter method is used)" />
                 <conditional name="options_rtrange">
@@ -137,21 +143,33 @@
                     </when>
                     <when value="hide" />
                 </conditional>
-                <conditional name="options_ri">
+               <conditional name="options_ri">
                     <param name="option" type="select" label="Use RI option " >
                         <option value="show">show</option>
                         <option value="hide" selected="true">hide</option>
                     </param>
                     <when value="show">
                         <param name="ri_input" type="data" format="csv,tsv,gg" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
+						
                     </when>
                     <when value="hide" />
+					
                 </conditional>
-            
+                
             </when>
 	     </conditional>
          <param name="unkn" type="text" value="1:5" label="EIC_Unknown" help="vector of peaks number to be plotted, for example 1:5 (mean 1 to 5) or 1,4,12  means 1 4 and 12). For all EIC use 0" />
-                 
+         <conditional name="options_rifilter">
+					<param name="option" type="select" label="Use RI as filter" >
+						<option value="false" selected="true">FALSE</option>
+						<option value="true" >TRUE</option>
+					</param>
+					<when value="true">
+						<param name="ri_shift" type="integer" value="5" label="RIshift" help="RI shift accepted" />
+						
+					</when>
+					<when value="false" />
+		</conditional>       
 	     <!-- pour !is.null(DB) il faut un conditionnal avec un input type="text" pour charger la db au format msp et donc il faut définir un datatype (cf Misharl) -->
     </inputs>
     
@@ -180,7 +198,6 @@
             <param name="settings|options_rtrange|option" value="hide" />
             <param name="settings|options_db|option" value="hide" />
             <param name="settings|options_ri|option" value="hide" />
-            <param name="methods|peakwidth" value="20,50" />
             <output name="sampleMetadata" file="sampleMetadata.tsv" />
             <output name="variableMetadata" file="variableMetadata.tsv" />
             <output name="dataMatrix" file="dataMatrix.tsv" lines_diff="6" />
