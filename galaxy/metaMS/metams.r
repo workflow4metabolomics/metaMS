@@ -46,20 +46,20 @@ if (listArguments[["ri"]]!="NULL"){
 
 if (listArguments[["rishift"]]!="none"){
     RIshift=listArguments[["rishift"]]
-   cat("Rishift used= ",RIshift)
+   cat("Rishift used= ",RIshift, "\n")
 } else {
     RIshift = "none"
-    cat("Rishift NONE= ",RIshift)
+    cat("Rishift NONE= ",RIshift, "\n")
 }
 
 DBarg=listArguments[["db"]]
 # if (listArguments[["use_db"]]!="NULL"){
 if (DBarg!="NULL"){
     DBarg=listArguments[["db"]]
-    cat("Db= ",DBarg)
+    cat("Db= ",DBarg, "\n")
 } else {
     DBarg = NULL
-    cat("NO Db : ",DBarg)
+    cat("NO Db : ",DBarg, "\n")
 }
 
 
@@ -67,9 +67,9 @@ if (DBarg!="NULL"){
 #for unknown EIC printing
 
 if (listArguments[["unkn"]][1]!="NULL") {
-    unknarg<-""
-} else { 
     unknarg<-listArguments[["unkn"]]
+} else { 
+    unknarg<-""
 }
 
 print(paste("Unkn:",unknarg))
@@ -185,12 +185,12 @@ if (listArguments[["settings"]]=="default") {
 	#use RI instead of rt for time comparison vs DB
 	if (RIshift!="none"){
 		TSQXLS.GC@match2DB.timeComparison<-"RI"
-		TSQXLS.GC@match2DB.RIdiff<-RIshift
+		TSQXLS.GC@match2DB.RIdiff<-as.numeric(RIshift)
 		TSQXLS.GC@betweenSamples.timeComparison<-"RI"
-		TSQXLS.GC@betweenSamples.RIdiff<-RIshift
+		TSQXLS.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
 	}
 	
-    nSlaves=listArguments[["nSlaves"]]
+   nSlaves=listArguments[["nSlaves"]]
 	
 	
     if(!metams_zip_file=="") {
@@ -278,9 +278,9 @@ if (listArguments[["settings"]]=="User_defined") {
 	#ONLY use RI instead of rt for time comparison vs DB or samples
 	if (RIshift!="none"){
 		GALAXY.GC@match2DB.timeComparison<-"RI"
-		GALAXY.GC@match2DB.RIdiff<-RIshift
+		GALAXY.GC@match2DB.RIdiff<-as.numeric(RIshift)
 		GALAXY.GC@betweenSamples.timeComparison<-"RI"
-		GALAXY.GC@betweenSamples.RIdiff<-RIshift
+		GALAXY.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
 	}
         # files, xset, settings, rtrange = NULL, DB = NULL,
        # removeArtefacts = TRUE, findUnknowns = nexp > 1,
