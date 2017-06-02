@@ -343,7 +343,13 @@ print("Step QC plot")
 
 #to do check if no peaks found
 #Quality controls plots but only working in R (don't know why)
-a<-plotUnknowns(resGC=resGC, unkn=unknarg) #use unknparam value
+a<-try(plotUnknowns(resGC=resGC, unkn=unknarg)); #use unknparam value
+if(class(a) == "try-error") {
+   pdf("Unknown_Error.pdf")
+	plot.new()
+	text(x=0.5,y=1,pos=1, labels="Error generating EICs\n please use none instead of a vector in plotUnknown")
+   dev.off()
+}
 
 # create a mergpdf
 
