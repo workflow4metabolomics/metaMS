@@ -1,25 +1,28 @@
 ﻿####----------------------------------------------------------------------####
-####                  GC-MS data processing version 0.99.5                ####
+####                  GC-MS data processing version 2.1.1                ####
 ####----------------------------------------------------------------------####
 
-I. Date: 2015-05-26
+I. Date: 2017-10-16
 
 II. Author and maintainer:
 
    Yann GUITTON
-   LINA - équipe Combi (CNRS, Univ-Nantes, EMN, INRIA)
-   IRISA -  équipe Dyliss (CNRS, Univ-Rennes 1, INRIA) 
-   Phone: +33 2 51 12 53 90
-   E-mail: yann.guitton@irisa.fr / yann.guitton@gmail.com
+   LABERCA - PFCA Metabolomics Platform
+   Route de Gachet 
+   44307 NANTES
+   FRANCE
+   Phone: +33 2 40 48 78 80
+   E-mail: yann.guitton@oniris-nantes.fr / yann.guitton@gmail.com
 
 III. Funding
 
    Developed within IDEALG project (http://www.idealg.ueb.eu/versionAnglaise/)
+   Developed within IFB-MetaboHub W4M project
 
 IV. Usage restrictions
 
    Use of this tool is restricted to the service conditions of the MetaboHUB-IFB infrastructures.
-   For any question regarding the use of these services, please contact: yann.guitton@univ-nantes.fr
+   For any question regarding the use of these services, please contact: yann.guitton@oniris-nantes.fr
 
 V. Installation
 

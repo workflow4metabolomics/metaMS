@@ -1,4 +1,4 @@
- <tool id="metams_runGC" name="metaMS.runGC" version="2.0.1">
+ <tool id="metams_runGC" name="metaMS.runGC" version="2.1.1">
        
     <description>GC-MS data preprocessing using metaMS package</description>
     
@@ -57,7 +57,11 @@
             db "NULL"
         #end if
         nSlaves \${GALAXY_SLOTS:-1}
-        unkn "c($unkn)"
+        #if $unkn == "none":
+		   unkn "none"
+		#elif $unkn != "none":
+		   unkn "c($unkn)"
+		#end if
          
     </command>
     
@@ -108,13 +112,13 @@
                         <option value="hide" selected="true">hide</option>
                     </param>
                     <when value="show">
-                        <param name="ri_input" type="data" format="csv,tsv,gg" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
+                        <param name="ri_input" type="data" format="tabular,txt,csv,tsv,gg" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
 				    </when>
                     <when value="hide" />
 			     </conditional>
 	        </when>
 		    <when value="usersettings">
-			    <param name="fwhm" type="integer" value="5" label="FWHM" help="The FWHM in seconds of your peaks (matchedFilter method is used)" />
+			    <param name="fwhm" type="integer" value="5" label="FWHM" help="The FWHM of your peaks (matchedFilter method is used)" />
                 <conditional name="options_rtrange">
                     <param name="option" type="select" label="RT range option " >
                         <option value="show">show</option>
@@ -149,7 +153,7 @@
                         <option value="hide" selected="true">hide</option>
                     </param>
                     <when value="show">
-                        <param name="ri_input" type="data" format="csv,tsv,gg" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
+                        <param name="ri_input" type="data" format="tabular,txt,csv,tsv,gg" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
 						
                     </when>
                     <when value="hide" />
@@ -158,7 +162,7 @@
                 
             </when>
 	     </conditional>
-         <param name="unkn" type="text" value="1:5" label="EIC_Unknown" help="vector of peaks number to be plotted, for example 1:5 (mean 1 to 5) or 1,4,12  means 1 4 and 12). For all EIC use 0. For no plot use none" />
+         <param name="unkn" type="text" value="1:5" label="EIC_Unknown" help="vector of peaks number to be plotted, for example 1:5 (mean 1 to 5) or 1,4,12  means 1 4 and 12). For all EIC use 0. none for no EIC plot" />
          <conditional name="options_rifilter">
 					<param name="option" type="select" label="Use RI as filter" >
 						<option value="false" selected="true">FALSE</option>
@@ -236,6 +240,7 @@ metaMS.runGC
 Description
 -----------
 metaMS.runGC is a function dedicated to GCMS data processing from converted files to the generation of pseudospectra (compounds) table.
+Current version for metaMS R package: 1.8.0
 
 **Process:** 
 Each of the converted data (cdf, mzML...)  is profiled by a combination of xcms and CAMERA functions. Then all the mass spectra of detected peaks are compared and clustered.
@@ -363,6 +368,11 @@ Output files
 
 Changelog/News
 --------------
+
+**Version 2.1 - 08/06/2017**
+
+- Quality: add sessionInfo logs with packages versions
+- Processing: add RI usage 
 
 **Version 1.1 - 11/07/2016**
 

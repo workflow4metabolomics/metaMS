@@ -1,6 +1,7 @@
-# lib_metams.r version 0.99.6
+# lib_metams.r version 2.1.1
 # R function for metaMS runGC under W4M
 # author Yann GUITTON CNRS IRISA/LINA Idealg project 2014-2015
+# author Yann GUITTON Oniris Laberca 2015-2017
 
 
 ##ADDITIONS FROM Y. Guitton
@@ -245,248 +246,257 @@ plotUnknowns<-function(resGC, unkn=""){
     ##Annotation table each value is a pcgrp associated to the unknown 
     ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
     ##R. Wehrens give me some clues on that and we found a correction
- 
-    mat<-matrix(ncol=length(resGC$xset), nrow=dim(resGC$PeakTable)[1])
-     
-    for (j in 1: length(resGC$xset)){
-        test<-resGC$annotation[[j]]
-        print(paste("j=",j))
-        for (i in 1:dim(test)[1]){
-            if (as.numeric(row.names(test)[i])>dim(mat)[1]){
-                next
-            } else {
-                mat[as.numeric(row.names(test)[i]),j]<-test[i,1]
-            }
-        }
-    }
-    colnames(mat)<-colnames(resGC$PeakTable[,c((which(colnames(resGC$PeakTable)=="rt"|colnames(resGC$PeakTable)=="RI")[length(which(colnames(resGC$PeakTable)=="rt"|colnames(resGC$PeakTable)=="RI"))]+1):dim(resGC$PeakTable)[2])])
-    
-    #debug
+    #if unkn="none"
+	
+	if(unkn=="none") {
+	   pdf("Unknown_Empty.pdf")
+	   plot.new()
+	   text(x=0.5,y=1,pos=1, labels="No EIC ploting required")
+	   dev.off()
+	}else {
 
-    # print(dim(mat))
-    # print(mat[1:3,]) 
-    # write.table(mat, file="myannotationtable.tsv", sep="\t", row.names=FALSE)
-    #correction of annotation matrix due to pcgrp removal by quality check in runGCresult
-    #matrix of correspondance between an@pspectra and filtered pspectra from runGC
+		mat<-matrix(ncol=length(resGC$xset), nrow=dim(resGC$PeakTable)[1])
+		 
+		for (j in 1: length(resGC$xset)){
+			test<-resGC$annotation[[j]]
+			print(paste("j=",j))
+			for (i in 1:dim(test)[1]){
+				if (as.numeric(row.names(test)[i])>dim(mat)[1]){
+					next
+				} else {
+					mat[as.numeric(row.names(test)[i]),j]<-test[i,1]
+				}
+			}
+		}
+		colnames(mat)<-colnames(resGC$PeakTable[,c((which(colnames(resGC$PeakTable)=="rt"|colnames(resGC$PeakTable)=="RI")[length(which(colnames(resGC$PeakTable)=="rt"|colnames(resGC$PeakTable)=="RI"))]+1):dim(resGC$PeakTable)[2])])
+		
+		#debug
 
-    allPCGRPs <-
-        lapply(1:length(resGC$xset),
-            function(i) {
-                an <- resGC$xset[[i]]
-                huhn <- an@pspectra[which(sapply(an@pspectra, length) >=
-                metaSetting(resGC$settings,
-                "DBconstruction.minfeat"))]
-                matCORR<-cbind(1:length(huhn), match(huhn, an@pspectra))
-            })
+		# print(dim(mat))
+		# print(mat[1:3,]) 
+		# write.table(mat, file="myannotationtable.tsv", sep="\t", row.names=FALSE)
+		#correction of annotation matrix due to pcgrp removal by quality check in runGCresult
+		#matrix of correspondance between an@pspectra and filtered pspectra from runGC
 
-    if (unkn[1]==""){    
-    #plot EIC and spectra for all unknown for comparative purpose
-   
+		allPCGRPs <-
+			lapply(1:length(resGC$xset),
+				function(i) {
+					an <- resGC$xset[[i]]
+					huhn <- an@pspectra[which(sapply(an@pspectra, length) >=
+					metaSetting(resGC$settings,
+					"DBconstruction.minfeat"))]
+					matCORR<-cbind(1:length(huhn), match(huhn, an@pspectra))
+				})
 
-        par (mar=c(5, 4, 4, 2) + 0.1)
-        for (l in 1:dim(resGC$PeakTable)[1]){ #l=2
-            #recordPlot
-            perpage=3 #if change change layout also!
-            num.plots <- ceiling(dim(mat)[2]/perpage) #three pcgroup per page
-            my.plots <- vector(num.plots, mode='list')
-            dev.new(width=21/2.54, height=29.7/2.54, file=paste("Unknown_",l,".pdf", sep="")) #A4 pdf
-            # par(mfrow=c(perpage,2))
-            layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths=rep(c(1,1),perpage), heights=rep(c(1,5),perpage))
-            # layout.show(6)
-            oma.saved <- par("oma")
-            par(oma = rep.int(0, 4))
-            par(oma = oma.saved)
-            o.par <- par(mar = rep.int(0, 4))
-            on.exit(par(o.par))
-            stop=0 #initialize
-            for (i in 1:num.plots) {
-                start=stop+1
-                stop=start+perpage-1 #
-                for (c in start:stop){
-                    if (c <=dim(mat)[2]){
-                            
-                        #get sample name
-                        sampname<-basename(resGC$xset[[c]]@xcmsSet@filepaths)
+		if (unkn[1]==""){    
+		#plot EIC and spectra for all unknown for comparative purpose
+	   
 
-                        #remove .cdf, .mzXML filepattern
-                        filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", 
-                                "[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
-                        filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), 
-                                collapse = "|")
-                        sampname<-gsub(filepattern, "",sampname)
-                         
-                        title1<-paste("unknown", l,"from",sampname, sep=" ")
-                        an<-resGC$xset[[c]]
-                         
-                        par (mar=c(0, 0, 0, 0) + 0.1)
-                        plot.new()
-                        box()
-                        text(0.5, 0.5, title1, cex=2)
-                        if (!is.na(mat[l,c])){
-                            pcgrp=allPCGRPs[[c]][which(allPCGRPs[[c]][,1]==mat[l,c]),2]
-                            if (pcgrp!=mat[l,c]) print ("pcgrp changed")
-                            par (mar=c(3, 2.5, 3, 1.5) + 0.1)
-                            plotEICs(an, pspec=pcgrp, maxlabel=2)
-                            plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
-                        } else {
-                            plot.new()
-                            box()
-                            text(0.5, 0.5, "NOT FOUND", cex=2)
-                            plot.new()
-                            box()
-                            text(0.5, 0.5, "NOT FOUND", cex=2)
-                        }
-                    }
-                 }
-                # my.plots[[i]] <- recordPlot()
-            }
-            graphics.off()
+			par (mar=c(5, 4, 4, 2) + 0.1)
+			for (l in 1:dim(resGC$PeakTable)[1]){ #l=2
+				#recordPlot
+				perpage=3 #if change change layout also!
+				num.plots <- ceiling(dim(mat)[2]/perpage) #three pcgroup per page
+				my.plots <- vector(num.plots, mode='list')
+				dev.new(width=21/2.54, height=29.7/2.54, file=paste("Unknown_",l,".pdf", sep="")) #A4 pdf
+				# par(mfrow=c(perpage,2))
+				layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths=rep(c(1,1),perpage), heights=rep(c(1,5),perpage))
+				# layout.show(6)
+				oma.saved <- par("oma")
+				par(oma = rep.int(0, 4))
+				par(oma = oma.saved)
+				o.par <- par(mar = rep.int(0, 4))
+				on.exit(par(o.par))
+				stop=0 #initialize
+				for (i in 1:num.plots) {
+					start=stop+1
+					stop=start+perpage-1 #
+					for (c in start:stop){
+						if (c <=dim(mat)[2]){
+								
+							#get sample name
+							sampname<-basename(resGC$xset[[c]]@xcmsSet@filepaths)
 
-                # pdf(file=paste("Unknown_",l,".pdf", sep=""), onefile=TRUE)
-                # for (my.plot in my.plots) {
-                    # replayPlot(my.plot)
-                # }
-                # my.plots
-                # graphics.off()
+							#remove .cdf, .mzXML filepattern
+							filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", 
+									"[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
+							filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), 
+									collapse = "|")
+							sampname<-gsub(filepattern, "",sampname)
+							 
+							title1<-paste("unknown", l,"from",sampname, sep=" ")
+							an<-resGC$xset[[c]]
+							 
+							par (mar=c(0, 0, 0, 0) + 0.1)
+							plot.new()
+							box()
+							text(0.5, 0.5, title1, cex=2)
+							if (!is.na(mat[l,c])){
+								pcgrp=allPCGRPs[[c]][which(allPCGRPs[[c]][,1]==mat[l,c]),2]
+								if (pcgrp!=mat[l,c]) print ("pcgrp changed")
+								par (mar=c(3, 2.5, 3, 1.5) + 0.1)
+								plotEICs(an, pspec=pcgrp, maxlabel=2)
+								plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
+							} else {
+								plot.new()
+								box()
+								text(0.5, 0.5, "NOT FOUND", cex=2)
+								plot.new()
+								box()
+								text(0.5, 0.5, "NOT FOUND", cex=2)
+							}
+						}
+					 }
+					# my.plots[[i]] <- recordPlot()
+				}
+				graphics.off()
 
-        }#end  for l
-    }#end if unkn=""
-    else{
-        par (mar=c(5, 4, 4, 2) + 0.1)
-        l=unkn
-        if (length(l)==1){
-            #recordPlot
-            perpage=3 #if change change layout also!
-            num.plots <- ceiling(dim(mat)[2]/perpage) #three pcgroup per page
-            my.plots <- vector(num.plots, mode='list')
-            
-            dev.new(width=21/2.54, height=29.7/2.54, file=paste("Unknown_",l,".pdf", sep="")) #A4 pdf
-            # par(mfrow=c(perpage,2))
-            layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths=rep(c(1,1),perpage), heights=rep(c(1,5),perpage))
-            # layout.show(6)
-            oma.saved <- par("oma")
-            par(oma = rep.int(0, 4))
-            par(oma = oma.saved)
-            o.par <- par(mar = rep.int(0, 4))
-            on.exit(par(o.par))
-            stop=0 #initialize
-            for (i in 1:num.plots) {
-                start=stop+1
-                stop=start+perpage-1 #
-                for (c in start:stop){
-                    if (c <=dim(mat)[2]){
-                            
-                        #get sample name
-                        sampname<-basename(resGC$xset[[c]]@xcmsSet@filepaths)
+					# pdf(file=paste("Unknown_",l,".pdf", sep=""), onefile=TRUE)
+					# for (my.plot in my.plots) {
+						# replayPlot(my.plot)
+					# }
+					# my.plots
+					# graphics.off()
 
-                        #remove .cdf, .mzXML filepattern
-                        filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", "[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
-                        filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), collapse = "|")
-                        sampname<-gsub(filepattern, "",sampname)
-                         
-                        title1<-paste("unknown", l,"from",sampname, sep=" ")
-                        an<-resGC$xset[[c]]
-                         
-                        par (mar=c(0, 0, 0, 0) + 0.1)
-                        plot.new()
-                        box()
-                        text(0.5, 0.5, title1, cex=2)
-                        if (!is.na(mat[l,c])){
-                            pcgrp=allPCGRPs[[c]][which(allPCGRPs[[c]][,1]==mat[l,c]),2]
-                            if (pcgrp!=mat[l,c]) print ("pcgrp changed")
-                            par (mar=c(3, 2.5, 3, 1.5) + 0.1)
-                            plotEICs(an, pspec=pcgrp, maxlabel=2)
-                            plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
-                        } else {
-                            plot.new()
-                            box()
-                            text(0.5, 0.5, "NOT FOUND", cex=2)
-                            plot.new()
-                            box()
-                            text(0.5, 0.5, "NOT FOUND", cex=2)
-                        }
-                    }
-                }
-                # my.plots[[i]] <- recordPlot()
-            }
-            graphics.off()
+			}#end  for l
+		}#end if unkn=""
+		else{
+			par (mar=c(5, 4, 4, 2) + 0.1)
+			l=unkn
+			if (length(l)==1){
+				#recordPlot
+				perpage=3 #if change change layout also!
+				num.plots <- ceiling(dim(mat)[2]/perpage) #three pcgroup per page
+				my.plots <- vector(num.plots, mode='list')
+				
+				dev.new(width=21/2.54, height=29.7/2.54, file=paste("Unknown_",l,".pdf", sep="")) #A4 pdf
+				# par(mfrow=c(perpage,2))
+				layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths=rep(c(1,1),perpage), heights=rep(c(1,5),perpage))
+				# layout.show(6)
+				oma.saved <- par("oma")
+				par(oma = rep.int(0, 4))
+				par(oma = oma.saved)
+				o.par <- par(mar = rep.int(0, 4))
+				on.exit(par(o.par))
+				stop=0 #initialize
+				for (i in 1:num.plots) {
+					start=stop+1
+					stop=start+perpage-1 #
+					for (c in start:stop){
+						if (c <=dim(mat)[2]){
+								
+							#get sample name
+							sampname<-basename(resGC$xset[[c]]@xcmsSet@filepaths)
 
-            # pdf(file=paste("Unknown_",l,".pdf", sep=""), onefile=TRUE)
-            # for (my.plot in my.plots) {
-                # replayPlot(my.plot)
-            # }
-            # my.plots
-            # graphics.off()
-        } else {
-            par (mar=c(5, 4, 4, 2) + 0.1)
-            for (l in 1:length(unkn)){ #l=2
-                #recordPlot
-                perpage=3 #if change change layout also!
-                num.plots <- ceiling(dim(mat)[2]/perpage) #three pcgroup per page
-                my.plots <- vector(num.plots, mode='list')
-                dev.new(width=21/2.54, height=29.7/2.54, file=paste("Unknown_",unkn[l],".pdf", sep="")) #A4 pdf
-                # par(mfrow=c(perpage,2))
-                layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths=rep(c(1,1),perpage), heights=rep(c(1,5),perpage))
-                # layout.show(6)
-                oma.saved <- par("oma")
-                par(oma = rep.int(0, 4))
-                par(oma = oma.saved)
-                o.par <- par(mar = rep.int(0, 4))
-                on.exit(par(o.par))
-                stop=0 #initialize
-                for (i in 1:num.plots) {
-                    start=stop+1
-                    stop=start+perpage-1 #
-                    for (c in start:stop){
-                        if (c <=dim(mat)[2]){
-                        
-                            #get sample name
-                            sampname<-basename(resGC$xset[[c]]@xcmsSet@filepaths)
+							#remove .cdf, .mzXML filepattern
+							filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", "[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
+							filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), collapse = "|")
+							sampname<-gsub(filepattern, "",sampname)
+							 
+							title1<-paste("unknown", l,"from",sampname, sep=" ")
+							an<-resGC$xset[[c]]
+							 
+							par (mar=c(0, 0, 0, 0) + 0.1)
+							plot.new()
+							box()
+							text(0.5, 0.5, title1, cex=2)
+							if (!is.na(mat[l,c])){
+								pcgrp=allPCGRPs[[c]][which(allPCGRPs[[c]][,1]==mat[l,c]),2]
+								if (pcgrp!=mat[l,c]) print ("pcgrp changed")
+								par (mar=c(3, 2.5, 3, 1.5) + 0.1)
+								plotEICs(an, pspec=pcgrp, maxlabel=2)
+								plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
+							} else {
+								plot.new()
+								box()
+								text(0.5, 0.5, "NOT FOUND", cex=2)
+								plot.new()
+								box()
+								text(0.5, 0.5, "NOT FOUND", cex=2)
+							}
+						}
+					}
+					# my.plots[[i]] <- recordPlot()
+				}
+				graphics.off()
 
-                            #remove .cdf, .mzXML filepattern
-                            filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", "[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
-                            filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), collapse = "|")
-                            sampname<-gsub(filepattern, "",sampname)
-                             
-                            title1<-paste("unknown",unkn[l],"from",sampname, sep=" ")
-                            an<-resGC$xset[[c]]
-                             
-                            par (mar=c(0, 0, 0, 0) + 0.1)
-                            plot.new()
-                            box()
-                            text(0.5, 0.5, title1, cex=2)
-                            if (!is.na(mat[unkn[l],c])){
-                                pcgrp=allPCGRPs[[c]][which(allPCGRPs[[c]][,1]==mat[unkn[l],c]),2]
-                                if (pcgrp!=mat[unkn[l],c]) print ("pcgrp changed")
-                                par (mar=c(3, 2.5, 3, 1.5) + 0.1)
-                                plotEICs(an, pspec=pcgrp, maxlabel=2)
-                                plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
-                            } else {
-                                plot.new()
-                                box()
-                                text(0.5, 0.5, "NOT FOUND", cex=2)
-                                plot.new()
-                                box()
-                                text(0.5, 0.5, "NOT FOUND", cex=2)
-                            }
-                        }
-                    }
-                    # my.plots[[i]] <- recordPlot()
-                }
-                graphics.off()
+				# pdf(file=paste("Unknown_",l,".pdf", sep=""), onefile=TRUE)
+				# for (my.plot in my.plots) {
+					# replayPlot(my.plot)
+				# }
+				# my.plots
+				# graphics.off()
+			} else {
+				par (mar=c(5, 4, 4, 2) + 0.1)
+				for (l in 1:length(unkn)){ #l=2
+					#recordPlot
+					perpage=3 #if change change layout also!
+					num.plots <- ceiling(dim(mat)[2]/perpage) #three pcgroup per page
+					my.plots <- vector(num.plots, mode='list')
+					dev.new(width=21/2.54, height=29.7/2.54, file=paste("Unknown_",unkn[l],".pdf", sep="")) #A4 pdf
+					# par(mfrow=c(perpage,2))
+					layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths=rep(c(1,1),perpage), heights=rep(c(1,5),perpage))
+					# layout.show(6)
+					oma.saved <- par("oma")
+					par(oma = rep.int(0, 4))
+					par(oma = oma.saved)
+					o.par <- par(mar = rep.int(0, 4))
+					on.exit(par(o.par))
+					stop=0 #initialize
+					for (i in 1:num.plots) {
+						start=stop+1
+						stop=start+perpage-1 #
+						for (c in start:stop){
+							if (c <=dim(mat)[2]){
+							
+								#get sample name
+								sampname<-basename(resGC$xset[[c]]@xcmsSet@filepaths)
 
-                # pdf(file=paste("Unknown_",unkn[l],".pdf", sep=""), onefile=TRUE)
-                # for (my.plot in my.plots) {
-                    # replayPlot(my.plot)
-                # }
-                # my.plots
-                # graphics.off()
+								#remove .cdf, .mzXML filepattern
+								filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", "[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
+								filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), collapse = "|")
+								sampname<-gsub(filepattern, "",sampname)
+								 
+								title1<-paste("unknown",unkn[l],"from",sampname, sep=" ")
+								an<-resGC$xset[[c]]
+								 
+								par (mar=c(0, 0, 0, 0) + 0.1)
+								plot.new()
+								box()
+								text(0.5, 0.5, title1, cex=2)
+								if (!is.na(mat[unkn[l],c])){
+									pcgrp=allPCGRPs[[c]][which(allPCGRPs[[c]][,1]==mat[unkn[l],c]),2]
+									if (pcgrp!=mat[unkn[l],c]) print ("pcgrp changed")
+									par (mar=c(3, 2.5, 3, 1.5) + 0.1)
+									plotEICs(an, pspec=pcgrp, maxlabel=2)
+									plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
+								} else {
+									plot.new()
+									box()
+									text(0.5, 0.5, "NOT FOUND", cex=2)
+									plot.new()
+									box()
+									text(0.5, 0.5, "NOT FOUND", cex=2)
+								}
+							}
+						}
+						# my.plots[[i]] <- recordPlot()
+					}
+					graphics.off()
 
-            }#end  for unkn[l]
-        
-        }
-    
-    }
+					# pdf(file=paste("Unknown_",unkn[l],".pdf", sep=""), onefile=TRUE)
+					# for (my.plot in my.plots) {
+						# replayPlot(my.plot)
+					# }
+					# my.plots
+					# graphics.off()
+
+				}#end  for unkn[l]
+			
+			}
+		
+		}
+	}
 } #end function 
 
 # This function get the raw file path from the arguments

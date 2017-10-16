@@ -1,7 +1,7 @@
 #!/usr/local/public/bin/Rscript --vanilla --slave --no-site-file
-# metams.r version="2.0"
+# metams.r version="2.1.1"
 #created by Yann GUITTON 
-#use RI options
+#use RI options + add try on plotUnknown add session Info
 
 #Redirect all stdout to the log file
 log_file=file("metams.log", open = "wt")
@@ -16,13 +16,24 @@ source_local <- function(fname) {
     base_dir <- dirname(substring(argv[grep("--file=", argv)], 8))
     source(paste(base_dir, fname, sep="/"))
 }
-print("step1")
+# print("step1")
 
 
 listArguments = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
-print("new version 2.0")
+# print("new version 2.0")
+## constants
+##----------
+
+modNamC <- "metaMS:runGC" ## module name
 
 
+## log file
+##---------
+cat("\nStart of the '", modNamC, "' Galaxy module call: ",
+format(Sys.time(), "%a %d %b %Y %X"), "\n", sep="")
+
+
+cat("\n1) Parameters:\n")
 print(listArguments)
 
 
@@ -350,7 +361,6 @@ if(class(a) == "try-error") {
 	text(x=0.5,y=1,pos=1, labels="Error generating EICs\n please use none instead of a vector in plotUnknown")
    dev.off()
 }
-
 # create a mergpdf
 
 #test
@@ -376,3 +386,27 @@ rm(listArguments)
 #saving R data in .Rdata file to save the variables used in the present tool
 save.image(paste("runGC","RData",sep="."))
 
+## Closing
+##--------
+
+cat("\nEnd of '", modNamC, "' Galaxy module call: ",
+    as.character(Sys.time()), "\n", sep = "")
+
+cat("\n\n\n============================================================================")
+cat("\nAdditional information about the call:\n")
+# cat("\n1) Parameters:\n")
+# print(cbind(value = argVc))
+
+cat("\n1) Session Info:\n")
+sessioninfo <- sessionInfo()
+cat(sessioninfo$R.version$version.string,"\n")
+cat("Main packages:\n")
+for (pkg in names(sessioninfo$otherPkgs)) { cat(paste(pkg,packageVersion(pkg)),"\t") }; cat("\n")
+cat("Other loaded packages:\n")
+for (pkg in names(sessioninfo$loadedOnly)) { cat(paste(pkg,packageVersion(pkg)),"\t") }; cat("\n")
+
+cat("============================================================================\n")
+
+sink()
+
+rm(list = ls())
