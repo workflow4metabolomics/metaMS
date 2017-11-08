@@ -1,7 +1,8 @@
 #!/usr/local/public/bin/Rscript --vanilla --slave --no-site-file
-# metams.r version="2.1.1"
+# metams.r version="2.1.2"
 #created by Yann GUITTON 
 #use RI options + add try on plotUnknown add session Info
+#use make.names in sampleMetadata to avoid issues with files names 
 
 #Redirect all stdout to the log file
 log_file=file("metams.log", open = "wt")
@@ -114,7 +115,7 @@ if (!is.null(listArguments[["zipfile"]])){
     # cat(samples) #debugg
     #create sampleMetadata, get sampleMetadata and class
     sampleMetadata<-xcms:::phenoDataFromPaths(samples)
-    sampleMetadata<-cbind(sampleMetadata=rownames(sampleMetadata),sampleMetadata)
+    sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
     row.names(sampleMetadata)<-NULL
 } else {
 	metams_zip_file=""
@@ -164,7 +165,7 @@ if (!is.null(listArguments[["xset"]])){
     }
     #create sampleMetadata, get sampleMetadata and class
     sampleMetadata<-xset@phenoData
-    sampleMetadata<-cbind(sampleMetadata=rownames(sampleMetadata),sampleMetadata)
+    sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
     row.names(sampleMetadata)<-NULL
     samples<-xset@filepaths
 } else {
