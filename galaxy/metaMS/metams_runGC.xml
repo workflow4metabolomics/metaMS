@@ -3,8 +3,7 @@
     <description>GC-MS data preprocessing using metaMS package</description>
     
     <requirements>
-        <requirement type="package" version="1.8.0">bioconductor-metams</requirement>
-        <requirement type="package" version="1.50.0">bioconductor-xcms</requirement>
+        <requirement type="package" version="1.12.0">bioconductor-metams</requirement>
         <requirement type="package" version="1.1_4">r-batch</requirement>
     </requirements>
     
