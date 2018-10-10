@@ -1,10 +1,9 @@
- <tool id="metams_runGC" name="metaMS.runGC" version="2.1.1">
+ <tool id="metams_runGC" name="metaMS.runGC" version="2.2.0">
        
     <description>GC-MS data preprocessing using metaMS package</description>
     
     <requirements>
-        <requirement type="package" version="1.8.0">bioconductor-metams</requirement>
-        <requirement type="package" version="1.46.0">bioconductor-xcms</requirement>
+        <requirement type="package" version="1.14.0">bioconductor-metams</requirement>
         <requirement type="package" version="1.1_4">r-batch</requirement>
     </requirements>
     
@@ -240,7 +239,7 @@ metaMS.runGC
 Description
 -----------
 metaMS.runGC is a function dedicated to GCMS data processing from converted files to the generation of pseudospectra (compounds) table.
-Current version for metaMS R package: 1.8.0
+Current version for metaMS R package: 1.14.0
 
 **Process:** 
 Each of the converted data (cdf, mzML...)  is profiled by a combination of xcms and CAMERA functions. Then all the mass spectra of detected peaks are compared and clustered.
@@ -369,6 +368,10 @@ Output files
 Changelog/News
 --------------
 
+**Version 2.2.0 - 02/03/2018**
+
+- Upgrade metaMS from 1.8 to 1.14   
+	    
 **Version 2.1 - 08/06/2017**
 
 - Quality: add sessionInfo logs with packages versions
