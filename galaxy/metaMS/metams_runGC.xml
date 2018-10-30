@@ -1,10 +1,9 @@
- <tool id="metams_runGC" name="metaMS.runGC" version="2.1.1">
+<tool id="metams_runGC" name="metaMS.runGC" version="2.2.0">
        
     <description>GC-MS data preprocessing using metaMS package</description>
     
     <requirements>
-        <requirement type="package" version="1.8.0">bioconductor-metams</requirement>
-        <requirement type="package" version="1.46.0">bioconductor-xcms</requirement>
+        <requirement type="package" version="1.14.0">bioconductor-metams</requirement>
         <requirement type="package" version="1.1_4">r-batch</requirement>
     </requirements>
     
@@ -21,47 +20,47 @@
                 xset  $inputs.xset
         #end if
         
-   		#if $settings.setting == "gcdefault":
-		    settings "default"
-	    #elif $settings.setting == "usersettings":
-		    settings "User_defined"
-		    fwhm $settings.fwhm
-		    rtdiff $settings.rtdiff
-		    minfeat $settings.minfeat
-		    simthreshold $settings.simthreshold
+        #if $settings.setting == "gcdefault":
+            settings "default"
+        #elif $settings.setting == "usersettings":
+            settings "User_defined"
+            fwhm $settings.fwhm
+            rtdiff $settings.rtdiff
+            minfeat $settings.minfeat
+            simthreshold $settings.simthreshold
             minclassfraction $settings.minclassfraction
             minclasssize $settings.minclasssize
         #end if
         #if $settings.options_rtrange.option == "show":
-        	rtrange "c($settings.options_rtrange.rtrange)"
+            rtrange "c($settings.options_rtrange.rtrange)"
         #end if 
         #if $settings.options_rtrange.option == "hide":
-        	rtrange "NULL"
+            rtrange "NULL"
         #end if
         #if $settings.options_ri.option == "show":
-        	ri $settings.options_ri.ri_input
-		#end if 
+            ri $settings.options_ri.ri_input
+        #end if 
         #if $settings.options_ri.option == "hide":
-        	ri "NULL"
+            ri "NULL"
         #end if
-		#if $options_rifilter.option == "true":
-        	rishift $options_rifilter.ri_shift
-		#end if 
+        #if $options_rifilter.option == "true":
+            rishift $options_rifilter.ri_shift
+        #end if 
         #if $options_rifilter.option == "false":
-        	rishift "none"
+            rishift "none"
         #end if
-		#if $settings.options_db.option == "show":
-        	db $settings.options_db.db_input
+        #if $settings.options_db.option == "show":
+            db $settings.options_db.db_input
         #end if 
         #if $settings.options_db.option == "hide":
             db "NULL"
         #end if
         nSlaves \${GALAXY_SLOTS:-1}
         #if $unkn == "none":
-		   unkn "none"
-		#elif $unkn != "none":
-		   unkn "c($unkn)"
-		#end if
+           unkn "none"
+        #elif $unkn != "none":
+           unkn "c($unkn)"
+        #end if
          
     </command>
     
@@ -76,13 +75,13 @@
             </when>
             <when value="xset">
                 <param name="xset" type="data" format="rdata.xcms.raw,rdata.xcms.group,rdata.xcms.retcor,rdata" label="Rdata from xcms.xcmsSet" help="Rdata file containing a xset object" />
-		    </when>
-	    </conditional>
-	    <conditional name="settings">
+            </when>
+        </conditional>
+        <conditional name="settings">
             <param name="setting" type="select" label="Settings" help="Choose the settings used for finding peaks" >
-			    <option value="gcdefault" selected="true">GC_Default</option>
-			    <option value="usersettings" >User_Defined</option>
-		    </param>
+                <option value="gcdefault" selected="true">GC_Default</option>
+                <option value="usersettings" >User_Defined</option>
+            </param>
             <when value="gcdefault">
                 <conditional name="options_rtrange">
                     <param name="option" type="select" label="RT range option " >
@@ -113,16 +112,16 @@
                     </param>
                     <when value="show">
                         <param name="ri_input" type="data" format="tabular,txt,csv,tsv,gg" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
-				    </when>
+                    </when>
                     <when value="hide" />
-			     </conditional>
-	        </when>
-		    <when value="usersettings">
-			    <param name="fwhm" type="integer" value="5" label="FWHM" help="The FWHM of your peaks (matchedFilter method is used)" />
+                 </conditional>
+            </when>
+            <when value="usersettings">
+                <param name="fwhm" type="integer" value="5" label="FWHM" help="The FWHM of your peaks (matchedFilter method is used)" />
                 <conditional name="options_rtrange">
                     <param name="option" type="select" label="RT range option " >
                         <option value="show">show</option>
-		                <option value="hide" selected="true">hide</option>
+                        <option value="hide" selected="true">hide</option>
                     </param>
                     <when value="show">
                          <param name="rtrange" type="text" value="" label="RTrange" help="RT range to process in minutes, for example 5,25" >
@@ -154,27 +153,27 @@
                     </param>
                     <when value="show">
                         <param name="ri_input" type="data" format="tabular,txt,csv,tsv,gg" label=" RI file" help="A file with two column (rt and RI) with rt in minutes as needed for RI option in runGC" />
-						
+                        
                     </when>
                     <when value="hide" />
-					
+                    
                 </conditional>
                 
             </when>
-	     </conditional>
+         </conditional>
          <param name="unkn" type="text" value="1:5" label="EIC_Unknown" help="vector of peaks number to be plotted, for example 1:5 (mean 1 to 5) or 1,4,12  means 1 4 and 12). For all EIC use 0. none for no EIC plot" />
          <conditional name="options_rifilter">
-					<param name="option" type="select" label="Use RI as filter" >
-						<option value="false" selected="true">FALSE</option>
-						<option value="true" >TRUE</option>
-					</param>
-					<when value="true">
-						<param name="ri_shift" type="integer" value="5" label="RIshift" help="RI shift accepted" />
-						
-					</when>
-					<when value="false" />
-		</conditional>       
-	     <!-- pour !is.null(DB) il faut un conditionnal avec un input type="text" pour charger la db au format msp et donc il faut définir un datatype (cf Misharl) -->
+                    <param name="option" type="select" label="Use RI as filter" >
+                        <option value="false" selected="true">FALSE</option>
+                        <option value="true" >TRUE</option>
+                    </param>
+                    <when value="true">
+                        <param name="ri_shift" type="integer" value="5" label="RIshift" help="RI shift accepted" />
+                        
+                    </when>
+                    <when value="false" />
+        </conditional>       
+         <!-- pour !is.null(DB) il faut un conditionnal avec un input type="text" pour charger la db au format msp et donc il faut définir un datatype (cf Misharl) -->
     </inputs>
     
     <outputs>
@@ -209,8 +208,8 @@
     </tests>
     
     <help>
-	
-	
+    
+    
 .. class:: infomark
 
 **Author(s)**  Ron Wehrens (ron.wehrens@gmail.com), Georg Weingart, Fulvio Mattivi
@@ -227,7 +226,7 @@
 
  xcms :   Smith, C. A.; Want, E. J.; O’Maille, G.; Abagyan, R.; Siuzdak, G. Anal. Chem. 2006, 78, 779–787.
 
- CAMERA :	Kuhl, C.; Tautenhahn, R.; Böttcher, C.; Larson, T. R.; Neumann, S. Analytical Chemistry 2012, 84, 283–289.
+ CAMERA :   Kuhl, C.; Tautenhahn, R.; Böttcher, C.; Larson, T. R.; Neumann, S. Analytical Chemistry 2012, 84, 283–289.
 
 
 ---------------------------------------------------
@@ -240,7 +239,7 @@ metaMS.runGC
 Description
 -----------
 metaMS.runGC is a function dedicated to GCMS data processing from converted files to the generation of pseudospectra (compounds) table.
-Current version for metaMS R package: 1.8.0
+Current version for metaMS R package: 1.14.0
 
 **Process:** 
 Each of the converted data (cdf, mzML...)  is profiled by a combination of xcms and CAMERA functions. Then all the mass spectra of detected peaks are compared and clustered.
@@ -272,7 +271,7 @@ You can start from here or use result file from :
 ========================= ==================== ======= ==========
 Name                      output file          format  parameter
 ========================= ==================== ======= ==========
-xcms.xcmsSet              xset.RData RData     RData   file            			
+xcms.xcmsSet              xset.RData RData     RData   file                     
 ========================= ==================== ======= ==========
 
 
@@ -369,6 +368,10 @@ Output files
 Changelog/News
 --------------
 
+**Version 2.2.0 - 02/03/2018**
+
+- Upgrade metaMS from 1.8 to 1.14   
+        
 **Version 2.1 - 08/06/2017**
 
 - Quality: add sessionInfo logs with packages versions

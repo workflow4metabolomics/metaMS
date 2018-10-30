@@ -4,48 +4,62 @@
 # author Yann GUITTON Oniris Laberca 2015-2017
 
 
-##ADDITIONS FROM Y. Guitton
-getBPC <- function(file,rtcor=NULL, ...) {
-     object <- xcmsRaw(file)
-	 sel <- profRange(object, ...)
-	 cbind(if (is.null(rtcor)) object@scantime[sel$scanidx] else rtcor ,xcms:::colMax(object@env$profile[sel$massidx,sel$scanidx,drop=FALSE]))
-    
+#@author G. Le Corguille
+# This function will
+# - load the packages
+# - display the sessionInfo
+loadAndDisplayPackages <- function(pkgs) {
+    for(pkg in pkgs) suppressPackageStartupMessages( stopifnot( library(pkg, quietly=TRUE, logical.return=TRUE, character.only=TRUE)))
+
+    sessioninfo = sessionInfo()
+    cat(sessioninfo$R.version$version.string,"\n")
+    cat("Main packages:\n")
+    for (pkg in names(sessioninfo$otherPkgs)) { cat(paste(pkg,packageVersion(pkg)),"\t") }; cat("\n")
+    cat("Other loaded packages:\n")
+    for (pkg in names(sessioninfo$loadedOnly)) { cat(paste(pkg,packageVersion(pkg)),"\t") }; cat("\n")
 }
 
-getBPC2s <- function (files, pdfname="BPCs.pdf", rt = c("raw","corrected"), scanrange=NULL) {
-    require(xcms)
+##ADDITIONS FROM Y. Guitton
+getBPC <- function(file,rtcor = NULL, ...) {
+    print("getBPC")
+    print(file)
+    object <- xcmsRaw(file)
+	sel <- profRange(object, ...)
+	cbind(if (is.null(rtcor)) object@scantime[sel$scanidx] else rtcor ,xcms:::colMax(object@env$profile[sel$massidx,sel$scanidx,drop=FALSE]))    
+}
 
-        
-                            
+getBPC2s <- function (files, pdfname = "BPCs.pdf", rt = c("raw","corrected"), scanrange = NULL) {
+    print("getBPC2s")
+    require(xcms)
+    print(files)        
     #create sampleMetadata, get sampleMetadata and class
-    sampleMetadata<-xcms:::phenoDataFromPaths(files)
-    class<-class<-as.vector(levels(sampleMetadata[,"class"])) #create phenoData like table
-    classnames<-vector("list",length(class))
+    sampleMetadata <- xcms:::phenoDataFromPaths(unname(files))
+    class <- class <- as.vector(levels(sampleMetadata[,"class"])) #create phenoData like table
+    classnames <- vector("list",length(class))
     for (i in 1:length(class)){
-        classnames[[i]]<-which( sampleMetadata[,1]==class[i])
+        classnames[[i]] <- which( sampleMetadata[,1] == class[i])
     }
-        
+
     N <- dim(sampleMetadata)[1]
       
-  
-   
     TIC <- vector("list",N)
-
 
     for (j in 1:N) {
 
-        cat(files[j],"\n")
+        cat("Processing file",names(files[j]),"\n")
         TIC[[j]] <- getBPC(files[j])
         #good for raw 
         # seems strange for corrected
         #errors if scanrange used in xcmsSetgeneration
-        if (!is.null(xcmsSet) && rt == "corrected")
-          rtcor <- xcmsSet@rt$corrected[[j]] else
-          rtcor <- NULL
-          TIC[[j]] <- getBPC(files[j],rtcor=rtcor)
+        if (!is.null(xcmsSet) && rt == "corrected"){
+        	rtcor <- xcmsSet@rt$corrected[[j]]
+        }else{
+        	rtcor <- NULL
+        }
+        TIC[[j]] <- getBPC(files[j],rtcor=rtcor)
     }
 
-    pdf(pdfname,w=16,h=10)
+    pdf(pdfname, w = 16, h = 10)
     cols <- rainbow(N)
     lty = 1:N
     pch = 1:N
@@ -57,66 +71,68 @@ getBPC2s <- function (files, pdfname="BPCs.pdf", rt = c("raw","corrected"), scan
 
     ##plot start
     
-    if (length(class)>2){
-      for (k in 1:(length(class)-1)){
-        for (l in (k+1):length(class)){
-            print(paste(class[k],"vs",class[l],sep=" ")) 
-            plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k]," vs ",class[l], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
-            colvect<-NULL
-           for (j in 1:length(classnames[[k]])) {
+    if (length(class) > 2){
+      	for (k in 1:(length(class)-1)){
+        	for (l in (k+1):length(class)){
+            	print(paste(class[k],"vs",class[l],sep=" ")) 
+            	plot(0, 0, type = "n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k]," vs ",class[l], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
+            	colvect <- NULL
+           		for (j in 1:length(classnames[[k]])) {
       
-              tic <- TIC[[classnames[[k]][j]]]
-              # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
-              points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
-              colvect<-append(colvect,cols[classnames[[k]][j]])
-            }
-          for (j in 1:length(classnames[[l]])) {
-          # i=class2names[j]
-          tic <- TIC[[classnames[[l]][j]]]
-          points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
-          colvect<-append(colvect,cols[classnames[[l]][j]])
-          }
-          legend("topright",paste(basename(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
-        }
-      }
+              		tic <- TIC[[classnames[[k]][j]]]
+              		# points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
+              		points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type = "l")
+              		colvect <- append(colvect,cols[classnames[[k]][j]])
+            	}
+          		for (j in 1:length(classnames[[l]])) {
+          			# i=class2names[j]
+          			tic <- TIC[[classnames[[l]][j]]]
+          			points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type = "l")
+          			colvect <- append(colvect,cols[classnames[[l]][j]])
+          		}
+          		legend("topright",paste(names(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
+        	}
+      	}
     }#end if length >2
-    if (length(class)==2){
-        k=1
-		l=2
-        colvect<-NULL
-        plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k],"vs",class[l], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
+    
+    if (length(class) == 2){
+        k = 1
+		l = 2
+        colvect <- NULL
+        plot(0, 0, type = "n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k],"vs",class[l], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
 
-       for (j in 1:length(classnames[[k]])) {
+       	for (j in 1:length(classnames[[k]])) {
 
-          tic <- TIC[[classnames[[k]][j]]]
-          # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
-          points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
-          colvect<-append(colvect,cols[classnames[[k]][j]])
+          	tic <- TIC[[classnames[[k]][j]]]
+          	# points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
+          	points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type = "l")
+          	colvect <- append(colvect,cols[classnames[[k]][j]])
         }
-      for (j in 1:length(classnames[[l]])) {
-          # i=class2names[j]
-          tic <- TIC[[classnames[[l]][j]]]
-          points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
-          colvect<-append(colvect,cols[classnames[[l]][j]])
-      }
-      legend("topright",paste(basename(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
+      	for (j in 1:length(classnames[[l]])) {
+          	# i=class2names[j]
+          	tic <- TIC[[classnames[[l]][j]]]
+          	points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type = "l")
+          	colvect <- append(colvect,cols[classnames[[l]][j]])
+      	}
+      	legend("topright",paste(names(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
 
     }#end length ==2
-       if (length(class)==1){
-        k=1
+    
+    if (length(class) == 1){
+        k = 1
 		ylim = range(sapply(TIC, function(x) range(x[,2])))
-        colvect<-NULL
-        plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
+        colvect <- NULL
+        plot(0, 0, type = "n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
 
-       for (j in 1:length(classnames[[k]])) {
+       	for (j in 1:length(classnames[[k]])) {
 
-          tic <- TIC[[classnames[[k]][j]]]
-          # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
-          points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
-          colvect<-append(colvect,cols[classnames[[k]][j]])
+          	tic <- TIC[[classnames[[k]][j]]]
+          	# points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
+          	points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type = "l")
+          	colvect <- append(colvect,cols[classnames[[k]][j]])
         }
       
-      legend("topright",paste(basename(files[c(classnames[[k]])])), col = colvect, lty = lty, pch = pch)
+        legend("topright",paste(names(files[c(classnames[[k]])])), col = colvect, lty = lty, pch = pch)
 
     }#end length ==1
     dev.off()
@@ -125,8 +141,8 @@ getBPC2s <- function (files, pdfname="BPCs.pdf", rt = c("raw","corrected"), scan
 }
 
 getTIC <- function(file,rtcor=NULL) {
-     object <- xcmsRaw(file)
-     cbind(if (is.null(rtcor)) object@scantime else rtcor, rawEIC(object,mzrange=range(object@env$mz))$intensity)
+    object <- xcmsRaw(file)
+    cbind(if (is.null(rtcor)) object@scantime else rtcor, rawEIC(object,mzrange=range(object@env$mz))$intensity)
 }
 
 ##
@@ -147,10 +163,11 @@ getTIC2s <- function(files, pdfname="TICs.pdf", rt=c("raw","corrected")) {
 
     for (i in 1:N) {
         cat(files[i],"\n")
-        if (!is.null(xcmsSet) && rt == "corrected")
-            rtcor <- xcmsSet@rt$corrected[[i]]
-        else
-            rtcor <- NULL
+        if (!is.null(xcmsSet) && rt == "corrected"){
+        	rtcor <- xcmsSet@rt$corrected[[i]]
+        }else{
+        	rtcor <- NULL
+        }
         TIC[[i]] <- getTIC(files[i],rtcor=rtcor)
     }
  
@@ -184,12 +201,12 @@ getTIC2s <- function(files, pdfname="TICs.pdf", rt=c("raw","corrected")) {
                     points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
                     colvect<-append(colvect,cols[classnames[[l]][j]])
                 }
-                legend("topright",paste(basename(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
+                legend("topright",paste(names(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
             }
         }
     }#end if length >2
+    
     if (length(class)==2){
-
 
         k=1
         l=2
@@ -209,9 +226,10 @@ getTIC2s <- function(files, pdfname="TICs.pdf", rt=c("raw","corrected")) {
             points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
             colvect<-append(colvect,cols[classnames[[l]][j]])
         }
-        legend("topright",paste(basename(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
+        legend("topright",paste(names(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
 
     }#end length ==2
+
     if (length(class)==1){
         k=1
         ylim = range(sapply(TIC, function(x) range(x[,2])))
@@ -226,9 +244,10 @@ getTIC2s <- function(files, pdfname="TICs.pdf", rt=c("raw","corrected")) {
             colvect<-append(colvect,cols[classnames[[k]][j]])
         }
 
-        legend("topright",paste(basename(files[c(classnames[[k]])])), col = colvect, lty = lty, pch = pch)
+        legend("topright",paste(names(files[c(classnames[[k]])])), col = colvect, lty = lty, pch = pch)
 
     }#end length ==1
+
     dev.off()
 
     # invisible(TIC)
@@ -242,18 +261,17 @@ getTIC2s <- function(files, pdfname="TICs.pdf", rt=c("raw","corrected")) {
 
 plotUnknowns<-function(resGC, unkn=""){
 
-
     ##Annotation table each value is a pcgrp associated to the unknown 
     ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
     ##R. Wehrens give me some clues on that and we found a correction
     #if unkn="none"
 	
 	if(unkn=="none") {
-	   pdf("Unknown_Empty.pdf")
-	   plot.new()
-	   text(x=0.5,y=1,pos=1, labels="No EIC ploting required")
-	   dev.off()
-	}else {
+	   	pdf("Unknown_Empty.pdf")
+	   	plot.new()
+	   	text(x=0.5,y=1,pos=1, labels="No EIC ploting required")
+	   	dev.off()
+	}else{
 
 		mat<-matrix(ncol=length(resGC$xset), nrow=dim(resGC$PeakTable)[1])
 		 
@@ -278,15 +296,12 @@ plotUnknowns<-function(resGC, unkn=""){
 		#correction of annotation matrix due to pcgrp removal by quality check in runGCresult
 		#matrix of correspondance between an@pspectra and filtered pspectra from runGC
 
-		allPCGRPs <-
-			lapply(1:length(resGC$xset),
-				function(i) {
-					an <- resGC$xset[[i]]
-					huhn <- an@pspectra[which(sapply(an@pspectra, length) >=
-					metaSetting(resGC$settings,
-					"DBconstruction.minfeat"))]
-					matCORR<-cbind(1:length(huhn), match(huhn, an@pspectra))
-				})
+		allPCGRPs <- lapply(1:length(resGC$xset),
+						function(i) {
+							an <- resGC$xset[[i]]
+							huhn <- an@pspectra[which(sapply(an@pspectra, length) >= metaSetting(resGC$settings,"DBconstruction.minfeat"))]
+							matCORR<-cbind(1:length(huhn), match(huhn, an@pspectra))
+						})
 
 		if (unkn[1]==""){    
 		#plot EIC and spectra for all unknown for comparative purpose
@@ -346,7 +361,7 @@ plotUnknowns<-function(resGC, unkn=""){
 								text(0.5, 0.5, "NOT FOUND", cex=2)
 							}
 						}
-					 }
+					}
 					# my.plots[[i]] <- recordPlot()
 				}
 				graphics.off()
@@ -500,38 +515,32 @@ plotUnknowns<-function(resGC, unkn=""){
 } #end function 
 
 # This function get the raw file path from the arguments
-getRawfilePathFromArguments <- function(singlefile, zipfile, listArguments) {
-    if (!is.null(listArguments[["zipfile"]]))           zipfile = listArguments[["zipfile"]]
-    if (!is.null(listArguments[["zipfilePositive"]]))   zipfile = listArguments[["zipfilePositive"]]
-    if (!is.null(listArguments[["zipfileNegative"]]))   zipfile = listArguments[["zipfileNegative"]]
+#@author Gildas Le Corguille lecorguille@sb-roscoff.fr
+getRawfilePathFromArguments <- function(singlefile, zipfile, args, prefix="") {
 
-    if (!is.null(listArguments[["singlefile_galaxyPath"]])) {
-        singlefile_galaxyPaths = listArguments[["singlefile_galaxyPath"]];
-        singlefile_sampleNames = listArguments[["singlefile_sampleName"]]
-    }
-    if (!is.null(listArguments[["singlefile_galaxyPathPositive"]])) {
-        singlefile_galaxyPaths = listArguments[["singlefile_galaxyPathPositive"]];
-        singlefile_sampleNames = listArguments[["singlefile_sampleNamePositive"]]
-    }
-    if (!is.null(listArguments[["singlefile_galaxyPathNegative"]])) {
-        singlefile_galaxyPaths = listArguments[["singlefile_galaxyPathNegative"]];
-        singlefile_sampleNames = listArguments[["singlefile_sampleNameNegative"]]
-    }
-    if (exists("singlefile_galaxyPaths")){
-        singlefile_galaxyPaths = unlist(strsplit(singlefile_galaxyPaths,","))
-        singlefile_sampleNames = unlist(strsplit(singlefile_sampleNames,","))
+  if (!(prefix %in% c("","Positive","Negative","MS1","MS2", "XSET"))) stop("prefix must be either '', 'Positive', 'Negative', 'MS1' ,'MS2' or 'XSET'")
 
-        singlefile=NULL
-        for (singlefile_galaxyPath_i in seq(1:length(singlefile_galaxyPaths))) {
-            singlefile_galaxyPath=singlefile_galaxyPaths[singlefile_galaxyPath_i]
-            singlefile_sampleName=singlefile_sampleNames[singlefile_galaxyPath_i]
-            singlefile[[singlefile_sampleName]] = singlefile_galaxyPath
-        }
+  if (!is.null(args[[paste0("zipfile",prefix)]])) zipfile <- args[[paste0("zipfile",prefix)]]
+
+  if (!is.null(args[[paste0("singlefile_galaxyPath",prefix)]])) {
+    singlefile_galaxyPaths <- args[[paste0("singlefile_galaxyPath",prefix)]]
+    singlefile_sampleNames <- args[[paste0("singlefile_sampleName",prefix)]]
+  }
+
+  if (exists("singlefile_galaxyPaths")){
+    singlefile_galaxyPaths <- unlist(strsplit(singlefile_galaxyPaths,"\\|"))
+    singlefile_sampleNames <- unlist(strsplit(singlefile_sampleNames,"\\|"))
+
+    singlefile <- NULL
+    for (singlefile_galaxyPath_i in seq(1:length(singlefile_galaxyPaths))) {
+      singlefile_galaxyPath <- singlefile_galaxyPaths[singlefile_galaxyPath_i]
+      singlefile_sampleName <- singlefile_sampleNames[singlefile_galaxyPath_i]
+      # In case, an url is used to import data within Galaxy
+      singlefile_sampleName <- tail(unlist(strsplit(singlefile_sampleName,"/")), n=1)
+      singlefile[[singlefile_sampleName]] <- singlefile_galaxyPath
     }
-    for (argument in c("zipfile","zipfilePositive","zipfileNegative","singlefile_galaxyPath","singlefile_sampleName","singlefile_galaxyPathPositive","singlefile_sampleNamePositive","singlefile_galaxyPathNegative","singlefile_sampleNameNegative")) {
-        listArguments[[argument]]=NULL
-    }
-    return(list(zipfile=zipfile, singlefile=singlefile, listArguments=listArguments))
+  }
+  return(list(zipfile=zipfile, singlefile=singlefile))
 }
 
 
@@ -578,3 +587,33 @@ retrieveRawfileInTheWorkingDirectory <- function(singlefile, zipfile) {
     return (directory)
 }
 
+#This function list the compatible files within the directory as xcms did
+#@author Gildas Le Corguille lecorguille@sb-roscoff.fr ABiMS TEAM
+getMSFiles <- function (directory) {
+    filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]","[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
+    filepattern <- paste(paste("\\.", filepattern, "$", sep=""),collapse="|")
+    info <- file.info(directory)
+    listed <- list.files(directory[info$isdir], pattern=filepattern,recursive=TRUE, full.names=TRUE)
+    files <- c(directory[!info$isdir], listed)
+    exists <- file.exists(files)
+    files <- files[exists]
+    return(files)
+}
+
+# This function retrieve a xset like object
+#@author Gildas Le Corguille lecorguille@sb-roscoff.fr
+getxcmsSetObject <- function(xobject) {
+    # XCMS 1.x
+    if (class(xobject) == "xcmsSet")
+        return (xobject)
+    # XCMS 3.x
+    if (class(xobject) == "XCMSnExp") {
+        # Get the legacy xcmsSet object
+        suppressWarnings(xset <- as(xobject, 'xcmsSet'))
+        if (!is.null(xset@phenoData$sample_group))
+            sampclass(xset) <- xset@phenoData$sample_group
+        else
+            sampclass(xset) <- "."
+        return (xset)
+    }
+}
