@@ -15,10 +15,12 @@
     <command><![CDATA[
     LC_ALL=C Rscript $__tool_directory__/new_metaMS.r
         
-        #set xset_files = '|'.join( [ str( $single_file ) for $single_file in $xset ] )
-            singlefile_galaxyPathXSET '$xset_files'
-        #set XsetListFileName = '|'.join( [ str( $single_file.name ) for $single_file in $xset ] )
-            singlefile_sampleNameXSET '$XsetListFileName'
+        #if $input.is_of_type("rdata.xcms.raw") or $input.is_of_type("rdata.xcms.group") or $input.is_of_type("rdata.xcms.retcor") or $input.is_of_type("rdata"):
+            singlefile_galaxyPath '$input' singlefile_sampleName '$input.name'
+        #else
+            zipfile '$input'
+        #end if
+
         
    		#if $settings.setting == "gcdefault":
 		    settings "default"
@@ -62,10 +64,15 @@
 		   unkn "c($unkn)"
 		#end if
          
+        ;
+        return=\$?;
+        cat 'rungc.log.txt';
+        sh -c "exit \$return"
+
     ]]></command>
     
     <inputs>
-        <param name="xset" type="data" format="rdata.xcms.raw,rdata.xcms.group,rdata.xcms.retcor,rdata" label="Rdata from xcms.xcmsSet" help="Rdata file containing a xset object" multiple="true"/>
+        <param name="input" type="data" format="rdata.xcms.findchrompeaks,rdata.xcms.group,no_unzip.zip,zip" label="Rdata from xcms.xcmsSet" help="Rdata file containing a xset object"/>
 	    <conditional name="settings">
             <param name="setting" type="select" label="Settings" help="Choose the settings used for finding peaks" >
 			    <option value="gcdefault" selected="true">GC_Default</option>
@@ -176,7 +183,7 @@
     
     <tests>
         <test>
-            <param name="xset" value="W4M_GCMS_Dataset.zip"  ftype="zip" />
+            <param name="input" value="W4M_GCMS_Dataset.zip"  ftype="zip" />
             <param name="settings|setting" value="gcdefault" />
             <param name="settings|options_rtrange|option" value="hide" />
             <param name="settings|options_db|option" value="hide" />

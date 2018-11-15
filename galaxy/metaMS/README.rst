@@ -1,4 +1,12 @@
-TODO : Update tests
+- DONE separate in 2 tools
+
+- TODO verify the parameters in each tool
+
+- TODO why EIC doesn't work ?
+
+- TODO udpate test data files
+
+- TODO update tests 
 
 Changelog/News
 --------------
