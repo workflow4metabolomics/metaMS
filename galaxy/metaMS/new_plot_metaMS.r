@@ -46,7 +46,7 @@ cat("\n\n")
 
 
 # ----- INFILE PROCESSING -----
-cat("\tINFILE PROCESSING INFO\n")
+cat("\tINFILE PROCESSING INFO\n\n")
 
 # Loading RData file
 load(args[["metaMS"]])
@@ -74,12 +74,20 @@ cat("\nProcessing BPCs...\n")
 if(!is.null(singlefile)){
     print("singlefile BPC")
     files <- paste("./",names(singlefile),sep="")
-    c <- getBPC2s(files = files, xset = xset, rt="raw", pdfname="BPCs_raw.pdf")
+    if(!is.null(files)){
+        c <- getBPC2s(files = files, xset = xset, rt="raw", pdfname="BPCs_raw.pdf")
+    }else{
+        print("Error files is empty")
+    }
 }
 if(!is.null(zipfile)){
     print("zipfile BPC")
-    files <- paste("./",names(zipfile),sep="")    
-    c <- getBPC2s(files = files, rt="raw", pdfname="BPCs_raw.pdf")  
+    files <- getMSFiles(directory)
+    if(!is.null(files)){
+        c <- getBPC2s(files = files, rt="raw", pdfname="BPCs_raw.pdf") 
+    }else{
+        print("Error files is empty")
+    } 
 }
 cat("BPC created...\n")
 
@@ -87,12 +95,20 @@ cat("\nProcessing TICs...\n")
 if(!is.null(singlefile)){
     print("singlefile TIC")
     files <- paste("./",names(singlefile),sep="")
-    b <- getTIC2s(files = files, xset = xset, rt="raw", pdfname="TICs_raw.pdf")
+    if(!is.null(files)){
+        b <- getTIC2s(files = files, xset = xset, rt="raw", pdfname="TICs_raw.pdf")
+    }else{
+        print("Error files is empty")
+    }
 }
 if(!is.null(zipfile)){
     print("zipfile TIC")
-    files <- paste("./",names(zipfile),sep="")
-   b <- getTIC2s(files = files, rt="raw", pdfname="TICs_raw.pdf")  
+    files <- getMSFiles(directory)
+    if(!is.null(files)){
+        b <- getTIC2s(files = files, rt="raw", pdfname="TICs_raw.pdf")  
+    }else{
+        print("Error files is empty")
+    }
 }
 cat("TIC created...\n")
 

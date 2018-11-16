@@ -107,30 +107,8 @@ if (args[["settings"]]=="default") {
         TSQXLS.GC@match2DB.RIdiff<-as.numeric(RIshift)
         TSQXLS.GC@betweenSamples.timeComparison<-"RI"
         TSQXLS.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
-    }
-    
+    } 
     nSlaves=args[["nSlaves"]]
-
-    #if(!is.null(xset)){
-    #    settingslist=TSQXLS.GC
-    #    if (class(xset.l[[1]])!="xsAnnotate"){
-    #        cat("Process xsAnnotate...\n")
-    #        xset<-lapply(xset.l,
-    #             function(x) {
-    #               y <- xsAnnotate(x, sample = 1)
-    #               capture.output(z <- groupFWHM(y, perfwhm = settingslist@CAMERA$perfwhm),
-    #                              file = NULL)
-    #               z})
-    #       
-    #    }
-    #
-    #    #default settings for GC from Wehrens et al
-    #    cat("Process metaMS...\n")
-    #    resGC<-runGC(xset = xset, settings = TSQXLS.GC, rtrange = rtrange, DB = DBarg, removeArtefacts = TRUE, 
-    #                findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves) 
-    #}else{
-    #    print("There is no xset")
-    #}
 }
 
 if (args[["settings"]]=="User_defined") {
@@ -180,13 +158,12 @@ if (args[["settings"]]=="User_defined") {
                 minfeat = minfeatparam)
                 
     #to used if contaminant filter
-    
-        # metaSetting(GALAXY.GC, "matchIrrelevants") <- list(
-                    # irrelevantClasses = c("Bleeding", "Plasticizers"),
-                    # timeComparison = "RI",
-                    # RIdiff = RIdiffparam,    
-                    # rtdiff = rtdiffparam,
-                    # simthresh = simthreshparam)
+    # metaSetting(GALAXY.GC, "matchIrrelevants") <- list(
+        # irrelevantClasses = c("Bleeding", "Plasticizers"),
+        # timeComparison = "RI",
+        # RIdiff = RIdiffparam,    
+        # rtdiff = rtdiffparam,
+        # simthresh = simthreshparam)
     
     metaSetting(GALAXY.GC, "betweenSamples") <- list(
                 min.class.fraction = minclassfractionparam,
@@ -203,32 +180,13 @@ if (args[["settings"]]=="User_defined") {
         GALAXY.GC@betweenSamples.timeComparison<-"RI"
         GALAXY.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
     }
-        # files, xset, settings, rtrange = NULL, DB = NULL,
-       # removeArtefacts = TRUE, findUnknowns = nexp > 1,
-       # returnXset = FALSE, RIstandards = NULL, nSlaves = 0
+    # files, xset, settings, rtrange = NULL, DB = NULL,
+    # removeArtefacts = TRUE, findUnknowns = nexp > 1,
+    # returnXset = FALSE, RIstandards = NULL, nSlaves = 0
     if (!is.null(DBarg)){
         manual <- read.msp(DBarg)
         DBarg <- createSTDdbGC(stdInfo = NULL, settings = GALAXY.GC, manualDB = manual)
     }
-    #if (!args[["zipfile"]]=="") {
-    #    resGC<-runGC(files = samples, settings = GALAXY.GC, rtrange = rtrange, DB = DBarg , removeArtefacts = TRUE, 
-    #                findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
-    #}
-    #if(!is.null(xset)) {
-    #    settingslist=GALAXY.GC
-    #    if (class(xset.l[[1]])!="xsAnnotate") {
-    #        print("Process xsAnnotate")
-    #        xset<-lapply(xset.l,
-    #             function(x) {
-    #               y <- xsAnnotate(x, sample = 1)
-    #               capture.output(z <- groupFWHM(y, perfwhm = settingslist@CAMERA$perfwhm),
-    #                              file = NULL)
-    #               z})
-    #       
-    #    }
-    #    resGC<-runGC(xset = xset, settings = GALAXY.GC, rtrange = rtrange, DB = DBarg, removeArtefacts = TRUE, 
-    #                findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
-    #}
 }
 
 
@@ -257,25 +215,17 @@ cat("\t\tCOMPUTE\n")
 
 if (!is.null(args[["zipfile"]])){
     cat("Loading from zip file...\n")
-    
-    #Get the full path to the files
-    files <- unzip(args[["zipfile"]])
-    cat("Processing",length(files),"files...\n",files,"\n")
-
-    #Add files in args but why ??
-    args=append(list(files), args)
 
     #Searching for good files
-    filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]","[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
-    filepattern <- paste(paste("\\.", filepattern, "$", sep = ""),collapse = "|") 
+    samples <- getMSFiles(directory)
+    cat("Processing",length(samples),"files...\n")
 
-    samples<-files[grep(filepattern, files)]
-    # cat(samples) #debugg
     #create sampleMetadata, get sampleMetadata and class
     sampleMetadata<-xcms:::phenoDataFromPaths(samples)
     sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
     row.names(sampleMetadata)<-NULL
 
+    print("Process runGC with metaMS package from raw files...")
     if(args[["settings"]]=="default") {
         resGC<-runGC(files = samples, settings = TSQXLS.GC, rtrange = rtrange, DB = DBarg , removeArtefacts = TRUE, 
                  findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
@@ -284,57 +234,20 @@ if (!is.null(args[["zipfile"]])){
         resGC<-runGC(files = samples, settings = GALAXY.GC, rtrange = rtrange, DB = DBarg , removeArtefacts = TRUE, 
                  findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
     }
-    print("RunGC with zip input")
-    
-
-    #Merge all xset from zip directory
-    #allxset <- vector("list",length(samples))
-    #for(i in 1:length(samples)){
-    #    cat(samples[[i]],"\n")
-    #    load(samples[i])
-    #    if(!exists("xset")){
-    #        if(exists("xdata")){
-    #            xset<-getxcmsSetObject(xdata)
-    #        }else{
-    #            print("no xset and no xdata... Probably a problem")
-    #        }
-    #    }
-    #    print(xset)
-    #    allxset[[i]] <- new("xcmsSet")
-    #    allxset[[i]]@peaks<-xset@peaks[which(xset@peaks[,"sample"]==i),]
-    #    df<-data.frame(class=xset@phenoData[i,])
-    #    print(df)
-    #    rownames(df)<-rownames(xset@phenoData)[i]
-    #    allxset[[i]]@phenoData<-df
-    #    allxset[[i]]@rt$raw<-xset@rt$raw[[i]]
-    #    allxset[[i]]@rt$corrected<-xset@rt$corrected[[i]]
-    #    allxset[[i]]@filepaths<-xset@filepaths[i]
-    #    allxset[[i]]@profinfo<-xset@profinfo
-    #}
 
 } else if(!is.null(args[["singlefile_galaxyPath"]])){ 
-    #CASE 3 from xset is an .RData file necessary to use the xcmsSet object generated by xcms.xcmsSet given by previous tools
-    print("Loading from file(s)...")
+    print("Loading from XCMS file(s)...")
     load(args[["singlefile_galaxyPath"]])
     if(!exists("xset")){
         if(exists("xdata")){
             xset<-getxcmsSetObject(xdata)
         }else{
-            print("no xset and no xdata... Probably a problem")
+            error_message="no xset and no xdata... Probably a problem"
+            print(error_message)
+            stop(error_message)
         }
     }
     if (class(xset)=="xcmsSet"){
-
-#    #treat case where Rdata came from xcmsSet with zip file entry
-#    if(exists("zip_file")){
-#        if (zip_file!=""){
-#            directory=unzip(zip_file)
-#            print("CASE 3 from xset and with ZIP input")
-#        } else {
-#            print("CASE 3 from xset and with LIBRARY input")
-#        }
-#    }
-#    #end zip file case
         if (length(xset@rt$raw)>1){
             #create an exceptable list of xset for metaMS
             xset.l<-vector("list",length(xset@rt$raw))
@@ -364,7 +277,7 @@ if (!is.null(args[["zipfile"]])){
     if(args[["settings"]]=="default"){
         settingslist=TSQXLS.GC
         if (class(xset.l[[1]])!="xsAnnotate"){
-            cat("Process xsAnnotate...\n")
+            cat("Process xsAnnotate with CAMERA package...\n")
             xsetCAM<-lapply(xset.l,
                  function(x) {
                    y <- xsAnnotate(x, sample = 1)
@@ -375,7 +288,7 @@ if (!is.null(args[["zipfile"]])){
         }
     
         #default settings for GC from Wehrens et al
-        cat("Process metaMS...\n")
+        cat("Process runGC with metaMS package...\n")
         resGC<-runGC(xset = xsetCAM, settings = TSQXLS.GC, rtrange = rtrange, DB = DBarg, removeArtefacts = TRUE, 
                     findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves) 
     }else{

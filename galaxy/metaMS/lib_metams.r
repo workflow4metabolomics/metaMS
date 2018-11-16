@@ -47,7 +47,6 @@ getBPC2s <- function (files, xset = NULL, pdfname = "BPCs.pdf", rt = c("raw","co
     }
     
     N <- dim(sampleMetadata)[1]
-    print(N)
     TIC <- vector("list",N)
 
     for (j in 1:N) {
@@ -79,7 +78,6 @@ getBPC2s <- function (files, xset = NULL, pdfname = "BPCs.pdf", rt = c("raw","co
     if (length(class) > 2){
       	for (k in 1:(length(class)-1)){
         	for (l in (k+1):length(class)){
-            	print(paste(class[k],"vs",class[l],sep = " ")) 
             	plot(0, 0, type = "n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k]," vs ",class[l], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
             	colvect <- NULL
            		for (j in 1:length(classnames[[k]])) {
@@ -199,7 +197,6 @@ getTIC2s <- function(files, xset = NULL, pdfname="TICs.pdf", rt=c("raw","correct
     if (length(class) > 2){
         for (k in 1:(length(class)-1)){
             for (l in (k+1):length(class)){
-                print(paste(class[k],"vs",class[l],sep=" ")) 
                 plot(0, 0, type = "n", xlim = xlim/60, ylim = ylim, main = paste("Total Ion Chromatograms \n","TICs_",class[k]," vs ",class[l], sep = ""), xlab = "Retention Time (min)", ylab = "TIC")
                 colvect <- NULL
                 for (j in 1:length(classnames[[k]])) {
