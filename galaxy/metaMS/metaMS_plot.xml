@@ -1,0 +1,243 @@
+ <tool id="plot_metaMS" name="plot_metaMS" version="3.0.0">
+       
+    <description>GC-MS data preprocessing using metaMS package</description>
+    
+    <requirements>
+        <requirement type="package" version="1.14.0">bioconductor-metams</requirement>
+        <requirement type="package" version="3.0.0">bioconductor-xcms</requirement>
+        <requirement type="package" version="1.1_4">r-batch</requirement>
+    </requirements>
+    
+    <stdio>
+        <exit_code range="1:" level="fatal" />
+    </stdio>
+    
+    <command><![CDATA[
+    LC_ALL=C Rscript $__tool_directory__/metaMS_plot.r
+        
+        metaMS $metaMS
+        
+        ;
+        return=\$?;
+        cat 'plot_metaMS.log';
+        sh -c "exit \$return"
+
+    ]]></command>
+    
+    <inputs>
+
+        <param name="metaMS" type="data" format="rdata" label="Rdata from new_metaMS_runGC" help="Rdata file containing a metaMS preprocess object" />
+    
+    </inputs>
+    
+    <outputs>
+    
+        <data name="ticsRawPdf"   format="pdf" from_work_dir="TICs_raw.pdf" label="TICs_raw.pdf" />
+        <data name="bpcsRawPdf"   format="pdf" from_work_dir="BPCs_raw.pdf" label="BPCs_raw.pdf" />
+        <data name="log" format="txt" from_work_dir="plot_metaMS.log" label="plot_metaMS.log" />
+
+    </outputs>
+    
+    <tests>
+        <test>
+            <param name="metaMS" value="runGC.rdata"  ftype="rdata" />
+            <param name="settings|setting" value="gcdefault" />
+            <param name="settings|options_rtrange|option" value="hide" />
+            <param name="settings|options_db|option" value="hide" />
+            <param name="settings|options_ri|option" value="hide" />
+            <output name="sampleMetadata" file="sampleMetadata.tsv" />
+            <output name="variableMetadata" file="variableMetadata.tsv" />
+            <output name="dataMatrix" file="dataMatrix.tsv" lines_diff="6" />
+        </test>
+    </tests>
+    
+    <help>
+	
+TODO : Update the different tests
+TODO : Verify the differents tests
+TODO : Update the help section
+	
+.. class:: infomark
+
+**Author(s)**  Ron Wehrens (ron.wehrens@gmail.com), Georg Weingart, Fulvio Mattivi
+
+.. class:: infomark
+
+**Galaxy wrapper and scripts developpers** Guitton Yann LABERCA yann.guitton@oniris-nantes.fr
+
+.. class:: infomark
+
+**Please cites**  
+ 
+ metaMS : Wehrens, R.; Weingart, G.; Mattivi, F. Journal of Chromatography B.
+
+ xcms :   Smith, C. A.; Want, E. J.; O’Maille, G.; Abagyan, R.; Siuzdak, G. Anal. Chem. 2006, 78, 779–787.
+
+ CAMERA :	Kuhl, C.; Tautenhahn, R.; Böttcher, C.; Larson, T. R.; Neumann, S. Analytical Chemistry 2012, 84, 283–289.
+
+
+---------------------------------------------------
+
+====================
+metaMS.runGC
+====================
+
+-----------
+Description
+-----------
+metaMS.runGC is a function dedicated to GCMS data processing from converted files to the generation of pseudospectra (compounds) table.
+Current version for metaMS R package: 1.14.0
+
+**Process:** 
+Each of the converted data (cdf, mzML...)  is profiled by a combination of xcms and CAMERA functions. Then all the mass spectra of detected peaks are compared and clustered.
+For more details see metaMS : Wehrens, R.; Weingart, G.; Mattivi, F. Journal of Chromatography B (10.1016/j.jchromb.2014.02.051) link_
+
+.. _link: http://www.sciencedirect.com/science/article/pii/S1570023214001548
+
+**Main outputs:**
+A PeakTable is generated with one line per "compound" and one column per sample. 
+A dataMatrix.csv file is generated and can be used for PCA or for further analysis.
+A peakspectra.mps file is generated that contains all the spectra of the detected compounds in MSP format. That file can be used for database search online (Golm, MassBank) or locally (NIST MSSEARCH)
+for NIST search a tutorial is available here_.
+
+.. _here: http://web11.sb-roscoff.fr/download/w4m/howto/w4m_HowToUseNIST_V01.pdf
+
+3 PDF are generated for BPCs, TICs and EICs of detected compounds in all samples
+
+  
+
+-----------------
+Workflow position
+-----------------
+
+
+**Upstream tools**
+
+You can start from here or use result file from :
+
+========================= ==================== ======= ==========
+Name                      output file          format  parameter
+========================= ==================== ======= ==========
+xcms.xcmsSet              xset.RData RData     RData   file            			
+========================= ==================== ======= ==========
+
+
+
+**Downstream tools**
+
++---------------------------+---------------------------------------+--------+
+| Name                      | Output file                           | Format |
++===========================+=======================================+========+
+|Determine Vdk or Lowess    |                        dataMatrix.tsv | Tabular|
++---------------------------+---------------------------------------+--------+
+|Normalization Vdk/Lowess   |                        dataMatrix.tsv | Tabular|
++---------------------------+---------------------------------------+--------+
+|Anova                      |                        dataMatrix.tsv | Tabular|
++---------------------------+---------------------------------------+--------+
+|PCA                        |                        dataMatrix.tsv | Tabular|
++---------------------------+---------------------------------------+--------+
+|Hierarchical Clustering    |                        dataMatrix.tsv | Tabular|
++---------------------------+---------------------------------------+--------+
+|Golm Metabolome Search     |                       peakspectra.msp | Text   |
++---------------------------+---------------------------------------+--------+
+
+**General schema of the metabolomic workflow for GCMS**
+
+.. image:: ./static/images/gcms_workflow.png
+
+-----------
+Input files
+-----------
+
+If you choose to use results from xcms.xcmsSet
+
++---------------------------+------------+
+| Parameter : num + label   |   Format   |
++===========================+============+
+| 1 : RData file            |   RData    |
++---------------------------+------------+
+
+Or converted GCMS files (mzML, CDF...) in your local libray 
+
+
+----------
+Parameters
+----------
+
+Parameters are described in metaMS R package and mainly correspond to those of xcms.xcmsSet
+
+----------
+Outputs
+----------
+
+The output file **dataMatrix.tsv** is an tabular file. You can continue your analysis using it in the statistical tools.
+The output file **peakspectra.msp** is a text file. You can continue your analysis using it in the golm search tool. Or you can load it in your 
+personnal NIST MSsearch program (c:/NISTXX/mssearch/nistms.exe) that tool is in general installed by default on GCMS apparatus. Tutorial available here_.
+
+.. _here:  http://web11.sb-roscoff.fr/download/w4m/howto/w4m_HowToUseNIST_V01.pdf
+
+
+----------------
+Working Exemple
+----------------
+.. class:: warningmark  
+
+**Reference Data for testing are taken from:**
+Dittami,S.M. et al. (2012) Towards deciphering dynamic changes and evolutionary mechanisms involved in the adaptation to low salinities in Ectocarpus (brown algae): Adaptation to low salinities in Ectocarpus. The Plant Journal
+
+Input files
+-----------
+
+    | **Zip file** -> GCMS_Idealg_FWS_SWS.zip
+
+Parameters
+----------
+
+    | Settings -> **User_Defined**
+    | RT range option -> **show**
+        | RTrange: -> **4.5,45**
+    | ...all default option values
+
+
+Output files
+------------
+
+    | **1) rungc.RData: RData file**
+
+    | **2) Example of BPCs_raw.pdf (Base Peak Chromatograms) :**
+
+.. image:: ./static/images/metaMS_BPCs.png
+
+
+
+---------------------------------------------------
+
+Changelog/News
+--------------
+
+**Verion 2.2.0 - 02/03/2018**
+
+- Upgrade metaMS from 1.8 to 1.14
+
+**Version 2.1 - 08/06/2017**
+
+- Quality: add sessionInfo logs with packages versions
+- Processing: add RI usage 
+
+**Version 1.1 - 11/07/2016**
+
+- TEST: refactoring to pass planemo test using conda dependencies
+
+
+**Version 1.0 - 01/06/2015**
+
+- NEW: new tool
+
+    </help>
+
+    <citations>
+        <citation type="doi">10.1016/j.jchromb.2014.02.051</citation>
+        <citation type="doi">10.1093/bioinformatics/btu813</citation>
+    </citations>
+
+</tool>

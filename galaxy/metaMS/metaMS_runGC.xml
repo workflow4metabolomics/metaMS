@@ -1,4 +1,4 @@
- <tool id="new_metams_runGC" name="new_metaMS.runGC" version="3.0.0">
+ <tool id="metams_runGC" name="metaMS.runGC" version="3.0.0">
        
     <description>GC-MS data preprocessing using metaMS package</description>
     
@@ -13,7 +13,7 @@
     </stdio>
     
     <command><![CDATA[
-    LC_ALL=C Rscript $__tool_directory__/new_metaMS.r
+    LC_ALL=C Rscript $__tool_directory__/metaMS_runGC.r
         
         #if $input.is_of_type("rdata.xcms.raw") or $input.is_of_type("rdata.xcms.group") or $input.is_of_type("rdata.xcms.retcor") or $input.is_of_type("rdata"):
             singlefile_galaxyPath '$input' singlefile_sampleName '$input.name'
@@ -66,7 +66,7 @@
          
         ;
         return=\$?;
-        cat 'rungc.log.txt';
+        cat 'metams.log';
         sh -c "exit \$return"
 
     ]]></command>
@@ -171,14 +171,12 @@
     <outputs>
     
         <data name="peaktable" format="tabular" from_work_dir="peaktable.tsv" label="peaktable.tsv" />
-        <!--  <data name="peaktable_PCA" format="tabular" from_work_dir="peaktable_PCA.tsv" label="peaktable_PCA.tsv" />
-        -->
         <data name="sampleMetadata" format="tabular" from_work_dir="sampleMetadata.tsv" label="sampleMetadata.tsv" />
         <data name="variableMetadata" format="tabular" from_work_dir="variableMetadata.tsv" label="variableMetadata.tsv" />
         <data name="dataMatrix" format="tabular" from_work_dir="dataMatrix.tsv" label="dataMatrix.tsv" />
         <data name="peakspectra" format="txt" from_work_dir="peakspectra.msp" label="peakspectra.msp" />
-        <data name="rungcRData" format="rdata" from_work_dir="runGC.RData" label="rungc.RData" />
-        <data name="log" format="txt" from_work_dir="metams.log" label="rungc.log.txt" />
+        <data name="rungcRData" format="rdata" from_work_dir="runGC.RData" label="runGC.RData" />
+        <data name="log" format="txt" from_work_dir="metams.log" label="metams.log" />
     </outputs>
     
     <tests>
@@ -195,8 +193,11 @@
     </tests>
     
     <help>
-	
-	
+
+TODO : Update the different tests
+TODO : Verify the differents tests
+TODO : Update the help section
+
 .. class:: infomark
 
 **Author(s)**  Ron Wehrens (ron.wehrens@gmail.com), Georg Weingart, Fulvio Mattivi

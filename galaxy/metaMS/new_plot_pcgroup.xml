@@ -58,7 +58,12 @@
 		#elif $unkn != "none":
 		   unkn "c($unkn)"
 		#end if
-         
+        
+        ;
+        return=\$?;
+        cat 'plot_pcgroup.log.txt';
+        sh -c "exit \$return"
+ 
     ]]></command>
     
     <inputs>
@@ -163,7 +168,7 @@
         <data name="ticsRawPdf"   format="pdf" from_work_dir="TICs_raw.pdf" label="TICs_raw.pdf" />
         <data name="bpcsRawPdf"   format="pdf" from_work_dir="BPCs_raw.pdf" label="BPCs_raw.pdf" />
         <data name="unknownPdf"   format="pdf" from_work_dir="GCMS_EIC.pdf" label="GCMS_EIC.pdf" />
-        <data name="log" format="txt" from_work_dir="plot_metaMS.log" label="plot_metaMS.log.txt" />
+        <data name="log" format="txt" from_work_dir="plot_pcgroup.log" label="plot_pcgroup.log.txt" />
 
     </outputs>
     
@@ -182,6 +187,9 @@
     
     <help>
 	
+TODO : Update the different tests
+TODO : Verify the differents tests
+TODO : Update the help section
 	
 .. class:: infomark
 

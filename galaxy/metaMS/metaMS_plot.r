@@ -34,7 +34,7 @@ cat("\nStart of the '", modNamC, "' Galaxy module call: ",
 
 
 # ----- ARGUMENTS -----
-cat("\tARGUMENTS INFO\n")
+cat("\tARGUMENTS INFO\n\n")
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
 write.table(as.matrix(args), col.names=F, quote=F, sep='\t\t')
 
@@ -50,16 +50,23 @@ cat("\tINFILE PROCESSING INFO\n\n")
 
 # Loading RData file
 load(args[["metaMS"]])
+print(ls())
 if (!exists("resGC")) stop("\n\nERROR: The RData doesn't contain any object called 'resGC' which is provided by the tool: new_metaMS.runGC")
-
+print(singlefile)
+print(zipfile)
 # Handle infiles
 if (!exists("singlefile")) singlefile <- NULL
 if (!exists("zipfile")) zipfile <- NULL
 rawFilePath <- getRawfilePathFromArguments(singlefile, zipfile, args)
+print(rawFilePath)
 zipfile <- rawFilePath$zipfile
 singlefile <- rawFilePath$singlefile
+print(singlefile)
+print(zipfile)
+print("la")
 directory <- retrieveRawfileInTheWorkingDirectory(singlefile, zipfile)
-
+print("ici")
+print(directory)
 
 # ----- MAIN PROCESSING INFO -----
 cat("\n\n\tMAIN PROCESSING INFO\n")
@@ -70,43 +77,46 @@ cat("\t\tCOMPUTE\n")
 #TIC/BPC picture generation
 
 #Use getTIC2s and getBPC2s because getTICs and getBPCs can exists due to transfert of function in Rdata
-cat("\nProcessing BPCs...\n")
+
 if(!is.null(singlefile)){
-    print("singlefile BPC")
+    cat("\nProcessing BPCs from XCMS files...\n")
     files <- paste("./",names(singlefile),sep="")
     if(!is.null(files)){
         c <- getBPC2s(files = files, xset = xset, rt="raw", pdfname="BPCs_raw.pdf")
     }else{
+        #TODO add error message
         print("Error files is empty")
     }
 }
 if(!is.null(zipfile)){
-    print("zipfile BPC")
+    cat("\nProcessing BPCs from raw files...\n")
     files <- getMSFiles(directory)
     if(!is.null(files)){
         c <- getBPC2s(files = files, rt="raw", pdfname="BPCs_raw.pdf") 
     }else{
+        #TODO add error message
         print("Error files is empty")
     } 
 }
 cat("BPC created...\n")
 
-cat("\nProcessing TICs...\n")
 if(!is.null(singlefile)){
-    print("singlefile TIC")
+    cat("\nProcessing TICs from XCMS files...\n")
     files <- paste("./",names(singlefile),sep="")
     if(!is.null(files)){
         b <- getTIC2s(files = files, xset = xset, rt="raw", pdfname="TICs_raw.pdf")
     }else{
+        #TODO add error message
         print("Error files is empty")
     }
 }
 if(!is.null(zipfile)){
-    print("zipfile TIC")
+    cat("\nProcessing TICs from raw files...\n")
     files <- getMSFiles(directory)
     if(!is.null(files)){
         b <- getTIC2s(files = files, rt="raw", pdfname="TICs_raw.pdf")  
     }else{
+        #TODO add error message
         print("Error files is empty")
     }
 }

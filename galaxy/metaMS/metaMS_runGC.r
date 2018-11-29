@@ -88,7 +88,7 @@ print(paste("Unkn:",unknarg))
 
 #settings process
 if (args[["settings"]]=="default") {
-    print("Using default parameters")
+    cat("Using default parameters")
     data(FEMsettings) 
     if (args[["rtrange"]][1]!="NULL") {
         rtrange=args[["rtrange"]]
@@ -112,8 +112,7 @@ if (args[["settings"]]=="default") {
 }
 
 if (args[["settings"]]=="User_defined") {
-    print("Using user parameters")
-    #args[["settings"]]=NULL #delete from the list of arguments
+    cat("Using user parameters")
     fwhmparam=args[["fwhm"]]
     rtdiffparam=args[["rtdiff"]]
     minfeatparam=args[["minfeat"]]
@@ -128,7 +127,6 @@ if (args[["settings"]]=="User_defined") {
         rtrange=NULL
         cat("rtrange= ",rtrange)
     }
-    
     
     nSlaves=args[["nSlaves"]]
     
@@ -180,9 +178,7 @@ if (args[["settings"]]=="User_defined") {
         GALAXY.GC@betweenSamples.timeComparison<-"RI"
         GALAXY.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
     }
-    # files, xset, settings, rtrange = NULL, DB = NULL,
-    # removeArtefacts = TRUE, findUnknowns = nexp > 1,
-    # returnXset = FALSE, RIstandards = NULL, nSlaves = 0
+    
     if (!is.null(DBarg)){
         manual <- read.msp(DBarg)
         DBarg <- createSTDdbGC(stdInfo = NULL, settings = GALAXY.GC, manualDB = manual)
@@ -205,7 +201,7 @@ directory <- retrieveRawfileInTheWorkingDirectory(singlefile, zipfile)
 # ----- MAIN PROCESSING INFO -----
 cat("\n\n\tMAIN PROCESSING INFO\n")
 
-cat("\t\tCOMPUTE\n")
+cat("\t\tCOMPUTE\n\n")
 
 #runGC accept either a list of files a zip folder or an xset object from xcms.xcmsSet tool
 
@@ -225,7 +221,7 @@ if (!is.null(args[["zipfile"]])){
     sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
     row.names(sampleMetadata)<-NULL
 
-    print("Process runGC with metaMS package from raw files...")
+    cat("Process runGC with metaMS package from raw files...")
     if(args[["settings"]]=="default") {
         resGC<-runGC(files = samples, settings = TSQXLS.GC, rtrange = rtrange, DB = DBarg , removeArtefacts = TRUE, 
                  findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
@@ -236,7 +232,7 @@ if (!is.null(args[["zipfile"]])){
     }
 
 } else if(!is.null(args[["singlefile_galaxyPath"]])){ 
-    print("Loading from XCMS file(s)...")
+    cat("Loading from XCMS file(s)...\n")
     load(args[["singlefile_galaxyPath"]])
     if(!exists("xset")){
         if(exists("xdata")){
@@ -247,6 +243,7 @@ if (!is.null(args[["zipfile"]])){
             stop(error_message)
         }
     }
+    #xset from xcms.xcmsSet is not well formatted for metaMS this function do the formatting
     if (class(xset)=="xcmsSet"){
         if (length(xset@rt$raw)>1){
             #create an exceptable list of xset for metaMS
@@ -266,6 +263,7 @@ if (!is.null(args[["zipfile"]])){
             xset.l<-xset
         }  
     
+        #IS IT NECESSARY ???????????????????????????????????????????????????????????????????????????????? make a sampleMetadata column with ..files ?????
         #create sampleMetadata, get sampleMetadata and class
         sampleMetadata <- xset@phenoData
         sampleMetadata <- cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
@@ -295,18 +293,23 @@ if (!is.null(args[["zipfile"]])){
         if(args[["settings"]]=="User_defined") {
             settingslist=GALAXY.GC
             if (class(xset.l[[1]])!="xsAnnotate") {
-                print("Process xsAnnotate")
+                cat("Process xsAnnotate with CAMERA package...")
                 xsetCAM<-lapply(xset.l,
                     function(x) {y <- xsAnnotate(x, sample = 1)
                                  capture.output(z <- groupFWHM(y, perfwhm = settingslist@CAMERA$perfwhm),file = NULL)
                                  z}) 
             }
+            cat("Process runGC with metaMS package...")
             resGC<-runGC(xset = xsetCAM, settings = GALAXY.GC, rtrange = rtrange, DB = DBarg, removeArtefacts = TRUE, 
                         findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
         }else{
-            print("There is no xset")
+            #TODO add error message
+            cat("There is no xset")
         }
     }
+}else{
+    #TODO add error message
+    print("Error")
 }
 
 
@@ -333,6 +336,8 @@ write.table(sampleMetadata, file = "sampleMetadata.tsv", sep = "\t", row.names =
 write.msp(resGC$PseudoSpectra, file = "peakspectra.msp", newFile = TRUE)
 
 #saving R data in .Rdata file to save the variables used in the present tool
+print(singlefile)
+print(zipfile)
 objects2save <- c("resGC", "xset", "singlefile", "zipfile")
 save(list = objects2save[objects2save %in% ls()], file = "runGC.RData")
 #save.image(paste("runGC","RData",sep="."))
