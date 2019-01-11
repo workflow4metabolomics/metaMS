@@ -21,7 +21,7 @@ source_local <- function(fname) {
 }
 source_local("lib_metams.r")
 
-pkgs <- c("metaMS","batch","CAMERA") #"batch" necessary for parseCommandArgs function
+pkgs <- c("metaMS","stringr","batch","CAMERA") #"batch" necessary for parseCommandArgs function
 loadAndDisplayPackages(pkgs)
 
 cat("\n\n")
@@ -217,16 +217,18 @@ if (!is.null(args[["zipfile"]])){
     cat("Processing",length(samples),"files...\n")
 
     #create sampleMetadata, get sampleMetadata and class
-    sampleMetadata<-xcms:::phenoDataFromPaths(samples)
-    sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
+    sampleMetadata <- xcms:::phenoDataFromPaths(samples)
+    sampleMetadata <- cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
     row.names(sampleMetadata)<-NULL
 
     cat("Process runGC with metaMS package from raw files...")
     if(args[["settings"]]=="default") {
+        print(str(TSQXLS.GC))
         resGC<-runGC(files = samples, settings = TSQXLS.GC, rtrange = rtrange, DB = DBarg , removeArtefacts = TRUE, 
                  findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
     }
     if(args[["settings"]]=="User_defined") {
+        print(str(GALAXY.GC))
         resGC<-runGC(files = samples, settings = GALAXY.GC, rtrange = rtrange, DB = DBarg , removeArtefacts = TRUE, 
                  findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
     }
@@ -234,6 +236,8 @@ if (!is.null(args[["zipfile"]])){
 } else if(!is.null(args[["singlefile_galaxyPath"]])){ 
     cat("Loading from XCMS file(s)...\n")
     load(args[["singlefile_galaxyPath"]])
+
+    #Transform XCMS object if needed
     if(!exists("xset")){
         if(exists("xdata")){
             xset<-getxcmsSetObject(xdata)
@@ -243,6 +247,7 @@ if (!is.null(args[["zipfile"]])){
             stop(error_message)
         }
     }
+
     #xset from xcms.xcmsSet is not well formatted for metaMS this function do the formatting
     if (class(xset)=="xcmsSet"){
         if (length(xset@rt$raw)>1){
@@ -263,16 +268,16 @@ if (!is.null(args[["zipfile"]])){
             xset.l<-xset
         }  
     
-        #IS IT NECESSARY ???????????????????????????????????????????????????????????????????????????????? make a sampleMetadata column with ..files ?????
         #create sampleMetadata, get sampleMetadata and class
         sampleMetadata <- xset@phenoData
-        sampleMetadata <- cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
-        row.names(sampleMetadata)<-NULL
+        colnames(sampleMetadata) <- c("sampleMetadata","sample_group","class")
+        sampleMetadata <- sampleMetadata[,-2]
+        row.names(sampleMetadata) <- NULL
         samples <- xset@filepaths
     } else {
         xset <- NULL
     }  
-    if(args[["settings"]]=="default"){
+    if(args[["settings"]] == "default"){
         settingslist=TSQXLS.GC
         if (class(xset.l[[1]])!="xsAnnotate"){
             cat("Process xsAnnotate with CAMERA package...\n")
@@ -286,21 +291,23 @@ if (!is.null(args[["zipfile"]])){
         }
     
         #default settings for GC from Wehrens et al
-        cat("Process runGC with metaMS package...\n")
-        resGC<-runGC(xset = xsetCAM, settings = TSQXLS.GC, rtrange = rtrange, DB = DBarg, removeArtefacts = TRUE, 
+        cat("Process runGC with metaMS package...\n\n")
+        print(str(TSQXLS.GC))
+        resGC <- runGC(xset = xsetCAM, settings = TSQXLS.GC, rtrange = rtrange, DB = DBarg, removeArtefacts = TRUE, 
                     findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves) 
     }else{
-        if(args[["settings"]]=="User_defined") {
+        if(args[["settings"]] == "User_defined") {
             settingslist=GALAXY.GC
-            if (class(xset.l[[1]])!="xsAnnotate") {
+            if (class(xset.l[[1]]) != "xsAnnotate") {
                 cat("Process xsAnnotate with CAMERA package...")
-                xsetCAM<-lapply(xset.l,
+                xsetCAM <- lapply(xset.l,
                     function(x) {y <- xsAnnotate(x, sample = 1)
                                  capture.output(z <- groupFWHM(y, perfwhm = settingslist@CAMERA$perfwhm),file = NULL)
                                  z}) 
             }
-            cat("Process runGC with metaMS package...")
-            resGC<-runGC(xset = xsetCAM, settings = GALAXY.GC, rtrange = rtrange, DB = DBarg, removeArtefacts = TRUE, 
+            cat("Process runGC with metaMS package...\n\n")
+            print(str(GALAXY.GC))
+            resGC <- runGC(xset = xsetCAM, settings = GALAXY.GC, rtrange = rtrange, DB = DBarg, removeArtefacts = TRUE, 
                         findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
         }else{
             #TODO add error message
@@ -315,29 +322,37 @@ if (!is.null(args[["zipfile"]])){
 
 # ----- EXPORT -----
 #peakTable ordered by rt
-peaktable <- resGC$PeakTable <- resGC$PeakTable[order(resGC$PeakTable[,"rt"]),]
+cat("\n\tGenerating peakTable file\n")
+peaktable <- resGC$PeakTable[order(resGC$PeakTable[,"rt"]),]
+peaktable <- getCorrectFileName(peaktable)
+print(head(peaktable))
 write.table(peaktable, file = "peaktable.tsv", sep = "\t", row.names = FALSE)
+
+#variableMetadata
+cat("\n\tGenerating variableMetadata file\n")
+variableMetadata <- peaktable[,!(colnames(peaktable) %in% sampleMetadata[,1])]
+rownames(variableMetadata) <- NULL
+print(head(variableMetadata))
+write.table(variableMetadata, file = "variableMetadata.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
 
 #peakTable for PCA
 #dataMatrix
-dataMatrix <- cbind(Name = resGC$PeakTable[,"Name"],resGC$PeakTable[,(colnames(resGC$PeakTable) %in% sampleMetadata[,1])])
+cat("\n\tGenerating dataMatrix file\n")
+dataMatrix <- cbind(Name = peaktable[,"Name"],peaktable[,(colnames(peaktable) %in% sampleMetadata[,1])])
 rownames(dataMatrix) <- NULL
+print(head(dataMatrix))
 write.table(dataMatrix, file = "dataMatrix.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
 
-#variableMetadata
-variableMetadata <- resGC$PeakTable[,!(colnames(resGC$PeakTable) %in% sampleMetadata[,1])]
-rownames(variableMetadata) <- NULL
-write.table(variableMetadata, file = "variableMetadata.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
-
 #sampleMetadata
+cat("\n\tGenerating sampleMetadata file\n")
+print(head(sampleMetadata))
 write.table(sampleMetadata, file = "sampleMetadata.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
 
 #peak spectrum as MSP for DB search
+cat("\n\tGenerating",length(resGC$PseudoSpectra),"peakspectra file\n")
 write.msp(resGC$PseudoSpectra, file = "peakspectra.msp", newFile = TRUE)
 
 #saving R data in .Rdata file to save the variables used in the present tool
-print(singlefile)
-print(zipfile)
 objects2save <- c("resGC", "xset", "singlefile", "zipfile")
 save(list = objects2save[objects2save %in% ls()], file = "runGC.RData")
 #save.image(paste("runGC","RData",sep="."))

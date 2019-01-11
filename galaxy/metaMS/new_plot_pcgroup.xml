@@ -216,28 +216,9 @@ TODO : Update the help section
 metaMS.runGC
 ====================
 
------------
-Description
------------
-metaMS.runGC is a function dedicated to GCMS data processing from converted files to the generation of pseudospectra (compounds) table.
-Current version for metaMS R package: 1.14.0
+This tool will plot Base Peak Intensity chromatogram (BPI) and Total Ion Current chromatogram (TIC) from xcms experiments.
 
-**Process:** 
-Each of the converted data (cdf, mzML...)  is profiled by a combination of xcms and CAMERA functions. Then all the mass spectra of detected peaks are compared and clustered.
-For more details see metaMS : Wehrens, R.; Weingart, G.; Mattivi, F. Journal of Chromatography B (10.1016/j.jchromb.2014.02.051) link_
-
-.. _link: http://www.sciencedirect.com/science/article/pii/S1570023214001548
-
-**Main outputs:**
-A PeakTable is generated with one line per "compound" and one column per sample. 
-A dataMatrix.csv file is generated and can be used for PCA or for further analysis.
-A peakspectra.mps file is generated that contains all the spectra of the detected compounds in MSP format. That file can be used for database search online (Golm, MassBank) or locally (NIST MSSEARCH)
-for NIST search a tutorial is available here_.
-
-.. _here: http://web11.sb-roscoff.fr/download/w4m/howto/w4m_HowToUseNIST_V01.pdf
-
-3 PDF are generated for BPCs, TICs and EICs of detected compounds in all samples
-
+It will compare with opposite graphs your different classes given by a samplemetadata file or from xcms.findchrompeaks Merger tool.
   
 
 -----------------
@@ -255,25 +236,6 @@ Name                      output file          format  parameter
 xcms.xcmsSet              xset.RData RData     RData   file            			
 ========================= ==================== ======= ==========
 
-
-
-**Downstream tools**
-
-+---------------------------+---------------------------------------+--------+
-| Name                      | Output file                           | Format |
-+===========================+=======================================+========+
-|Determine Vdk or Lowess    |                        dataMatrix.tsv | Tabular|
-+---------------------------+---------------------------------------+--------+
-|Normalization Vdk/Lowess   |                        dataMatrix.tsv | Tabular|
-+---------------------------+---------------------------------------+--------+
-|Anova                      |                        dataMatrix.tsv | Tabular|
-+---------------------------+---------------------------------------+--------+
-|PCA                        |                        dataMatrix.tsv | Tabular|
-+---------------------------+---------------------------------------+--------+
-|Hierarchical Clustering    |                        dataMatrix.tsv | Tabular|
-+---------------------------+---------------------------------------+--------+
-|Golm Metabolome Search     |                       peakspectra.msp | Text   |
-+---------------------------+---------------------------------------+--------+
 
 **General schema of the metabolomic workflow for GCMS**
 

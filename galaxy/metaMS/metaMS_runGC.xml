@@ -1,4 +1,4 @@
- <tool id="metams_runGC" name="metaMS.runGC" version="3.0.0">
+ <tool id="metaMS_runGC" name="metaMS.runGCTEST" version="3.0.0">
        
     <description>GC-MS data preprocessing using metaMS package</description>
     
@@ -72,7 +72,7 @@
     ]]></command>
     
     <inputs>
-        <param name="input" type="data" format="rdata.xcms.findchrompeaks,rdata.xcms.group,no_unzip.zip,zip" label="Rdata from xcms.xcmsSet" help="Rdata file containing a xset object"/>
+        <param name="input" type="data" format="rdata,rdata.xcms.findchrompeaks,rdata.xcms.group,no_unzip.zip,zip" label="Rdata from xcms.xcmsSet or zipfile with raw files directly" help="Rdata file containing a xset object or zipfile with raw files directly"/>
 	    <conditional name="settings">
             <param name="setting" type="select" label="Settings" help="Choose the settings used for finding peaks" >
 			    <option value="gcdefault" selected="true">GC_Default</option>
@@ -220,13 +220,13 @@ TODO : Update the help section
 ---------------------------------------------------
 
 ====================
-metaMS.runGC
+metaMS_runGC
 ====================
 
 -----------
 Description
 -----------
-metaMS.runGC is a function dedicated to GCMS data processing from converted files to the generation of pseudospectra (compounds) table.
+metaMS_runGC is a function dedicated to GCMS data processing from converted files to the generation of pseudospectra (compounds) table.
 Current version for metaMS R package: 1.14.0
 
 **Process:** 
@@ -243,7 +243,9 @@ for NIST search a tutorial is available here_.
 
 .. _here: http://web11.sb-roscoff.fr/download/w4m/howto/w4m_HowToUseNIST_V01.pdf
 
-3 PDF are generated for BPCs, TICs and EICs of detected compounds in all samples
+The next tool call metaMS_plot_pcgroup can be use to generate 3 PDF : BPCs and TICs 
+
+EICs of detected compounds in all samples are in development
 
   
 
@@ -256,12 +258,13 @@ Workflow position
 
 You can start from here or use result file from :
 
-========================= ==================== ======= ==========
-Name                      output file          format  parameter
-========================= ==================== ======= ==========
-xcms.xcmsSet              xset.RData RData     RData   file            			
-========================= ==================== ======= ==========
-
++--------------------------+--------------------+---------------------------+------------+
+|Name                      | output file        | format                    | parameter  |
++==========================+====================+===========================+============+
+|xcms.findChromPeaks       | raw.xset.RData     | rdata.xcms.findchrompeaks | file       |    			
++--------------------------+--------------------+---------------------------+------------+
+|xcms.findChromPeaksMerger | xset.merged.RData  | rdata.xcms.findchrompeaks | file       |             
++--------------------------+--------------------+---------------------------+------------+
 
 
 **Downstream tools**
@@ -284,21 +287,21 @@ xcms.xcmsSet              xset.RData RData     RData   file
 
 **General schema of the metabolomic workflow for GCMS**
 
-.. image:: ./static/images/gcms_workflow.png
+.. image:: gcms_workflow.png
 
 -----------
 Input files
 -----------
 
-If you choose to use results from xcms.xcmsSet
+You can use results from xcms.findChromPeaks (xcmsSet) or directly a zipfile with raw files (mzML, mzData...)
 
 +---------------------------+------------+
 | Parameter : num + label   |   Format   |
 +===========================+============+
 | 1 : RData file            |   RData    |
 +---------------------------+------------+
-
-Or converted GCMS files (mzML, CDF...) in your local libray 
+| 2 : Zip file              |  Zip file  |
++---------------------------+------------+
 
 
 ----------

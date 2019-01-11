@@ -4,6 +4,74 @@
 # author Yann GUITTON Oniris Laberca 2015-2017
 
 
+#@author G. Le Corguille
+# This function will
+# - load the packages
+# - display the sessionInfo
+loadAndDisplayPackages <- function(pkgs) {
+    for(pkg in pkgs) suppressPackageStartupMessages( stopifnot( library(pkg, quietly=TRUE, logical.return=TRUE, character.only=TRUE)))
+
+    sessioninfo = sessionInfo()
+    cat(sessioninfo$R.version$version.string,"\n")
+    cat("Main packages:\n")
+    for (pkg in names(sessioninfo$otherPkgs)) { cat(paste(pkg,packageVersion(pkg)),"\t") }; cat("\n")
+    cat("Other loaded packages:\n")
+    for (pkg in names(sessioninfo$loadedOnly)) { cat(paste(pkg,packageVersion(pkg)),"\t") }; cat("\n")
+}
+
+#This function list the compatible files within the directory as xcms did
+#@author Gildas Le Corguille lecorguille@sb-roscoff.fr ABiMS TEAM
+getMSFiles <- function (directory) {
+    filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]","[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
+    filepattern <- paste(paste("\\.", filepattern, "$", sep=""),collapse="|")
+    info <- file.info(directory)
+    listed <- list.files(directory[info$isdir], pattern=filepattern,recursive=TRUE, full.names=TRUE)
+    files <- c(directory[!info$isdir], listed)
+    exists <- file.exists(files)
+    files <- files[exists]
+    return(files)
+}
+
+# This function retrieve a xset like object
+#@author Gildas Le Corguille lecorguille@sb-roscoff.fr
+getxcmsSetObject <- function(xobject) {
+    # XCMS 1.x
+    if (class(xobject) == "xcmsSet")
+        return (xobject)
+    # XCMS 3.x
+    if (class(xobject) == "XCMSnExp") {
+        # Get the legacy xcmsSet object
+        suppressWarnings(xset <- as(xobject, 'xcmsSet'))
+        if (!is.null(xset@phenoData$sample_group))
+            sampclass(xset) <- xset@phenoData$sample_group
+        else
+            sampclass(xset) <- "."
+        return (xset)
+    }
+}
+
+#J.Saint-Vanne
+#Function to correct the file names which can be written like "..alg8.mzData" and we just want "alg8"
+getCorrectFileName <- function(peaktable){
+    for(i in 1:(length(peaktable)-4)){
+        j <- i + 4
+        #Verify if file names always have their extensions
+        possibleExtensions <- c(".mzData",".mzML","mzxML","CDF","cdf") #Have to be modify with all extensions !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if(gsub("(^.*)(\\..*$)","\\2",colnames(peaktable)[j]) %in% possibleExtensions){ 
+            newname <- gsub("(^.*)(\\..*$)","\\1",colnames(peaktable)[j])
+            if(newname != sampleMetadata[i,1]){
+                #Correction for 2 points starting the name (I don't know why they are here...)
+                if(".." == gsub("(^\\.+)(.*)","\\1",newname)){
+                    newname <- sub("(^\\.+)(.*)","\\2",newname)
+                }
+            }
+            colnames(peaktable)[j] <- newname  
+        }
+    }
+    return(peaktable)
+}
+
+
 ##ADDITIONS FROM Y. Guitton
 getBPC <- function(file,rtcor=NULL, ...) {
      object <- xcmsRaw(file)
@@ -12,37 +80,37 @@ getBPC <- function(file,rtcor=NULL, ...) {
     
 }
 
-getBPC2s <- function (files, pdfname="BPCs.pdf", rt = c("raw","corrected"), scanrange=NULL) {
+getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corrected"), scanrange=NULL) {
     require(xcms)
-
-        
-                            
+    
     #create sampleMetadata, get sampleMetadata and class
-    sampleMetadata<-xcms:::phenoDataFromPaths(files)
-    class<-class<-as.vector(levels(sampleMetadata[,"class"])) #create phenoData like table
-    classnames<-vector("list",length(class))
-    for (i in 1:length(class)){
-        classnames[[i]]<-which( sampleMetadata[,1]==class[i])
-    }
-        
-    N <- dim(sampleMetadata)[1]
-      
-  
-   
-    TIC <- vector("list",N)
+    if(!is.null(xset)){
+    	#When files come from XCMS3 directly before metaMS
+    	sampleMetadata <- xset@phenoData
+    }else{
+		#When files come from a zip directory with raw files before metaMS
+    	sampleMetadata <- xcms:::phenoDataFromPaths(files)
+	}
+   	class <- unique(sampleMetadata[,"class"]) #create phenoData like table
+   	classnames <- vector("list",length(class))
+   	for (i in 1:length(class)){
+       	classnames[[i]] <- which( sampleMetadata[,"class"] == class[i])
+   	}
+   	N <- dim(sampleMetadata)[1]
+   	TIC <- vector("list",N)
 
+   	for (j in 1:N) {
 
-    for (j in 1:N) {
-
-        cat(files[j],"\n")
-        TIC[[j]] <- getBPC(files[j])
-        #good for raw 
-        # seems strange for corrected
-        #errors if scanrange used in xcmsSetgeneration
-        if (!is.null(xcmsSet) && rt == "corrected")
-          rtcor <- xcmsSet@rt$corrected[[j]] else
-          rtcor <- NULL
-          TIC[[j]] <- getBPC(files[j],rtcor=rtcor)
+       	TIC[[j]] <- getBPC(files[j])
+       	#good for raw 
+       	#seems strange for corrected
+       	#errors if scanrange used in xcmsSetgeneration
+        if (!is.null(xcmsSet) && rt == "corrected") {
+          	rtcor <- xcmsSet@rt$corrected[[j]] 
+        } else {
+          	rtcor <- NULL
+        }
+        TIC[[j]] <- getBPC(files[j],rtcor=rtcor)
     }
 
     pdf(pdfname,w=16,h=10)
@@ -54,32 +122,32 @@ getBPC2s <- function (files, pdfname="BPCs.pdf", rt = c("raw","corrected"), scan
     ylim = range(sapply(TIC, function(x) range(x[,2])))
     ylim = c(-ylim[2], ylim[2])
 
-
     ##plot start
-    
+
     if (length(class)>2){
       for (k in 1:(length(class)-1)){
         for (l in (k+1):length(class)){
             print(paste(class[k],"vs",class[l],sep=" ")) 
             plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k]," vs ",class[l], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
             colvect<-NULL
-           for (j in 1:length(classnames[[k]])) {
-      
-              tic <- TIC[[classnames[[k]][j]]]
-              # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
-              points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
-              colvect<-append(colvect,cols[classnames[[k]][j]])
+
+            for (j in 1:length(classnames[[k]])) {
+              	tic <- TIC[[classnames[[k]][j]]]
+              	# points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
+              	points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
+              	colvect<-append(colvect,cols[classnames[[k]][j]])
             }
           for (j in 1:length(classnames[[l]])) {
-          # i=class2names[j]
-          tic <- TIC[[classnames[[l]][j]]]
-          points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
-          colvect<-append(colvect,cols[classnames[[l]][j]])
+          	# i=class2names[j]
+          	tic <- TIC[[classnames[[l]][j]]]
+          	points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
+          	colvect<-append(colvect,cols[classnames[[l]][j]])
           }
-          legend("topright",paste(basename(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
+          legend("topright",paste(gsub("(^.+)\\..*$","\\1",basename(files[c(classnames[[k]],classnames[[l]])]))), col = colvect, lty = lty, pch = pch)
         }
       }
     }#end if length >2
+
     if (length(class)==2){
         k=1
 		l=2
@@ -93,16 +161,18 @@ getBPC2s <- function (files, pdfname="BPCs.pdf", rt = c("raw","corrected"), scan
           points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
           colvect<-append(colvect,cols[classnames[[k]][j]])
         }
-      for (j in 1:length(classnames[[l]])) {
-          # i=class2names[j]
-          tic <- TIC[[classnames[[l]][j]]]
-          points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
-          colvect<-append(colvect,cols[classnames[[l]][j]])
-      }
-      legend("topright",paste(basename(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
+      	for (j in 1:length(classnames[[l]])) {
+
+        	# i=class2names[j]
+        	tic <- TIC[[classnames[[l]][j]]]
+        	points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
+        	colvect<-append(colvect,cols[classnames[[l]][j]])
+      	}
+        legend("topright",paste(gsub("(^.+)\\..*$","\\1",basename(files[c(classnames[[k]],classnames[[l]])]))), col = colvect, lty = lty, pch = pch)
 
     }#end length ==2
-       if (length(class)==1){
+    
+    if (length(class)==1){
         k=1
 		ylim = range(sapply(TIC, function(x) range(x[,2])))
         colvect<-NULL
@@ -116,13 +186,14 @@ getBPC2s <- function (files, pdfname="BPCs.pdf", rt = c("raw","corrected"), scan
           colvect<-append(colvect,cols[classnames[[k]][j]])
         }
       
-      legend("topright",paste(basename(files[c(classnames[[k]])])), col = colvect, lty = lty, pch = pch)
+      legend("topright",paste(gsub("(^.+)\\..*$","\\1",basename(files[c(classnames[[k]])]))), col = colvect, lty = lty, pch = pch)
 
     }#end length ==1
-    dev.off()
 
+    dev.off()
     # invisible(TIC)
 }
+
 
 getTIC <- function(file,rtcor=NULL) {
      object <- xcmsRaw(file)
@@ -132,26 +203,33 @@ getTIC <- function(file,rtcor=NULL) {
 ##
 ##  overlay TIC from all files in current folder or from xcmsSet, create pdf
 ##
-getTIC2s <- function(files, pdfname="TICs.pdf", rt=c("raw","corrected")) {
-         
-    #create sampleMetadata, get sampleMetadata and class
-    sampleMetadata<-xcms:::phenoDataFromPaths(files)
-    class<-class<-as.vector(levels(sampleMetadata[,"class"])) #create phenoData like table
+getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected")) {
+	require(xcms)
+
+	#create sampleMetadata, get sampleMetadata and class
+	if(!is.null(xset)){
+		#When files come from XCMS3 before metaMS treatment
+    	sampleMetadata<-xset@phenoData
+    } else {
+		#When files come from a zip directory with raw files before metaMS
+    	sampleMetadata<-xcms:::phenoDataFromPaths(files)
+    }
+    class <- as.vector(levels(sampleMetadata[,"class"])) #create phenoData like table
     classnames<-vector("list",length(class))
     for (i in 1:length(class)){
-        classnames[[i]]<-which( sampleMetadata[,1]==class[i])
+        classnames[[i]] <- which( sampleMetadata[,"class"]==class[i])
     }
         
     N <- dim(sampleMetadata)[1]
     TIC <- vector("list",N)
 
     for (i in 1:N) {
-        cat(files[i],"\n")
-        if (!is.null(xcmsSet) && rt == "corrected")
-            rtcor <- xcmsSet@rt$corrected[[i]]
-        else
-            rtcor <- NULL
-        TIC[[i]] <- getTIC(files[i],rtcor=rtcor)
+       	if (!is.null(xcmsSet) && rt == "corrected") {
+           	rtcor <- xcmsSet@rt$corrected[[i]]
+       	}else{
+           	rtcor <- NULL
+       	}
+       	TIC[[i]] <- getTIC(files[i],rtcor=rtcor)
     }
  
     pdf(pdfname,w=16,h=10)
@@ -161,57 +239,53 @@ getTIC2s <- function(files, pdfname="TICs.pdf", rt=c("raw","corrected")) {
     #search for max x and max y in TICs
     xlim = range(sapply(TIC, function(x) range(x[,1])))
     ylim = range(sapply(TIC, function(x) range(x[,2])))
-    ylim = c(-ylim[2], ylim[2])
-	  
-	  
+    ylim = c(-ylim[2], ylim[2])  
+	 
     ##plot start
     if (length(class)>2){
-        for (k in 1:(length(class)-1)){
-            for (l in (k+1):length(class)){
-                print(paste(class[k],"vs",class[l],sep=" ")) 
-                plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Total Ion Chromatograms \n","TICs_",class[k]," vs ",class[l], sep=""), xlab = "Retention Time (min)", ylab = "TIC")
-                colvect<-NULL
-                for (j in 1:length(classnames[[k]])) {
-
-                    tic <- TIC[[classnames[[k]][j]]]
-                    # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
-                    points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
-                    colvect<-append(colvect,cols[classnames[[k]][j]])
-                }
-                for (j in 1:length(classnames[[l]])) {
-                    # i=class2names[j]
-                    tic <- TIC[[classnames[[l]][j]]]
-                    points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
-                    colvect<-append(colvect,cols[classnames[[l]][j]])
-                }
-                legend("topright",paste(basename(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
-            }
+       	for (k in 1:(length(class)-1)){
+           	for (l in (k+1):length(class)){
+               	print(paste(class[k],"vs",class[l],sep=" ")) 
+               	plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Total Ion Chromatograms \n","TICs_",class[k]," vs ",class[l], sep=""), xlab = "Retention Time (min)", ylab = "TIC")
+               	colvect<-NULL
+               	for (j in 1:length(classnames[[k]])) {
+                   	tic <- TIC[[classnames[[k]][j]]]
+                   	# points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
+                   	points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
+                   	colvect<-append(colvect,cols[classnames[[k]][j]])
+               	}
+               	for (j in 1:length(classnames[[l]])) {
+               	    # i=class2names[j]
+                   	tic <- TIC[[classnames[[l]][j]]]
+                   	points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
+                   	colvect<-append(colvect,cols[classnames[[l]][j]])
+               	}
+               	legend("topright",paste(gsub("(^.+)\\..*$","\\1",basename(files[c(classnames[[k]],classnames[[l]])]))), col = colvect, lty = lty, pch = pch)
+           	}
         }
     }#end if length >2
+
     if (length(class)==2){
-
-
-        k=1
-        l=2
-		
-        plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Total Ion Chromatograms \n","TICs_",class[k],"vs",class[l], sep=""), xlab = "Retention Time (min)", ylab = "TIC")
-        colvect<-NULL
-        for (j in 1:length(classnames[[k]])) {
-
-            tic <- TIC[[classnames[[k]][j]]]
-            # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
-            points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
-            colvect<-append(colvect,cols[classnames[[k]][j]])
-        }
-        for (j in 1:length(classnames[[l]])) {
-            # i=class2names[j]
-            tic <- TIC[[classnames[[l]][j]]]
-            points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
-            colvect<-append(colvect,cols[classnames[[l]][j]])
-        }
-        legend("topright",paste(basename(files[c(classnames[[k]],classnames[[l]])])), col = colvect, lty = lty, pch = pch)
-
-    }#end length ==2
+		k=1
+       	l=2
+	
+       	plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Total Ion Chromatograms \n","TICs_",class[k],"vs",class[l], sep=""), xlab = "Retention Time (min)", ylab = "TIC")
+       	colvect<-NULL
+       	for (j in 1:length(classnames[[k]])) {
+       	    tic <- TIC[[classnames[[k]][j]]]
+       	    # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
+       	    points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
+       	    colvect<-append(colvect,cols[classnames[[k]][j]])
+       	}
+       	for (j in 1:length(classnames[[l]])) {
+       	    # i=class2names[j]
+       	    tic <- TIC[[classnames[[l]][j]]]
+       	    points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
+       	    colvect<-append(colvect,cols[classnames[[l]][j]])
+       	}
+       	legend("topright",paste(gsub("(^.+)\\..*$","\\1",basename(files[c(classnames[[k]],classnames[[l]])]))), col = colvect, lty = lty, pch = pch)
+   	}#end length ==2
+    
     if (length(class)==1){
         k=1
         ylim = range(sapply(TIC, function(x) range(x[,2])))
@@ -219,19 +293,17 @@ getTIC2s <- function(files, pdfname="TICs.pdf", rt=c("raw","corrected")) {
         plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Total Ion Chromatograms \n","TICs_",class[k], sep=""), xlab = "Retention Time (min)", ylab = "TIC")
         colvect<-NULL
         for (j in 1:length(classnames[[k]])) {
+           	tic <- TIC[[classnames[[k]][j]]]
+           	# points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
+           	points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
+           	colvect<-append(colvect,cols[classnames[[k]][j]])
+       	}
 
-            tic <- TIC[[classnames[[k]][j]]]
-            # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
-            points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
-            colvect<-append(colvect,cols[classnames[[k]][j]])
-        }
+       	legend("topright",paste(gsub("(^.+)\\..*$","\\1",basename(files[c(classnames[[k]])]))), col = colvect, lty = lty, pch = pch)
+   	}#end length ==1
 
-        legend("topright",paste(basename(files[c(classnames[[k]])])), col = colvect, lty = lty, pch = pch)
-
-    }#end length ==1
-    dev.off()
-
-    # invisible(TIC)
+   	dev.off()
+   	# invisible(TIC)
 }
 
 
