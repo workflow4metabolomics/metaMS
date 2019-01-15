@@ -16,7 +16,19 @@
     LC_ALL=C Rscript $__tool_directory__/metaMS_plot.r
         
         metaMS $metaMS
+
+        selecttic $selectedbpc.BPC
+
+        selectbpc $selectedtic.TIC
+
+        selecteic $selectedeic.EIC
         
+        #if $selectedeic.EIC == "true"
+            unkn "c($selectedeic.unkn)"
+        #else
+            unkn "none"
+        #end if
+
         ;
         return=\$?;
         cat 'plot_metaMS.log';
@@ -27,27 +39,60 @@
     <inputs>
 
         <param name="metaMS" type="data" format="rdata" label="Rdata from new_metaMS_runGC" help="Rdata file containing a metaMS preprocess object" />
-    
+
+        <conditional name="selectedtic">
+            <param name="TIC" checked="false" falsevalue="false" truevalue="true" label="Do you want to process for TIC(s) ?"  type="boolean">
+                <option value="false">no</option>
+                <option value="true">yes</option>
+            </param>
+            <when value="true"/>
+            <when value="false"/>
+        </conditional>
+        <conditional name="selectedbpc">
+            <param name="BPC" checked="false" falsevalue="false" truevalue="true" label="Do you want to process for BPC(s) ?"  type="boolean">
+                <option value="false">no</option>
+                <option value="true">yes</option>
+            </param>
+            <when value="true"/>
+            <when value="false"/>
+        </conditional>
+        <conditional name="selectedeic">
+            <param name="EIC" checked="false" falsevalue="false" truevalue="true" label="Do you want to process for EIC(s) ?"  type="boolean">
+                <option value="false">no</option>
+                <option value="true">yes</option>
+            </param>
+            <when value="true">
+                <param name="unkn" type="text" value="1:5" label="EIC_Unknown" help="vector of peaks number to be plotted, for example 1:5 (mean 1 to 5) or 1,4,12  means 1 4 and 12). For all EIC use 0. none for no EIC plot" /> 
+            </when>
+            <when value="false"/>
+        </conditional>
+
     </inputs>
     
     <outputs>
     
-        <data name="ticsRawPdf"   format="pdf" from_work_dir="TICs_raw.pdf" label="TICs_raw.pdf" />
-        <data name="bpcsRawPdf"   format="pdf" from_work_dir="BPCs_raw.pdf" label="BPCs_raw.pdf" />
         <data name="log" format="txt" from_work_dir="plot_metaMS.log" label="plot_metaMS.log" />
-
+        <!-- Only when user selected TIC option -->
+        <data name="ticsRawPdf"   format="pdf" from_work_dir="TICs_raw.pdf" label="TICs_raw.pdf">
+            <filter>selectedtic['TIC'] is True</filter>
+        </data>
+        <!-- Only when user selected BPC option -->
+        <data name="bpcsRawPdf"   format="pdf" from_work_dir="BPCs_raw.pdf" label="BPCs_raw.pdf">
+            <filter>selectedbpc['BPC'] is True</filter>
+        </data>
+        <!-- Only when user selected EIC option -->
+        <data name="unknownPdf"   format="pdf" from_work_dir="GCMS_EIC.pdf" label="GCMS_EIC.pdf">
+            <filter>selectedeic['EIC'] is True</filter>
+        </data>
+        <data name="log" format="txt" from_work_dir="plot_metaMS.log" label="plot_metaMS.log" />
+        
     </outputs>
     
     <tests>
         <test>
             <param name="metaMS" value="runGC.rdata"  ftype="rdata" />
             <param name="settings|setting" value="gcdefault" />
-            <param name="settings|options_rtrange|option" value="hide" />
-            <param name="settings|options_db|option" value="hide" />
-            <param name="settings|options_ri|option" value="hide" />
-            <output name="sampleMetadata" file="sampleMetadata.tsv" />
-            <output name="variableMetadata" file="variableMetadata.tsv" />
-            <output name="dataMatrix" file="dataMatrix.tsv" lines_diff="6" />
+            <output name="log" file="output_metaMS_plot.log" />
         </test>
     </tests>
     

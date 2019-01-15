@@ -1,0 +1,35 @@
+	SESSION INFO
+R version 3.5.1 (2018-07-02) 
+Main packages:
+batch 1.1.5 	metaMS 1.18.1 	CAMERA 1.38.1 	xcms 3.2.0 	MSnbase 2.8.3 	ProtGenerics 1.14.0 	S4Vectors 0.20.1 	mzR 2.16.1 	Rcpp 1.0.0 	BiocParallel 1.16.5 	Biobase 2.42.0 	BiocGenerics 0.28.0 	
+Other loaded packages:
+vsn 3.50.0 	splines 3.5.1 	foreach 1.4.4 	Formula 1.2.3 	BiocManager 1.30.4 	affy 1.60.0 	latticeExtra 0.6.28 	RBGL 1.58.1 	robustbase 0.93.3 	impute 1.56.0 	pillar 1.3.1 	backports 1.1.3 	lattice 0.20.35 	limma 3.38.3 	digest 0.6.18 	RColorBrewer 1.1.2 	checkmate 1.9.0 	colorspace 1.3.2 	htmltools 0.3.6 	preprocessCore 1.44.0 	Matrix 1.2.14 	plyr 1.8.4 	MALDIquant 1.18 	XML 3.98.1.16 	pkgconfig 2.0.2 	zlibbioc 1.28.0 	scales 1.0.0 	RANN 2.6.1 	affyio 1.52.0 	htmlTable 1.13.1 	tibble 2.0.0 	IRanges 2.16.0 	ggplot2 3.1.0 	nnet 7.3.12 	lazyeval 0.2.1 	MassSpecWavelet 1.48.1 	survival 2.42.6 	magrittr 1.5 	crayon 1.3.4 	ncdf4 1.16 	doParallel 1.0.14 	MASS 7.3.50 	foreign 0.8.71 	graph 1.60.0 	tools 3.5.1 	data.table 1.11.8 	stringr 1.3.1 	munsell 0.5.0 	cluster 2.0.7.1 	pcaMethods 1.74.0 	compiler 3.5.1 	mzID 1.20.1 	rlang 0.3.1 	grid 3.5.1 	iterators 1.0.10 	rstudioapi 0.9.0 	htmlwidgets 1.3 	igraph 1.2.2 	base64enc 0.1.3 	gtable 0.2.0 	codetools 0.2.15 	multtest 2.38.0 	gridExtra 2.3 	knitr 1.21 	Hmisc 4.1.1 	stringi 1.2.4 	rpart 4.1.13 	acepack 1.4.1 	DEoptimR 1.0.8 	xfun 0.4 	
+
+
+Start of the 'plot_metaMS' Galaxy module call: Mon 14 Jan 2019 13:10:33
+
+	ARGUMENTS INFO
+
+metaMS		/home/jsaintvanne/galaxy/database/files/001/dataset_1081.dat
+selectplot		BPC
+unkn		none
+
+
+	ARGUMENTS PROCESSING INFO
+
+
+	INFILE PROCESSING INFO
+
+files_root_directory	 . 
+
+
+	MAIN PROCESSING INFO
+		COMPUTE
+
+Processing BPC(s) from raw files...
+[1] "FWS_100perNaCl vs FWS_5percNaCL"
+[1] "FWS_100perNaCl vs SWS"
+[1] "FWS_5percNaCL vs SWS"
+BPC(s) created...
+
+End of 'plot_metaMS' Galaxy module call: 2019-01-14 13:10:42

@@ -78,14 +78,6 @@ if (args[["db"]] != "NULL"){
     cat("\nNO Db : NULL\n\n")
 }
 
-#Unknown EIC parameter
-if (args[["unkn"]][1] != "NULL") {
-    unknarg <- args[["unkn"]]
-} else { 
-    unknarg <- ""
-}
-print(paste("Unkn:",unknarg))
-
 #settings process
 if (args[["settings"]]=="default") {
     cat("Using default parameters")

@@ -312,26 +312,23 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
 #version 20150512
 #only for Galaxy 
 
-plotUnknowns<-function(resGC, unkn=""){
-
+plotUnknowns<-function(resGC, unkn="", fileFrom=NULL){
 
     ##Annotation table each value is a pcgrp associated to the unknown 
     ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
     ##R. Wehrens give me some clues on that and we found a correction
     #if unkn="none"
-	
 	if(unkn=="none") {
 	   pdf("Unknown_Empty.pdf")
 	   plot.new()
 	   text(x=0.5,y=1,pos=1, labels="No EIC ploting required")
 	   dev.off()
-	}else {
+	} else {
 
 		mat<-matrix(ncol=length(resGC$xset), nrow=dim(resGC$PeakTable)[1])
 		 
 		for (j in 1: length(resGC$xset)){
 			test<-resGC$annotation[[j]]
-			print(paste("j=",j))
 			for (i in 1:dim(test)[1]){
 				if (as.numeric(row.names(test)[i])>dim(mat)[1]){
 					next
@@ -360,10 +357,9 @@ plotUnknowns<-function(resGC, unkn=""){
 					matCORR<-cbind(1:length(huhn), match(huhn, an@pspectra))
 				})
 
-		if (unkn[1]==""){    
+		if (unkn[1]=="") {    
 		#plot EIC and spectra for all unknown for comparative purpose
-	   
-
+	  
 			par (mar=c(5, 4, 4, 2) + 0.1)
 			for (l in 1:dim(resGC$PeakTable)[1]){ #l=2
 				#recordPlot
@@ -398,6 +394,11 @@ plotUnknowns<-function(resGC, unkn=""){
 							 
 							title1<-paste("unknown", l,"from",sampname, sep=" ")
 							an<-resGC$xset[[c]]
+							if(fileFrom == "zipfile"){
+								an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
+							}else{
+								an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
+							}
 							 
 							par (mar=c(0, 0, 0, 0) + 0.1)
 							plot.new()
@@ -432,7 +433,8 @@ plotUnknowns<-function(resGC, unkn=""){
 
 			}#end  for l
 		}#end if unkn=""
-		else{
+		else {
+
 			par (mar=c(5, 4, 4, 2) + 0.1)
 			l=unkn
 			if (length(l)==1){
@@ -467,6 +469,11 @@ plotUnknowns<-function(resGC, unkn=""){
 							 
 							title1<-paste("unknown", l,"from",sampname, sep=" ")
 							an<-resGC$xset[[c]]
+							if(fileFrom == "zipfile"){
+								an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
+							}else{
+								an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
+							}
 							 
 							par (mar=c(0, 0, 0, 0) + 0.1)
 							plot.new()
@@ -498,7 +505,9 @@ plotUnknowns<-function(resGC, unkn=""){
 				# }
 				# my.plots
 				# graphics.off()
-			} else {
+			} #end if length(unkn) = 1 
+			else {
+
 				par (mar=c(5, 4, 4, 2) + 0.1)
 				for (l in 1:length(unkn)){ #l=2
 					#recordPlot
@@ -527,11 +536,17 @@ plotUnknowns<-function(resGC, unkn=""){
 								#remove .cdf, .mzXML filepattern
 								filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", "[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
 								filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), collapse = "|")
+								
 								sampname<-gsub(filepattern, "",sampname)
 								 
 								title1<-paste("unknown",unkn[l],"from",sampname, sep=" ")
 								an<-resGC$xset[[c]]
-								 
+								if(fileFrom == "zipfile"){
+									an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
+								}else{
+									an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
+								}
+
 								par (mar=c(0, 0, 0, 0) + 0.1)
 								plot.new()
 								box()
@@ -570,6 +585,7 @@ plotUnknowns<-function(resGC, unkn=""){
 		}
 	}
 } #end function 
+
 
 # This function get the raw file path from the arguments
 getRawfilePathFromArguments <- function(singlefile, zipfile, listArguments) {

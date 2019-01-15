@@ -42,6 +42,16 @@ write.table(as.matrix(args), col.names=F, quote=F, sep='\t\t')
 # ----- PROCESSING INFILE -----
 cat("\n\n\tARGUMENTS PROCESSING INFO\n")
 
+if(args[["selecteic"]]) {
+   #Unknown EIC parameter
+    if (args[["unkn"]][1] != "NULL") {
+        unknarg <- args[["unkn"]]
+    } else { 
+        unknarg <- ""
+    }
+    print(paste("Unkn:",unknarg)) 
+}
+
 cat("\n\n")
 
 
@@ -51,6 +61,7 @@ cat("\tINFILE PROCESSING INFO\n\n")
 # Loading RData file
 load(args[["metaMS"]])
 if (!exists("resGC")) stop("\n\nERROR: The RData doesn't contain any object called 'resGC' which is provided by the tool: new_metaMS.runGC")
+
 # Handle infiles
 if (!exists("singlefile")) singlefile <- NULL
 if (!exists("zipfile")) zipfile <- NULL
@@ -58,7 +69,6 @@ rawFilePath <- getRawfilePathFromArguments(singlefile, zipfile, args)
 zipfile <- rawFilePath$zipfile
 singlefile <- rawFilePath$singlefile
 directory <- retrieveRawfileInTheWorkingDirectory(singlefile, zipfile)
-
 
 # ----- MAIN PROCESSING INFO -----
 cat("\n\n\tMAIN PROCESSING INFO\n")
@@ -73,12 +83,21 @@ cat("\t\tCOMPUTE\n")
 if(!is.null(singlefile)){
     files <- paste("./",names(singlefile),sep="")
     if(!is.null(files)){
-        cat("\nProcessing BPCs from XCMS files...\n")
-        c <- getBPC2s(files = files, xset = xset, rt="raw", pdfname="BPCs_raw.pdf")
-        cat("BPC created...\n")
-        cat("\nProcessing TICs from XCMS files...\n")
-        b <- getTIC2s(files = files, xset = xset, rt="raw", pdfname="TICs_raw.pdf")
-        cat("TIC created...\n")
+        if(args[["selectbpc"]]){
+            cat("\nProcessing BPC(s) from XCMS files...\n")
+            c <- getBPC2s(files = files, xset = xset, rt="raw", pdfname="BPCs_raw.pdf")
+            cat("BPC(s) created...\n")
+        }
+        if(args[["selecttic"]]){
+            cat("\nProcessing TIC(s) from XCMS files...\n")
+            b <- getTIC2s(files = files, xset = xset, rt="raw", pdfname="TICs_raw.pdf")
+            cat("TIC(s) created...\n")
+        }
+        if(args[["selecteic"]]){
+            cat("\nProcessing EIC(s) from XCMS files...\n")
+            plotUnknowns(resGC=resGC, unkn=unknarg, fileFrom="singlefile")
+            cat("EIC(s) created...\n")
+        }
     }else{
         #TODO add error message
         print("Error files is empty")
@@ -87,12 +106,21 @@ if(!is.null(singlefile)){
 if(!is.null(zipfile)){
     files <- getMSFiles(directory)
     if(!is.null(files)){
-        cat("\nProcessing BPCs from raw files...\n")
-        c <- getBPC2s(files = files, rt="raw", pdfname="BPCs_raw.pdf")
-        cat("BPC created...\n")
-        cat("\nProcessing TICs from raw files...\n")
-        b <- getTIC2s(files = files, rt="raw", pdfname="TICs_raw.pdf")  
-        cat("TIC created...\n")
+        if(args[["selectbpc"]]){
+            cat("\nProcessing BPC(s) from raw files...\n")
+            c <- getBPC2s(files = files, rt="raw", pdfname="BPCs_raw.pdf")
+            cat("BPC(s) created...\n")
+        }
+        if(args[["selecttic"]]) {
+            cat("\nProcessing TIC(s) from raw files...\n")
+            b <- getTIC2s(files = files, rt="raw", pdfname="TICs_raw.pdf")  
+            cat("TIC(s) created...\n")
+        }
+        if(args[["selecteic"]]) {
+            cat("\nProcessing EIC(s) from XCMS files...\n")
+            plotUnknowns(resGC=resGC, unkn=unknarg, fileFrom="zipfile")
+            cat("EIC(s) created...\n")
+        }
     }else{
         #TODO add error message
         print("Error files is empty")

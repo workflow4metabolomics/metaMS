@@ -170,13 +170,14 @@
     
     <outputs>
     
+        <data name="log" format="txt" from_work_dir="metams.log" label="metams.log" />
         <data name="peaktable" format="tabular" from_work_dir="peaktable.tsv" label="peaktable.tsv" />
         <data name="sampleMetadata" format="tabular" from_work_dir="sampleMetadata.tsv" label="sampleMetadata.tsv" />
         <data name="variableMetadata" format="tabular" from_work_dir="variableMetadata.tsv" label="variableMetadata.tsv" />
         <data name="dataMatrix" format="tabular" from_work_dir="dataMatrix.tsv" label="dataMatrix.tsv" />
         <data name="peakspectra" format="txt" from_work_dir="peakspectra.msp" label="peakspectra.msp" />
         <data name="rungcRData" format="rdata" from_work_dir="runGC.RData" label="runGC.RData" />
-        <data name="log" format="txt" from_work_dir="metams.log" label="metams.log" />
+
     </outputs>
     
     <tests>
