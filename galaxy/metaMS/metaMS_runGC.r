@@ -24,6 +24,16 @@ source_local("lib_metams.r")
 pkgs <- c("metaMS","stringr","batch","CAMERA") #"batch" necessary for parseCommandArgs function
 loadAndDisplayPackages(pkgs)
 
+source("/home/jsaintvanne/metaMS-1/R/runGC.R")
+source("/home/jsaintvanne/metaMS-1/R/matchSamples2DB.R")
+source("/home/jsaintvanne/metaMS-1/R/printString.R")
+source("/home/jsaintvanne/metaMS-1/R/matchfuns.R")
+source("/home/jsaintvanne/metaMS-1/R/annotations2tab.R")
+source("/home/jsaintvanne/metaMS-1/R/annotate.R")
+
+
+
+
 cat("\n\n")
 
 modNamC <- "metaMS:runGC" ## module name
@@ -241,8 +251,8 @@ if (!is.null(args[["zipfile"]])){
     }
 
     #xset from xcms.xcmsSet is not well formatted for metaMS this function do the formatting
-    if (class(xset)=="xcmsSet"){
-        if (length(xset@rt$raw)>1){
+    if (class(xset)=="xcmsSet") {
+        if (length(xset@rt$raw)>1) {
             #create an exceptable list of xset for metaMS
             xset.l<-vector("list",length(xset@rt$raw))
             for (i in 1:length(xset@rt$raw)){
@@ -316,7 +326,7 @@ if (!is.null(args[["zipfile"]])){
 #peakTable ordered by rt
 cat("\n\tGenerating peakTable file\n")
 peaktable <- resGC$PeakTable[order(resGC$PeakTable[,"rt"]),]
-peaktable <- getCorrectFileName(peaktable)
+peaktable <- getCorrectFileName(peaktable,sampleMetadata)
 print(head(peaktable))
 write.table(peaktable, file = "peaktable.tsv", sep = "\t", row.names = FALSE)
 

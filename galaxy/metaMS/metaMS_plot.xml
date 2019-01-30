@@ -62,7 +62,7 @@
                 <option value="true">yes</option>
             </param>
             <when value="true">
-                <param name="unkn" type="text" value="1:5" label="EIC_Unknown" help="vector of peaks number to be plotted, for example 1:5 (mean 1 to 5) or 1,4,12  means 1 4 and 12). For all EIC use 0. none for no EIC plot" /> 
+                <param name="unkn" type="text" value="1:5" label="EIC_Unknown" help="vector of peaks number to be plotted, for example 1:5 (mean 1 to 5) or 1,4,12  (means 1 4 and 12). For all EIC use 0" /> 
             </when>
             <when value="false"/>
         </conditional>
@@ -71,7 +71,6 @@
     
     <outputs>
     
-        <data name="log" format="txt" from_work_dir="plot_metaMS.log" label="plot_metaMS.log" />
         <!-- Only when user selected TIC option -->
         <data name="ticsRawPdf"   format="pdf" from_work_dir="TICs_raw.pdf" label="TICs_raw.pdf">
             <filter>selectedtic['TIC'] is True</filter>
@@ -90,9 +89,20 @@
     
     <tests>
         <test>
-            <param name="metaMS" value="runGC.rdata"  ftype="rdata" />
-            <param name="settings|setting" value="gcdefault" />
-            <output name="log" file="output_metaMS_plot.log" />
+            <param name="metaMS" value="runGC.RData"  ftype="rdata" />
+            <conditional name="selectedtic">
+                <param name="TIC" value="true"/>
+                <output name="ticsRawPdf" value="TICs_raw.pdf" ftype="pdf"/>
+            </conditional>
+            <conditional name="selectedbpc">
+                <param name="BPC" value="true"/>
+                <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf"/>
+            </conditional>
+            <conditional name="selectedeic">
+                <param name="EIC" value="true"/>
+                <output name="ticsRawPdf" value="GCMS_EIC.pdf" ftype="pdf"/>
+            </conditional>
+         
         </test>
     </tests>
     

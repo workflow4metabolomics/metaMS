@@ -40,16 +40,35 @@ write.table(as.matrix(args), col.names=F, quote=F, sep='\t\t')
 
 
 # ----- PROCESSING INFILE -----
-cat("\n\n\tARGUMENTS PROCESSING INFO\n")
+cat("\n\n\tARGUMENTS PROCESSING INFO\n\n")
+
+# Loading RData file
+load(args[["metaMS"]])
+if (!exists("resGC")) stop("\n\nERROR: The RData doesn't contain any object called 'resGC' which is provided by the tool: new_metaMS.runGC")
 
 if(args[["selecteic"]]) {
-   #Unknown EIC parameter
+    #Unknown EIC parameter
     if (args[["unkn"]][1] != "NULL") {
-        unknarg <- args[["unkn"]]
+        #When unkn = 0 user want to process all unknowns
+        if(args[["unkn"]][1] == 0){
+            args[["unkn"]] <- c(1:nrow(resGC$PeakTable))
+            print("User want to process on all unknown(s) found in metaMS process")
+        }
+        #TODO find the biggest number of unkn ask by user cause it can write "1,15,9,8" with a max of 11 unkn. With this code it finds the 8 and it will pass
+        #Verify that there is not more user's unkn than metaMS unkn (find in resGC$PeakTable)
+        cat("Number of unknown after metaMS process :",nrow(resGC$PeakTable),"\n")
+        cat("Number of the last unknown ask by user :",args[["unkn"]][length(args[["unkn"]])],"\n")
+        cat("Number of unknown ask by user :",length(args[["unkn"]]),"\n")
+        if(args[["unkn"]][length(args[["unkn"]])] <= nrow(resGC$PeakTable)) {
+            unknarg <- args[["unkn"]]
+        }else{
+            error_message="Too much unkn compare metaMS results"
+            print(error_message)
+            stop(error_message)
+        }
     } else { 
         unknarg <- ""
     }
-    print(paste("Unkn:",unknarg)) 
 }
 
 cat("\n\n")
@@ -57,10 +76,6 @@ cat("\n\n")
 
 # ----- INFILE PROCESSING -----
 cat("\tINFILE PROCESSING INFO\n\n")
-
-# Loading RData file
-load(args[["metaMS"]])
-if (!exists("resGC")) stop("\n\nERROR: The RData doesn't contain any object called 'resGC' which is provided by the tool: new_metaMS.runGC")
 
 # Handle infiles
 if (!exists("singlefile")) singlefile <- NULL
@@ -84,17 +99,18 @@ if(!is.null(singlefile)){
     files <- paste("./",names(singlefile),sep="")
     if(!is.null(files)){
         if(args[["selectbpc"]]){
-            cat("\nProcessing BPC(s) from XCMS files...\n")
+            cat("\n\tProcessing BPC(s) from XCMS files...\n")
             c <- getBPC2s(files = files, xset = xset, rt="raw", pdfname="BPCs_raw.pdf")
             cat("BPC(s) created...\n")
         }
         if(args[["selecttic"]]){
-            cat("\nProcessing TIC(s) from XCMS files...\n")
+            cat("\n\tProcessing TIC(s) from XCMS files...\n")
             b <- getTIC2s(files = files, xset = xset, rt="raw", pdfname="TICs_raw.pdf")
             cat("TIC(s) created...\n")
         }
         if(args[["selecteic"]]){
-            cat("\nProcessing EIC(s) from XCMS files...\n")
+            cat("\n\tProcessing EIC(s) from XCMS files...\n")
+            cat(length(unknarg),"unknown(s) will be process !\n")
             plotUnknowns(resGC=resGC, unkn=unknarg, fileFrom="singlefile")
             cat("EIC(s) created...\n")
         }
@@ -107,17 +123,18 @@ if(!is.null(zipfile)){
     files <- getMSFiles(directory)
     if(!is.null(files)){
         if(args[["selectbpc"]]){
-            cat("\nProcessing BPC(s) from raw files...\n")
+            cat("\n\tProcessing BPC(s) from raw files...\n")
             c <- getBPC2s(files = files, rt="raw", pdfname="BPCs_raw.pdf")
             cat("BPC(s) created...\n")
         }
         if(args[["selecttic"]]) {
-            cat("\nProcessing TIC(s) from raw files...\n")
+            cat("\n\tProcessing TIC(s) from raw files...\n")
             b <- getTIC2s(files = files, rt="raw", pdfname="TICs_raw.pdf")  
             cat("TIC(s) created...\n")
         }
         if(args[["selecteic"]]) {
-            cat("\nProcessing EIC(s) from XCMS files...\n")
+            cat("\n\tProcessing EIC(s) from XCMS files...\n")
+            cat(length(unknarg),"unknown(s) will be process !\n")
             plotUnknowns(resGC=resGC, unkn=unknarg, fileFrom="zipfile")
             cat("EIC(s) created...\n")
         }
