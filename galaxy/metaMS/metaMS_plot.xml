@@ -92,15 +92,15 @@
             <param name="metaMS" value="runGC.RData"  ftype="rdata" />
             <conditional name="selectedtic">
                 <param name="TIC" value="true"/>
-                <output name="ticsRawPdf" value="TICs_raw.pdf" ftype="pdf"/>
+                <output name="ticsRawPdf" value="TICs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
             </conditional>
             <conditional name="selectedbpc">
                 <param name="BPC" value="true"/>
-                <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf"/>
+                <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
             </conditional>
             <conditional name="selectedeic">
                 <param name="EIC" value="true"/>
-                <output name="ticsRawPdf" value="GCMS_EIC.pdf" ftype="pdf"/>
+                <output name="ticsRawPdf" value="GCMS_EIC.pdf" ftype="pdf" compare="sim_size" delta="600"/>
             </conditional>
          
         </test>
@@ -108,10 +108,12 @@
     
     <help>
 	
-TODO : Update the different tests
+<!--TODO : Update the different tests
 TODO : Verify the differents tests
-TODO : Update the help section
-    
+TODO : Update the help section-->
+
+/!\\ WORK IN PROGRESS /!\\ 
+
 .. class:: infomark
 
 **Author(s)**  Ron Wehrens (ron.wehrens@gmail.com), Georg Weingart, Fulvio Mattivi
