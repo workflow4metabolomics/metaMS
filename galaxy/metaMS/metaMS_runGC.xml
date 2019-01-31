@@ -67,7 +67,7 @@
     ]]></command>
     
     <inputs>
-        <param name="input" type="data" format="rdata,rdata.xcms.findchrompeaks,rdata.xcms.group,no_unzip.zip,zip" label="Rdata from xcms.xcmsSet or zipfile with raw files directly" help="Rdata file containing a xset object or zipfile with raw files directly"/>
+        <param name="input" type="data" format="rdata,rdata.xcms.findchrompeaks,rdata.xcms.group.zip" label="Rdata from xcms.xcmsSet and merged" help="Rdata file containing a xset object"/>
 	    <conditional name="settings">
             <param name="setting" type="select" label="Settings" help="Choose the settings used for finding peaks" >
 			    <option value="gcdefault" selected="true">GC_Default</option>
@@ -150,14 +150,14 @@
             </when>
 	    </conditional>
         <conditional name="options_rifilter">
-					<param name="option" type="select" label="Use RI as filter" >
-						<option value="false" selected="true">FALSE</option>
-						<option value="true" >TRUE</option>
-					</param>
-					<when value="true">
-						<param name="ri_shift" type="integer" value="5" label="RIshift" help="RI shift accepted" />	
-					</when>
-					<when value="false" />
+			<param name="option" type="select" label="Use RI as filter" >
+				<option value="false" selected="true">FALSE</option>
+				<option value="true" >TRUE</option>
+			</param>
+			<when value="true">
+				<param name="ri_shift" type="integer" value="5" label="RIshift" help="RI shift accepted" />	
+			</when>
+			<when value="false" />
 		</conditional>       
 	     <!-- pour !is.null(DB) il faut un conditionnal avec un input type="text" pour charger la db au format msp et donc il faut définir un datatype (cf Misharl) -->
     </inputs>
@@ -176,36 +176,26 @@
     
     <tests>
         <test>
-            <param name="input" value="ziptest_W4M_GCMS_Dataset.zip"  ftype="zip" />
+            <param name="input" value="xset_merged.RData"  ftype="RData" />
             <param name="settings|setting" value="gcdefault" />
             <param name="settings|options_rtrange|option" value="hide" />
             <param name="settings|options_db|option" value="hide" />
             <param name="settings|options_ri|option" value="hide" />
-            <output name="peaktable" file="ziptest_peaktable.tsv" lines_diff="6"/>
-            <output name="sampleMetadata" file="ziptest_sampleMetadata.tsv" />
-            <output name="variableMetadata" file="ziptest_variableMetadata.tsv" lines_diff="6"/>
-            <output name="dataMatrix" file="ziptest_dataMatrix.tsv" lines_diff="6" />
-            <output name="peakspectra" file="ziptest_peakspectra.msp" lines_diff="6"/>
-        </test>
-        <test>
-            <param name="input" value="RawFilesTest_xset_merged.RData"  ftype="RData" />
-            <param name="settings|setting" value="gcdefault" />
-            <param name="settings|options_rtrange|option" value="hide" />
-            <param name="settings|options_db|option" value="hide" />
-            <param name="settings|options_ri|option" value="hide" />
-            <output name="peaktable" file="RawFilesTest_peaktable.tsv" lines_diff="6"/>
-            <output name="sampleMetadata" file="RawFilesTest_sampleMetadata.tsv" />
-            <output name="variableMetadata" file="RawFilesTest_variableMetadata.tsv" lines_diff="6"/>
-            <output name="dataMatrix" file="RawFilesTest_dataMatrix.tsv" lines_diff="6" />
-            <output name="peakspectra" file="RawFilesTest_peakspectra.msp" lines_diff="6"/>
+            <output name="peaktable" file="peaktable.tsv" lines_diff="6"/>
+            <output name="sampleMetadata" file="sampleMetadata.tsv" />
+            <output name="variableMetadata" file="variableMetadata.tsv" lines_diff="6"/>
+            <output name="dataMatrix" file="dataMatrix.tsv" lines_diff="6" />
+            <output name="peakspectra" file="peakspectra.msp" lines_diff="6"/>
         </test>
     </tests>
     
     <help>
 
-TODO : Update the different tests
+<!--TODO : Update the different tests
 TODO : Verify the differents tests
-TODO : Update the help section
+TODO : Update the help section-->
+
+/!\\ WORK IN PROGRESS /!\\
 
 .. class:: infomark
 
