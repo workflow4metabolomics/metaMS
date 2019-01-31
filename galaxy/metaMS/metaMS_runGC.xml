@@ -67,6 +67,7 @@
     ]]></command>
     
     <inputs>
+        
         <param name="input" type="data" format="rdata,rdata.xcms.findchrompeaks,rdata.xcms.group.zip" label="Rdata from xcms.xcmsSet and merged" help="Rdata file containing a xset object"/>
 	    <conditional name="settings">
             <param name="setting" type="select" label="Settings" help="Choose the settings used for finding peaks" >
@@ -160,6 +161,7 @@
 			<when value="false" />
 		</conditional>       
 	     <!-- pour !is.null(DB) il faut un conditionnal avec un input type="text" pour charger la db au format msp et donc il faut définir un datatype (cf Misharl) -->
+    
     </inputs>
     
     <outputs>
@@ -176,7 +178,7 @@
     
     <tests>
         <test>
-            <param name="input" value="xset_merged.RData"  ftype="RData" />
+            <param name="input" value="xset_merged.RData"  ftype="rdata" />
             <param name="settings|setting" value="gcdefault" />
             <param name="settings|options_rtrange|option" value="hide" />
             <param name="settings|options_db|option" value="hide" />
