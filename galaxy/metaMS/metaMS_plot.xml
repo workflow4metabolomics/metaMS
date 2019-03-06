@@ -3,7 +3,7 @@
     <description>GC-MS data preprocessing using metaMS package</description>
     
     <requirements>
-        <requirement type="package" version="1.14.0">bioconductor-metams</requirement>
+        <requirement type="package" version="1.18.1">bioconductor-metams</requirement>
         <requirement type="package" version="3.0.0">bioconductor-xcms</requirement>
         <requirement type="package" version="1.1_4">r-batch</requirement>
     </requirements>
@@ -108,9 +108,12 @@
     
     <help>
 	
-<!--TODO : Update the different tests
+<!--
+TODO : plotEIC not correct : we can't track the good unknown when we make EICs
+TODO : Update the different tests
 TODO : Verify the differents tests
-TODO : Update the help section-->
+TODO : Update the help section
+-->
 
 /!\\ WORK IN PROGRESS /!\\ 
 

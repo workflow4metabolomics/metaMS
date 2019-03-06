@@ -3,7 +3,7 @@
     <description>GC-MS data preprocessing using metaMS package</description>
     
     <requirements>
-        <requirement type="package" version="1.14.0">bioconductor-metams</requirement>
+        <requirement type="package" version="1.18.1">bioconductor-metams</requirement>
         <requirement type="package" version="3.0.0">bioconductor-xcms</requirement>
         <requirement type="package" version="1.1_4">r-batch</requirement>
     </requirements>
@@ -15,12 +15,8 @@
     <command><![CDATA[
     LC_ALL=C Rscript $__tool_directory__/metaMS_runGC.r
         
-        #if $input.is_of_type("rdata.xcms.raw") or $input.is_of_type("rdata.xcms.group") or $input.is_of_type("rdata.xcms.retcor") or $input.is_of_type("rdata"):
-            singlefile_galaxyPath '$input' singlefile_sampleName '$input.name'
-        #else
-            zipfile '$input'
-        #end if
-
+        singlefile_galaxyPath '$input' 
+        singlefile_sampleName '$input.name'
         
    		#if $settings.setting == "gcdefault":
 		    settings "default"
@@ -67,7 +63,7 @@
     ]]></command>
     
     <inputs>
-        
+
         <param name="input" type="data" format="rdata,rdata.xcms.findchrompeaks,rdata.xcms.group.zip" label="Rdata from xcms.xcmsSet and merged" help="Rdata file containing a xset object"/>
 	    <conditional name="settings">
             <param name="setting" type="select" label="Settings" help="Choose the settings used for finding peaks" >

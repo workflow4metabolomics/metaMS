@@ -46,11 +46,11 @@ cat("\n\n\tARGUMENTS PROCESSING INFO\n\n")
 load(args[["metaMS"]])
 if (!exists("resGC")) stop("\n\nERROR: The RData doesn't contain any object called 'resGC' which is provided by the tool: new_metaMS.runGC")
 
-if(args[["selecteic"]]) {
+if(!is.null(args[["selecteic"]])) {
     #Unknown EIC parameter
     if (args[["unkn"]][1] != "NULL") {
         #When unkn = 0 user want to process all unknowns
-        if(args[["unkn"]][1] == 0){
+        if(args[["unkn"]][1] == 0) {
             args[["unkn"]] <- c(1:nrow(resGC$PeakTable))
             print("User want to process on all unknown(s) found in metaMS process")
         }
@@ -61,7 +61,7 @@ if(args[["selecteic"]]) {
         cat("Number of unknown ask by user :",length(args[["unkn"]]),"\n")
         if(args[["unkn"]][length(args[["unkn"]])] <= nrow(resGC$PeakTable)) {
             unknarg <- args[["unkn"]]
-        }else{
+        } else {
             error_message="Too much unkn compare metaMS results"
             print(error_message)
             stop(error_message)
@@ -69,6 +69,10 @@ if(args[["selecteic"]]) {
     } else { 
         unknarg <- ""
     }
+} else {
+    error_message <- "No EIC selected !"
+    print(error_message)
+    stop(error_message)
 }
 
 cat("\n\n")
@@ -95,7 +99,7 @@ cat("\t\tCOMPUTE\n")
 
 #Use getTIC2s and getBPC2s because getTICs and getBPCs can exists due to transfert of function in Rdata
 
-if(!is.null(singlefile)){
+if(!is.null(singlefile)) {
     files <- paste("./",names(singlefile),sep="")
     if(!is.null(files)){
         if(args[["selectbpc"]]){
@@ -114,15 +118,15 @@ if(!is.null(singlefile)){
             plotUnknowns(resGC=resGC, unkn=unknarg, fileFrom="singlefile")
             cat("EIC(s) created...\n")
         }
-    }else{
+    } else {
         #TODO add error message
         print("Error files is empty")
     }
 }
-if(!is.null(zipfile)){
+if(!is.null(zipfile)) {
     files <- getMSFiles(directory)
-    if(!is.null(files)){
-        if(args[["selectbpc"]]){
+    if(!is.null(files)) {
+        if(args[["selectbpc"]]) {
             cat("\n\tProcessing BPC(s) from raw files...\n")
             c <- getBPC2s(files = files, rt="raw", pdfname="BPCs_raw.pdf")
             cat("BPC(s) created...\n")
@@ -138,7 +142,7 @@ if(!is.null(zipfile)){
             plotUnknowns(resGC=resGC, unkn=unknarg, fileFrom="zipfile")
             cat("EIC(s) created...\n")
         }
-    }else{
+    } else {
         #TODO add error message
         print("Error files is empty")
     } 

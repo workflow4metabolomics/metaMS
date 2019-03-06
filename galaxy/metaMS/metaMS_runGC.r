@@ -24,15 +24,16 @@ source_local("lib_metams.r")
 pkgs <- c("metaMS","stringr","batch","CAMERA") #"batch" necessary for parseCommandArgs function
 loadAndDisplayPackages(pkgs)
 
+
+###################################################################DELETE IT AFTER#############################################################################
+#Added it to have corrections of metaMS package
 source("/home/jsaintvanne/metaMS-1/R/runGC.R")
 source("/home/jsaintvanne/metaMS-1/R/matchSamples2DB.R")
 source("/home/jsaintvanne/metaMS-1/R/printString.R")
 source("/home/jsaintvanne/metaMS-1/R/matchfuns.R")
 source("/home/jsaintvanne/metaMS-1/R/annotations2tab.R")
 source("/home/jsaintvanne/metaMS-1/R/annotate.R")
-
-
-
+################################################################################################################################################################
 
 cat("\n\n")
 
@@ -98,13 +99,13 @@ if (args[["settings"]]=="default") {
         rtrange=NULL
     }
     
-    if (!is.null(DBarg)){
+    if (!is.null(DBarg)) {
         manual <- read.msp(DBarg)
         DBarg <- createSTDdbGC(stdInfo = NULL, settings = TSQXLS.GC, manualDB = manual)
     }
     
     #use RI instead of rt for time comparison vs DB
-    if (RIshift!="none"){
+    if (RIshift!="none") {
         TSQXLS.GC@match2DB.timeComparison<-"RI"
         TSQXLS.GC@match2DB.RIdiff<-as.numeric(RIshift)
         TSQXLS.GC@betweenSamples.timeComparison<-"RI"
@@ -174,14 +175,14 @@ if (args[["settings"]]=="User_defined") {
                 simthresh = simthreshparam)
 
     #ONLY use RI instead of rt for time comparison vs DB or samples
-    if (RIshift!="none"){
+    if (RIshift!="none") {
         GALAXY.GC@match2DB.timeComparison<-"RI"
         GALAXY.GC@match2DB.RIdiff<-as.numeric(RIshift)
         GALAXY.GC@betweenSamples.timeComparison<-"RI"
         GALAXY.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
     }
     
-    if (!is.null(DBarg)){
+    if (!is.null(DBarg)) {
         manual <- read.msp(DBarg)
         DBarg <- createSTDdbGC(stdInfo = NULL, settings = GALAXY.GC, manualDB = manual)
     }
@@ -211,39 +212,15 @@ cat("\t\tCOMPUTE\n\n")
 #necessary to unzip .zip file uploaded to Galaxy
 #thanks to .zip file it's possible to upload many file as the same time conserving the tree hierarchy of directories
 
-if (!is.null(args[["zipfile"]])){
-    cat("Loading from zip file...\n")
-
-    #Searching for good files
-    samples <- getMSFiles(directory)
-    cat("Processing",length(samples),"files...\n")
-
-    #create sampleMetadata, get sampleMetadata and class
-    sampleMetadata <- xcms:::phenoDataFromPaths(samples)
-    sampleMetadata <- cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
-    row.names(sampleMetadata)<-NULL
-
-    cat("Process runGC with metaMS package from raw files...")
-    if(args[["settings"]]=="default") {
-        print(str(TSQXLS.GC))
-        resGC<-runGC(files = samples, settings = TSQXLS.GC, rtrange = rtrange, DB = DBarg , removeArtefacts = TRUE, 
-                 findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
-    }
-    if(args[["settings"]]=="User_defined") {
-        print(str(GALAXY.GC))
-        resGC<-runGC(files = samples, settings = GALAXY.GC, rtrange = rtrange, DB = DBarg , removeArtefacts = TRUE, 
-                 findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
-    }
-
-} else if(!is.null(args[["singlefile_galaxyPath"]])){ 
+if(!is.null(args[["singlefile_galaxyPath"]])) { 
     cat("Loading from XCMS file(s)...\n")
     load(args[["singlefile_galaxyPath"]])
 
     #Transform XCMS object if needed
-    if(!exists("xset")){
-        if(exists("xdata")){
+    if(!exists("xset")) {
+        if(exists("xdata")) {
             xset<-getxcmsSetObject(xdata)
-        }else{
+        } else {
             error_message="no xset and no xdata... Probably a problem"
             print(error_message)
             stop(error_message)
@@ -279,9 +256,9 @@ if (!is.null(args[["zipfile"]])){
     } else {
         xset <- NULL
     }  
-    if(args[["settings"]] == "default"){
+    if(args[["settings"]] == "default") {
         settingslist=TSQXLS.GC
-        if (class(xset.l[[1]])!="xsAnnotate"){
+        if (class(xset.l[[1]])!="xsAnnotate") {
             cat("Process xsAnnotate with CAMERA package...\n")
             xsetCAM<-lapply(xset.l,
                  function(x) {
@@ -289,7 +266,6 @@ if (!is.null(args[["zipfile"]])){
                    capture.output(z <- groupFWHM(y, perfwhm = settingslist@CAMERA$perfwhm),
                                   file = NULL)
                    z})
-           
         }
     
         #default settings for GC from Wehrens et al
@@ -297,7 +273,7 @@ if (!is.null(args[["zipfile"]])){
         print(str(TSQXLS.GC))
         resGC <- runGC(xset = xsetCAM, settings = TSQXLS.GC, rtrange = rtrange, DB = DBarg, removeArtefacts = TRUE, 
                     findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves) 
-    }else{
+    } else {
         if(args[["settings"]] == "User_defined") {
             settingslist=GALAXY.GC
             if (class(xset.l[[1]]) != "xsAnnotate") {
@@ -311,14 +287,17 @@ if (!is.null(args[["zipfile"]])){
             print(str(GALAXY.GC))
             resGC <- runGC(xset = xsetCAM, settings = GALAXY.GC, rtrange = rtrange, DB = DBarg, removeArtefacts = TRUE, 
                         findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
-        }else{
-            #TODO add error message
-            cat("There is no xset")
+        } else {
+            error_message <- "There is no xset"
+            print(error_message)
+            stop(error_message)
         }
     }
-}else{
-    #TODO add error message
-    print("Error")
+} else {
+    #TODO update error message
+    error_message <- "No galaxy path entered"
+    print(error_message)
+    stop(error_message)
 }
 
 
