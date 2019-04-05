@@ -404,7 +404,6 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
 #only for Galaxy 
 
 plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
-print("dans plotUnknowns")
     ##Annotation table each value is a pcgrp associated to the unknown 
     ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
     ##R. Wehrens give me some clues on that and we found a correction
@@ -450,20 +449,17 @@ print("dans plotUnknowns")
         helpannotation[[j]] <- cbind(helpannotation[[j]],pspvector)
         names(helpannotation)[j] <- names(resGC$annotation[j])
     }
-    print(helpannotation)
 
     peaktable <- resGC$PeakTable
 	par (mar = c(5, 4, 4, 2) + 0.1)
     #For each unknown
 	for (l in 1:length(unkn)) {
-        print("unkn en cours :")
-        print(peaktable[unkn[l],])
 		#recordPlot
 		perpage = 3 #if change change layout also!
 		dev.new(width = 21/2.54, height = 29.7/2.54, file = paste("Unknown_",unkn[l],".pdf", sep = "")) #A4 pdf
-		# par(mfrow=c(perpage,2))
+		#par(mfrow=c(perpage,2))
 		layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths = rep(c(1,1),perpage), heights = rep(c(1,5),perpage))
-		# layout.show(6)
+		#layout.show(9)
 		oma.saved <- par("oma")
 		par(oma = rep.int(0, 4))
 		par(oma = oma.saved)
@@ -471,10 +467,7 @@ print("dans plotUnknowns")
 		on.exit(par(o.par))
 								
         #For each sample
-        for (c in 1:length(resGC$xset)) {
-                    
-            print(paste("Processing sample :",c,"on",length(resGC$xset)))
-                    
+        for (c in 1:length(resGC$xset)) {                    
 			#get sample name
 			sampname <- basename(resGC$xset[[c]]@xcmsSet@filepaths)
 			#remove .cdf, .mzXML filepattern
@@ -483,7 +476,6 @@ print("dans plotUnknowns")
 			sampname <- gsub(filepattern, "",sampname)
 			title1 <- paste(peaktable[unkn[l],1],"from",sampname, sep = " ")
 
-            print(title1)
             an <- resGC$xset[[c]]
 			if(fileFrom == "zipfile") {
 				an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
@@ -491,36 +483,42 @@ print("dans plotUnknowns")
 				an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
 			}
 
-			par (mar=c(0, 0, 0, 0) + 0.1)
-			plot.new()
-			box()
-			text(0.5, 0.5, title1, cex=2)
+		    
 
             #Find the good annotation for this sample
             for(a in 1:length(helpannotation)){
+                
                 if(gsub(filepattern, "", names(helpannotation)[a]) == paste0("./",sampname)){
-                    print("good sample")
                     #Find the unkn or the matched std in this sample
                     findunkn <- FALSE
                     for(r in 1:nrow(helpannotation[[a]])){
-                        print(helpannotation[[a]][r,])
-                        print("--------------")
                         if(helpannotation[[a]][r,"annotation"] == peaktable[unkn[l],1]){
-                            print("re bingo")
                             findunkn <- TRUE
                             pcgrp <- helpannotation[[a]][r,"pspvector"]
-                            print(pcgrp)
+                            par (mar=c(0, 0, 0, 0) + 0.1)
+                            #Write title
+                            plot.new()
+                            box()
+                            text(0.5, 0.5, title1, cex=2)
                             par (mar = c(3, 2.5, 3, 1.5) + 0.1)
+                            #Window for EIC
                             plotEICs(an, pspec = pcgrp, maxlabel = 2)
+                            #Window for pseudospectra
                             plotPsSpectrum(an, pspec = pcgrp, maxlabel = 2)
-                            break #Have to remove it to be able to draw each pseudospectra when there is more than one matching with one unkn or std
                         }
                     }
+                    #If we can't find it, we print "not found"
                     if(!findunkn){
-                        print("can't find this unkn in this sample")
+                        par (mar=c(0, 0, 0, 0) + 0.1)
+                        #Write title
+                        plot.new()
+                        box()
+                        text(0.5, 0.5, title1, cex=2)
+                        #Window for EIC
                         plot.new()
                         box()
                         text(0.5, 0.5, "NOT FOUND", cex=2)
+                        #Window for pseudospectra
                         plot.new()
                         box()
                         text(0.5, 0.5, "NOT FOUND", cex=2)

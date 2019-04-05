@@ -185,7 +185,7 @@ Num Peaks: 236
 Name: Glycine, 3TMS
 DB.idx: 5
 RI: 1302.682
-MW: 291.610
+monoMW: 291.610
 rt: 13.965
 std.rt: 0.0033
 Class: Standard
@@ -234,7 +234,7 @@ Num Peaks: 97
 261  1; 273  3;
 
 Name: Alanine, 3TMS
-DB.idx : 7
+DB.idx: 7
 RI: 1360.504
 Formula: C12H31NO2Si3
 MW: 305.637

@@ -46,7 +46,7 @@ cat("\n\n\tARGUMENTS PROCESSING INFO\n\n")
 load(args[["metaMS"]])
 if (!exists("resGC")) stop("\n\nERROR: The RData doesn't contain any object called 'resGC' which is provided by the tool: new_metaMS.runGC")
 
-if(!is.null(args[["selecteic"]])) {
+if(args[["selecteic"]]) {
     #Unknown EIC parameter
     if (args[["unkn"]][1] != "NULL") {
         #When unkn = 0 user want to process all unknowns
@@ -66,13 +66,11 @@ if(!is.null(args[["selecteic"]])) {
             print(error_message)
             stop(error_message)
         }
-    } else { 
-        unknarg <- ""
+    } else {
+        error_message <- "No EIC selected !"
+        print(error_message)
+        stop(error_message)
     }
-} else {
-    error_message <- "No EIC selected !"
-    print(error_message)
-    stop(error_message)
 }
 
 cat("\n\n")
@@ -115,7 +113,7 @@ if(!is.null(singlefile)) {
         if(args[["selecteic"]]){
             cat("\n\tProcessing EIC(s) from XCMS files...\n")
             cat(length(unknarg),"unknown(s) will be process !\n")
-            plotUnknowns(resGC=resGC, unkn=unknarg, fileFrom="singlefile")
+            plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBarg, fileFrom="singlefile")
             cat("EIC(s) created...\n")
         }
     } else {
@@ -139,7 +137,7 @@ if(!is.null(zipfile)) {
         if(args[["selecteic"]]) {
             cat("\n\tProcessing EIC(s) from XCMS files...\n")
             cat(length(unknarg),"unknown(s) will be process !\n")
-            plotUnknowns(resGC=resGC, unkn=unknarg, fileFrom="zipfile")
+            plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBarg, fileFrom="zipfile")
             cat("EIC(s) created...\n")
         }
     } else {

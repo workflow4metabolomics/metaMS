@@ -24,17 +24,6 @@ source_local("lib_metams.r")
 pkgs <- c("metaMS","stringr","batch","CAMERA") #"batch" necessary for parseCommandArgs function
 loadAndDisplayPackages(pkgs)
 
-
-###################################################################DELETE IT AFTER#############################################################################
-#Added it to have corrections of metaMS package
-source("/home/jsaintvanne/metaMS-1/R/runGC.R")
-source("/home/jsaintvanne/metaMS-1/R/matchSamples2DB.R")
-source("/home/jsaintvanne/metaMS-1/R/printString.R")
-source("/home/jsaintvanne/metaMS-1/R/matchfuns.R")
-source("/home/jsaintvanne/metaMS-1/R/annotations2tab.R")
-source("/home/jsaintvanne/metaMS-1/R/annotate.R")
-################################################################################################################################################################
-
 cat("\n\n")
 
 modNamC <- "metaMS:runGC" ## module name
@@ -304,8 +293,8 @@ if(!is.null(args[["singlefile_galaxyPath"]])) {
 # ----- EXPORT -----
 #peakTable ordered by rt
 cat("\n\tGenerating peakTable file\n")
-peaktable <- resGC$PeakTable[order(resGC$PeakTable[,"rt"]),]
-peaktable <- getCorrectFileName(peaktable,sampleMetadata)
+#peaktable <- resGC$PeakTable[order(resGC$PeakTable[,"rt"]),] Remove because difficulties to find the good pcgroup with the good name during plotUnkn function (in metaMS_plot)
+peaktable <- getCorrectFileName(resGC$PeakTable,sampleMetadata)
 print(head(peaktable))
 write.table(peaktable, file = "peaktable.tsv", sep = "\t", row.names = FALSE)
 
@@ -334,7 +323,7 @@ cat("\n\tGenerating",length(resGC$PseudoSpectra),"peakspectra file\n")
 write.msp(resGC$PseudoSpectra, file = "peakspectra.msp", newFile = TRUE)
 
 #saving R data in .Rdata file to save the variables used in the present tool
-objects2save <- c("resGC", "xset", "singlefile", "zipfile")
+objects2save <- c("resGC", "xset", "singlefile", "zipfile", "DBarg")
 save(list = objects2save[objects2save %in% ls()], file = "runGC.RData")
 #save.image(paste("runGC","RData",sep="."))
 
