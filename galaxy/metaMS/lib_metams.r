@@ -2,6 +2,7 @@
 # R function for metaMS runGC under W4M
 # author Yann GUITTON CNRS IRISA/LINA Idealg project 2014-2015
 # author Yann GUITTON Oniris Laberca 2015-2017
+# Modify by J.Saint-Vanne 04/2019
 
 
 #@author G. Le Corguille
