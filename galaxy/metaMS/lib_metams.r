@@ -397,282 +397,139 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
    	# invisible(TIC)
 }
 
-#Update by J.SAint-Vanne
+#Update by J.Saint-Vanne
 ##addition for quality control of peak picking
 #metaMS EIC and pspectra plotting option
 #version 20190129
 #only for Galaxy 
 
-plotUnknowns<-function(resGC, unkn="", fileFrom=NULL){
-
-  ##Annotation table each value is a pcgrp associated to the unknown 
-  ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
-  ##R. Wehrens give me some clues on that and we found a correction
-  peaktable <- resGC$PeakTable[order(resGC$PeakTable[,"rt"]),]
-  print(peaktable)
-
-	mat<-matrix(ncol=length(resGC$xset), nrow=dim(peaktable)[1])
-
-	for (j in 1: length(resGC$xset)) {
-		test<-resGC$annotation[[j]]
-		for (i in 1:dim(test)[1]) {
-			if (as.numeric(row.names(test)[i])>dim(mat)[1]) {
-				next
-			} else {
-				mat[as.numeric(row.names(test)[i]),j]<-test[i,1]
-			}
-		}
-	}
-  #Add files names as colnames
-	colnames(mat) <- colnames(peaktable[,c((which(colnames(peaktable) == "rt" | colnames(peaktable) == "RI")
-                    [length(which(colnames(peaktable) == "rt" | colnames(peaktable) == "RI"))] + 1) : dim(peaktable)[2])])
-	#debug
-print("======")
-print(mat)
-	# print(dim(mat))
-	# print(mat[1:3,]) 
-	# write.table(mat, file="myannotationtable.tsv", sep="\t", row.names=FALSE)
-	#correction of annotation matrix due to pcgrp removal by quality check in runGCresult
-	#matrix of correspondance between an@pspectra and filtered pspectra from runGC
-
-	allPCGRPs <-
-		lapply(1:length(resGC$xset),
-			function(i) {
-				an <- resGC$xset[[i]]
-				huhn <- an@pspectra[which(sapply(an@pspectra, length) >= 
-					metaSetting(resGC$settings,"DBconstruction.minfeat"))] 
-					matCORR<-cbind(1:length(huhn), match(huhn, an@pspectra))
-				})
+plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
+print("dans plotUnknowns")
+    ##Annotation table each value is a pcgrp associated to the unknown 
+    ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
+    ##R. Wehrens give me some clues on that and we found a correction
+  
+    #correction of annotation matrix due to pcgrp removal by quality check in runGCresult
+    #matrix of correspondance between an@pspectra and filtered pspectra from runGC
     
-  #When this one is possible ??????????????????????????????????????????????????????
-	#if (unkn[1]=="") {
-	#plot EIC and spectra for all unknown for comparative purpose
-	  
-	#	par (mar=c(5, 4, 4, 2) + 0.1)
-	#	for (l in 1:dim(peaktable)[1]){ #l=2
-	#		#recordPlot
-	#		perpage=3 #if change change layout also!
-	#		num.plots <- ceiling(dim(mat)[2]/perpage) #three pcgroup per page
-	#		my.plots <- vector(num.plots, mode='list')
-	#		dev.new(width=21/2.54, height=29.7/2.54, file=paste("Unknown_",l,".pdf", sep="")) #A4 pdf
-	#		# par(mfrow=c(perpage,2))
-	#		layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths=rep(c(1,1),perpage), heights=rep(c(1,5),perpage))
-	#		# layout.show(6)
-	#		oma.saved <- par("oma")
-	#		par(oma = rep.int(0, 4))
-	#		par(oma = oma.saved)
-	#		o.par <- par(mar = rep.int(0, 4))
-	#		on.exit(par(o.par))
-	#		stop=0 #initialize
-	#		for (i in 1:num.plots) {
-	#			start=stop+1
-	#			stop=start+perpage-1 #
-	#			for (c in start:stop){
-	#				if (c <=dim(mat)[2]){
-	#						
-	#					#get sample name
-	#					sampname<-basename(resGC$xset[[c]]@xcmsSet@filepaths)
-#
-	#					#remove .cdf, .mzXML filepattern
-	#					filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", 
-	#							"[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
-	#					filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), 
-	#							collapse = "|")
-	#					sampname<-gsub(filepattern, "",sampname)
-	#						 
-	#					title1<-paste(peaktable[l,1],"from",sampname, sep=" ")
-	#					an<-resGC$xset[[c]]
-	#					if(fileFrom == "zipfile"){
-	#						an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
-	#					}else{
-	#						an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
-	#					}
-	#					 
-	#					par (mar=c(0, 0, 0, 0) + 0.1)
-	#					plot.new()
-	#					box()
-	#					text(0.5, 0.5, title1, cex=2)
-	#					if (!is.na(mat[l,c])){
-	#						pcgrp=allPCGRPs[[c]][which(allPCGRPs[[c]][,1]==mat[l,c]),2]
-	#						if (pcgrp!=mat[l,c]) print ("pcgrp changed")
-	#						par (mar=c(3, 2.5, 3, 1.5) + 0.1)
-	#						plotEICs(an, pspec=pcgrp, maxlabel=2)
-	#						plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
-	#					} else {
-	#						plot.new()
-	#						box()
-	#						text(0.5, 0.5, "NOT FOUND", cex=2)
-	#						plot.new()
-	#						box()
-	#						text(0.5, 0.5, "NOT FOUND", cex=2)
-	#					}
-	#				}
-	#			}
-	#			# my.plots[[i]] <- recordPlot()
-	#		}
-	#		graphics.off()
-#
-	#		# pdf(file=paste("Unknown_",l,".pdf", sep=""), onefile=TRUE)
-	#		# for (my.plot in my.plots) {
-	#			# replayPlot(my.plot)
-	#		# }
-	#		# my.plots
-	#		# graphics.off()
-#
-	#	}#end for l
-	#}#end if unkn=""
+    #Select only pspectra which correpond to them select in metaMS
+    # col1 = filtered spectra from runGC and col2 = an@spectra
+    allPCGRPs <-
+        lapply(1:length(resGC$xset),
+            function(i) {
+                an <- resGC$xset[[i]]
+                huhn <- an@pspectra[which(sapply(an@pspectra, length) >= 
+                    metaSetting(resGC$settings,"DBconstruction.minfeat"))] 
+                    matCORR<-cbind(1:length(huhn), match(huhn, an@pspectra))
+                })
 
-	#else {
+    #Build a new annotation list with sampnames and pseudospectra number from xset
+    helpannotation <- list()
+    for(j in 1:length(resGC$xset)){
+        helpannotation[[j]] <- resGC$annotation[[j]][1:2]
+        pspvector <- vector()
+        for(i in 1: nrow(helpannotation[[j]])){
+            #Find corresponding pspec
+            psplink <- allPCGRPs[[j]][match(helpannotation[[j]][i,1],allPCGRPs[[j]]),2]
+            pspvector <- c(pspvector,psplink)
+            #Change the annotation column into sampname column
+            if(helpannotation[[j]][i,2] < 0){
+                #It's an unknown
+                new_name <- paste("Unknown",abs(as.integer(helpannotation[[j]][i,2])))
+                helpannotation[[j]][i,2] <- new_name
+            }else{
+                #It has been found in local database
+                for(k in 1:length(DB)){
+                    if(helpannotation[[j]][i,2] == k){
+                        helpannotation[[j]][i,2] <- DB[[k]]$Name
+                        break
+                    }
+                }
+            }
+        }
+        helpannotation[[j]] <- cbind(helpannotation[[j]],pspvector)
+        names(helpannotation)[j] <- names(resGC$annotation[j])
+    }
+    print(helpannotation)
 
-		par (mar=c(5, 4, 4, 2) + 0.1)
-		if (length(unkn) == 1) {
-			#recordPlot
-			perpage = 3 #if change change layout also!
-			num.plots <- ceiling(dim(mat)[2]/perpage) #three pcgroup per page
-			my.plots <- vector(num.plots, mode='list')
-				
-			dev.new(width = 21/2.54, height = 29.7/2.54, file = paste("Unknown_",unkn,".pdf", sep = "")) #A4 pdf
-			# par(mfrow=c(perpage,2))
-			layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths = rep(c(1,1),perpage), heights = rep(c(1,5),perpage))
-			# layout.show(6)
-			oma.saved <- par("oma")
-			par(oma = rep.int(0, 4))
-			par(oma = oma.saved)
-			o.par <- par(mar = rep.int(0, 4))
-			on.exit(par(o.par))
-			stop = 0 #initialize
-			for (i in 1:num.plots) {
-				start = stop + 1
-				stop = start + perpage - 1 #
-				for (c in start:stop) {
-					if (c <= dim(mat)[2]) {
-								
-						#get sample name
-						sampname <- basename(resGC$xset[[c]]@xcmsSet@filepaths)
-
-						#remove .cdf, .mzXML filepattern
-						filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", "[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
-						filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), collapse = "|")
-						sampname <- gsub(filepattern, "",sampname)
-							 
-						title1 <- paste(peaktable[l,1],"from",sampname, sep=" ")
-						an <- resGC$xset[[c]]
-						if(fileFrom == "zipfile") {
-							an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
-						} else {
-							an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
-						}
-							 
-						par (mar=c(0, 0, 0, 0) + 0.1)
-						plot.new()
-						box()
-						text(0.5, 0.5, title1, cex=2)
-						if (!is.na(mat[unkn,c])) {
-							pcgrp = allPCGRPs[[c]][which(allPCGRPs[[c]][,1] == mat[unkn,c]),2]
-							print("----")
-              print(pcgrp)
-              print("----")
-
-              if (pcgrp!=mat[unkn,c]) print ("pcgrp changed")
-							par (mar = c(3, 2.5, 3, 1.5) + 0.1)
-							plotEICs(an, pspec = pcgrp, maxlabel = 2)
-							plotPsSpectrum(an, pspec = pcgrp, maxlabel = 2)
-						} else {
-							plot.new()
-							box()
-							text(0.5, 0.5, "NOT FOUND", cex = 2)
-							plot.new()
-							box()
-							text(0.5, 0.5, "NOT FOUND", cex = 2)
-						}
-					}
-				}
-				# my.plots[[i]] <- recordPlot()
-			}
-			graphics.off()
-
-			# pdf(file=paste("Unknown_",unkn,".pdf", sep=""), onefile=TRUE)
-			# for (my.plot in my.plots) {
-				# replayPlot(my.plot)
-			# }
-			# my.plots
-			# graphics.off()
-		} #end if length(unkn) = 1
-
-		else {
-
-			par (mar = c(5, 4, 4, 2) + 0.1)
-      #For each unknown
-			for (l in 1:length(unkn)) {
+    peaktable <- resGC$PeakTable
+	par (mar = c(5, 4, 4, 2) + 0.1)
+    #For each unknown
+	for (l in 1:length(unkn)) {
+        print("unkn en cours :")
         print(peaktable[unkn[l],])
-				#recordPlot
-				perpage = 3 #if change change layout also!
-				num.plots <- ceiling(dim(mat)[2]/perpage) #three pcgroup per page
-				my.plots <- vector(num.plots, mode = 'list')
-				dev.new(width = 21/2.54, height = 29.7/2.54, file = paste("Unknown_",unkn[l],".pdf", sep = "")) #A4 pdf
-				# par(mfrow=c(perpage,2))
-				layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths = rep(c(1,1),perpage), heights = rep(c(1,5),perpage))
-				# layout.show(6)
-				oma.saved <- par("oma")
-				par(oma = rep.int(0, 4))
-				par(oma = oma.saved)
-				o.par <- par(mar = rep.int(0, 4))
-				on.exit(par(o.par))
-				stop = 0 #initialize
-				for (i in 1:num.plots) {
-					start = stop + 1
-					stop = start + perpage - 1 #
-					for (c in start:stop) {
-						if (c <= dim(mat)[2]) {
-							#get sample name
-							sampname <- basename(resGC$xset[[c]]@xcmsSet@filepaths)
-							#remove .cdf, .mzXML filepattern
-							filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", "[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
-							filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), collapse = "|")
+		#recordPlot
+		perpage = 3 #if change change layout also!
+		dev.new(width = 21/2.54, height = 29.7/2.54, file = paste("Unknown_",unkn[l],".pdf", sep = "")) #A4 pdf
+		# par(mfrow=c(perpage,2))
+		layout(matrix(c(1,1,2,3,4,4,5,6,7,7,8,9), 6, 2, byrow = TRUE), widths = rep(c(1,1),perpage), heights = rep(c(1,5),perpage))
+		# layout.show(6)
+		oma.saved <- par("oma")
+		par(oma = rep.int(0, 4))
+		par(oma = oma.saved)
+		o.par <- par(mar = rep.int(0, 4))
+		on.exit(par(o.par))
 								
-							sampname <- gsub(filepattern, "",sampname)
-							print(sampname)
-							title1 <- paste(peaktable[unkn[l],1],"from",sampname, sep = " ")
-							an <- resGC$xset[[c]]
-              print(an)
-							if(fileFrom == "zipfile") {
-								an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
-							} else {
-								an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
-							}
+        #For each sample
+        for (c in 1:length(resGC$xset)) {
+                    
+            print(paste("Processing sample :",c,"on",length(resGC$xset)))
+                    
+			#get sample name
+			sampname <- basename(resGC$xset[[c]]@xcmsSet@filepaths)
+			#remove .cdf, .mzXML filepattern
+			filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", "[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
+			filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), collapse = "|")	
+			sampname <- gsub(filepattern, "",sampname)
+			title1 <- paste(peaktable[unkn[l],1],"from",sampname, sep = " ")
 
-							par (mar=c(0, 0, 0, 0) + 0.1)
-							plot.new()
-							box()
-							text(0.5, 0.5, title1, cex=2)
-							if (!is.na(mat[unkn[l],c])) {
-								pcgrp=allPCGRPs[[c]][which(allPCGRPs[[c]][,1]==mat[unkn[l],c]),2]
-                if (pcgrp!=mat[unkn[l],c]) print ("pcgrp changed")
-								par (mar=c(3, 2.5, 3, 1.5) + 0.1)
-								plotEICs(an, pspec=pcgrp, maxlabel=2)
-								plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
-							} else {
-								plot.new()
-								box()
-								text(0.5, 0.5, "NOT FOUND", cex=2)
-								plot.new()
-								box()
-								text(0.5, 0.5, "NOT FOUND", cex=2)
-							}
-						}
-					}
-					# my.plots[[i]] <- recordPlot()
-				}
-				graphics.off()
+            print(title1)
+            an <- resGC$xset[[c]]
+			if(fileFrom == "zipfile") {
+				an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
+			} else {
+				an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
+			}
 
-				# pdf(file=paste("Unknown_",unkn[l],".pdf", sep=""), onefile=TRUE)
-				# for (my.plot in my.plots) {
-					# replayPlot(my.plot)
-				# }
-				# my.plots
-				# graphics.off()
+			par (mar=c(0, 0, 0, 0) + 0.1)
+			plot.new()
+			box()
+			text(0.5, 0.5, title1, cex=2)
 
-			}#end for unkn[l]			
-		}		
-	#}
+            #Find the good annotation for this sample
+            for(a in 1:length(helpannotation)){
+                if(gsub(filepattern, "", names(helpannotation)[a]) == paste0("./",sampname)){
+                    print("good sample")
+                    #Find the unkn or the matched std in this sample
+                    findunkn <- FALSE
+                    for(r in 1:nrow(helpannotation[[a]])){
+                        print(helpannotation[[a]][r,])
+                        print("--------------")
+                        if(helpannotation[[a]][r,"annotation"] == peaktable[unkn[l],1]){
+                            print("re bingo")
+                            findunkn <- TRUE
+                            pcgrp <- helpannotation[[a]][r,"pspvector"]
+                            print(pcgrp)
+                            par (mar = c(3, 2.5, 3, 1.5) + 0.1)
+                            plotEICs(an, pspec = pcgrp, maxlabel = 2)
+                            plotPsSpectrum(an, pspec = pcgrp, maxlabel = 2)
+                            break #Have to remove it to be able to draw each pseudospectra when there is more than one matching with one unkn or std
+                        }
+                    }
+                    if(!findunkn){
+                        print("can't find this unkn in this sample")
+                        plot.new()
+                        box()
+                        text(0.5, 0.5, "NOT FOUND", cex=2)
+                        plot.new()
+                        box()
+                        text(0.5, 0.5, "NOT FOUND", cex=2)
+                    }
+                    break
+                }
+            }
+		}
+		graphics.off()
+
+	}#end for unkn[l]				
 } #end function 
