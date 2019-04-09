@@ -11,7 +11,7 @@ sink(log_file, type = "output")
 
 
 # ----- PACKAGE -----
-cat("\tSESSION INFO\n")
+cat("\tSESSION INFO\n\n")
 
 #Import the different functions
 source_local <- function(fname) {
@@ -31,10 +31,10 @@ cat("\nStart of the '", modNamC, "' Galaxy module call: ", format(Sys.time(), "%
 
 
 # ----- ARGUMENTS -----
-cat("\n\n\tARGUMENTS INFO\n")
+cat("\n\n\tARGUMENTS INFO\n\n")
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
-write.table(as.matrix(args), col.names=F, quote=F, sep='\t\t')
-
+#write.table(as.matrix(args), col.names=F, quote=F, sep='\t\t')
+print(cbind(value = unlist(args)))
 
 # ----- PROCESSING INFILE -----
 cat("\n\n\tARGUMENTS PROCESSING INFO\n\n")
@@ -53,29 +53,22 @@ if (args[["ri"]]!="NULL"){
     }
     #to do check real column names
     colnames(RIarg) <- c("rt","RI")
-    cat("RIarg :")
-    print(RIarg)
 } else {
     RIarg <- NULL
-    cat("Ri = NULL\n\n")
 }
 
 #RIshift parameter
 if (args[["rishift"]] != "none"){
     RIshift <- args[["rishift"]]
-    cat("\nRishift used = ",RIshift, "\n")
 } else {
     RIshift <- "none"
-    cat("Rishift = ",RIshift, "\n")
 }
 
 #Personal databae parameter
 if (args[["db"]] != "NULL"){
     DBarg <- args[["db"]]
-    cat("\nDb = ",DBarg, "\n")
 } else {
     DBarg <- NULL
-    cat("\nNO Db : NULL\n\n")
 }
 
 #settings process
@@ -179,7 +172,7 @@ if (args[["settings"]]=="User_defined") {
 
 
 # ----- INFILE PROCESSING -----
-cat("\n\n\tINFILE PROCESSING INFO\n\n")
+cat("\n\n\n\tINFILE PROCESSING INFO\n\n")
 
 # Handle infiles
 if (!exists("singlefile")) singlefile <- NULL
@@ -191,7 +184,7 @@ directory <- retrieveRawfileInTheWorkingDirectory(singlefile, zipfile)
 
 
 # ----- MAIN PROCESSING INFO -----
-cat("\n\n\tMAIN PROCESSING INFO\n")
+cat("\n\tMAIN PROCESSING INFO\n")
 
 cat("\t\tCOMPUTE\n\n")
 
@@ -202,7 +195,7 @@ cat("\t\tCOMPUTE\n\n")
 #thanks to .zip file it's possible to upload many file as the same time conserving the tree hierarchy of directories
 
 if(!is.null(args[["singlefile_galaxyPath"]])) { 
-    cat("Loading from XCMS file(s)...\n")
+    cat("Loading datas from XCMS file(s)...\n")
     load(args[["singlefile_galaxyPath"]])
 
     #Transform XCMS object if needed
@@ -292,39 +285,45 @@ if(!is.null(args[["singlefile_galaxyPath"]])) {
 
 # ----- EXPORT -----
 #peakTable ordered by rt
-cat("\n\tGenerating peakTable file\n")
+cat("\nGenerating peakTable file")
 #peaktable <- resGC$PeakTable[order(resGC$PeakTable[,"rt"]),] Remove because difficulties to find the good pcgroup with the good name during plotUnkn function (in metaMS_plot)
 peaktable <- getCorrectFileName(resGC$PeakTable,sampleMetadata)
-print(head(peaktable))
+cat("\t.\t.")
 write.table(peaktable, file = "peaktable.tsv", sep = "\t", row.names = FALSE)
+cat("\t.\tOK")
 
 #variableMetadata
-cat("\n\tGenerating variableMetadata file\n")
+cat("\nGenerating variableMetadata file")
 variableMetadata <- peaktable[,!(colnames(peaktable) %in% sampleMetadata[,1])]
 rownames(variableMetadata) <- NULL
-print(head(variableMetadata))
+cat("\t.")
 write.table(variableMetadata, file = "variableMetadata.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
+cat("\t.\tOK")
+
 
 #peakTable for PCA
 #dataMatrix
-cat("\n\tGenerating dataMatrix file\n")
+cat("\nGenerating dataMatrix file")
 dataMatrix <- cbind(Name = peaktable[,"Name"],peaktable[,(colnames(peaktable) %in% sampleMetadata[,1])])
 rownames(dataMatrix) <- NULL
-print(head(dataMatrix))
+cat("\t.\t.")
 write.table(dataMatrix, file = "dataMatrix.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
+cat("\t.\tOK")
+
 
 #sampleMetadata
-cat("\n\tGenerating sampleMetadata file\n")
-print(head(sampleMetadata))
+cat("\nGenerating sampleMetadata file")
+cat("\t.\t.")
 write.table(sampleMetadata, file = "sampleMetadata.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
+cat("\t.\tOK")
+
 
 #peak spectrum as MSP for DB search
-cat("\n\tGenerating",length(resGC$PseudoSpectra),"peakspectra file\n")
+cat("\nGenerating",length(resGC$PseudoSpectra),"peakspectra in peakspectra.msp file\n")
 write.msp(resGC$PseudoSpectra, file = "peakspectra.msp", newFile = TRUE)
 
 #saving R data in .Rdata file to save the variables used in the present tool
 objects2save <- c("resGC", "xset", "singlefile", "zipfile", "DBarg")
 save(list = objects2save[objects2save %in% ls()], file = "runGC.RData")
-#save.image(paste("runGC","RData",sep="."))
 
 cat("\nEnd of '", modNamC, "' Galaxy module call: ", as.character(Sys.time()), "\n", sep = "")
