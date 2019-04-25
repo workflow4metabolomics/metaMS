@@ -6,14 +6,8 @@
 language: python
 
 env:
-  - TESTFOLDER=tools/msnbase_readmsdata
-  - TESTFOLDER=tools/xcms_xcmsset
-  - TESTFOLDER=tools/xcms_merge
-  - TESTFOLDER=tools/xcms_group
-  - TESTFOLDER=tools/xcms_retcor
-  - TESTFOLDER=tools/xcms_fillpeaks
-  - TESTFOLDER=tools/xcms_plot_chromatogram
-  - TESTFOLDER=tools/xcms_summary
+  - TESTFOLDER=tools/metaMS_runGC
+  - TESTFOLDER=tools/metaMS_plot
 
 before_install:
   - sudo apt-get install -y python-virtualenv
