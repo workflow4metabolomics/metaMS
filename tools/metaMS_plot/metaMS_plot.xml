@@ -87,21 +87,29 @@
     </outputs>
     
     <tests>
+        <!-- Test TIC -->
         <test>
             <param name="metaMS" value="runGC.RData"  ftype="rdata" />
             <conditional name="selectedtic">
                 <param name="TIC" value="true"/>
                 <output name="ticsRawPdf" value="TICs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
             </conditional>
+        </test>
+        <!-- Test BPC -->
+        <test>
+            <param name="metaMS" value="runGC.RData"  ftype="rdata" />
             <conditional name="selectedbpc">
                 <param name="BPC" value="true"/>
                 <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
             </conditional>
+        </test>
+        <!-- Test EICs -->
+        <test>
+            <param name="metaMS" value="runGC.RData"  ftype="rdata" />
             <conditional name="selectedeic">
                 <param name="EIC" value="true"/>
                 <output name="ticsRawPdf" value="GCMS_EIC.pdf" ftype="pdf" compare="sim_size" delta="600"/>
             </conditional>
-         
         </test>
     </tests>
     
