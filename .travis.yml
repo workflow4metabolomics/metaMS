@@ -23,4 +23,4 @@ install:
 script:
   - planemo lint ${TRAVIS_BUILD_DIR}/${TESTFOLDER}
   # --conda_ensure_channels bioconda,workflow4metabolomics,conda-forge,default
-- planemo test  --galaxy_branch release_18.05 --no_cache_galaxy ${TRAVIS_BUILD_DIR}/${TESTFOLDER}
+  - planemo test  --galaxy_branch release_18.05 --no_cache_galaxy ${TRAVIS_BUILD_DIR}/${TESTFOLDER}
