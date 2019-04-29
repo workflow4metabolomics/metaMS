@@ -168,7 +168,7 @@
     
     <tests>
         <!-- Test without DB -->
-        <test>
+        <!--<test>
             <param name="input" value="xset_merged.RData"  ftype="rdata" />
             <param name="settings|setting" value="gcdefault" />
             <param name="settings|options_rtrange|option" value="hide" />
@@ -179,14 +179,16 @@
             <output name="variableMetadata" file="variableMetadata_noDB.tsv" lines_diff="6"/>
             <output name="dataMatrix" file="dataMatrix_noDB.tsv" lines_diff="6" />
             <output name="peakspectra" file="peakspectra_noDB.msp" lines_diff="6"/>
-        </test>
+        </test>-->
         <!-- Test with DB -->
         <test>
             <param name="input" value="xset_merged.RData"  ftype="rdata" />
             <param name="settings|setting" value="gcdefault" />
             <param name="settings|options_rtrange|option" value="hide" />
-            <param name="settings|options_db|option" value="show" />
-            <param name="settings|db_input" value="W4M0004_database_small.msp" ftype="msp" />
+            <conditional name="settings">
+                <param name="options_db|option" value="show" />
+                <param name="options_db|db_input" value="W4M0004_database_small.msp" ftype="msp" />
+            </conditional>
             <param name="settings|options_ri|option" value="hide" />
             <output name="peaktable" file="peaktable.tsv" lines_diff="6"/>
             <output name="sampleMetadata" file="sampleMetadata.tsv" />
