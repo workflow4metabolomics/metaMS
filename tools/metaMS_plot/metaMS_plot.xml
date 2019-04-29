@@ -2,14 +2,8 @@
        
     <description>GC-MS data preprocessing using metaMS package</description>
     
-    <requirements>
-        <requirement type="package" version="1.18.1">bioconductor-metams</requirement>
-        <requirement type="package" version="1.1_4">r-batch</requirement>
-    </requirements>
-    
-    <stdio>
-        <exit_code range="1:" level="fatal" />
-    </stdio>
+    <expand macro="requirements"/>
+    <expand macro="stdio"/>
     
     <command><![CDATA[
     LC_ALL=C Rscript $__tool_directory__/metaMS_plot.r
@@ -90,26 +84,20 @@
         <!-- Test TIC -->
         <test>
             <param name="metaMS" value="runGC.RData"  ftype="rdata" />
-            <conditional name="selectedtic">
-                <param name="TIC" value="true"/>
-                <output name="ticsRawPdf" value="TICs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
-            </conditional>
+            <param name="selectedtic|TIC" value="true"/>
+            <output name="ticsRawPdf" value="TICs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
         <!-- Test BPC -->
         <test>
             <param name="metaMS" value="runGC.RData"  ftype="rdata" />
-            <conditional name="selectedbpc">
-                <param name="BPC" value="true"/>
-                <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
-            </conditional>
+            <param name="selectedbpc|BPC" value="true"/>
+            <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
         <!-- Test EICs -->
         <test>
             <param name="metaMS" value="runGC.RData"  ftype="rdata" />
-            <conditional name="selectedeic">
-                <param name="EIC" value="true"/>
-                <output name="ticsRawPdf" value="GCMS_EIC.pdf" ftype="pdf" compare="sim_size" delta="600"/>
-            </conditional>
+            <param name="selectedeic|EIC" value="true"/>
+            <output name="ticsRawPdf" value="GCMS_EIC.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
     </tests>
     
