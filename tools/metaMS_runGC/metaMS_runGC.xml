@@ -2,17 +2,15 @@
        
     <description>GC-MS data preprocessing using metaMS package</description>
     
-    <requirements>
-        <requirement type="package" version="1.18.1">bioconductor-metams</requirement>
-        <requirement type="package" version="1.1_4">r-batch</requirement>
-    </requirements>
-    
-    <stdio>
-        <exit_code range="1:" level="fatal" />
-    </stdio>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+
+    <expand macro="requirements"/>
+    <expand macro="stdio"/>
     
     <command><![CDATA[
-    LC_ALL=C Rscript $__tool_directory__/metaMS_runGC.r
+    @COMMAND_RSCRIPT@/metaMS_runGC.r
         
         singlefile_galaxyPath '$input' 
         singlefile_sampleName '$input.name'
@@ -54,10 +52,7 @@
         #end if
         nSlaves \${GALAXY_SLOTS:-1}
          
-        ;
-        return=\$?;
-        cat 'metams.log';
-        sh -c "exit \$return"
+        @COMMAND_LOG_EXIT@
 
     ]]></command>
     
@@ -172,11 +167,26 @@
     </outputs>
     
     <tests>
+        <!-- Test without DB -->
         <test>
             <param name="input" value="xset_merged.RData"  ftype="rdata" />
             <param name="settings|setting" value="gcdefault" />
             <param name="settings|options_rtrange|option" value="hide" />
             <param name="settings|options_db|option" value="hide" />
+            <param name="settings|options_ri|option" value="hide" />
+            <output name="peaktable" file="peaktable_noDB.tsv" lines_diff="6"/>
+            <output name="sampleMetadata" file="sampleMetadata_noDB.tsv" />
+            <output name="variableMetadata" file="variableMetadata_noDB.tsv" lines_diff="6"/>
+            <output name="dataMatrix" file="dataMatrix_noDB.tsv" lines_diff="6" />
+            <output name="peakspectra" file="peakspectra_noDB.msp" lines_diff="6"/>
+        </test>
+        <!-- Test with DB -->
+        <test>
+            <param name="input" value="xset_merged.RData"  ftype="rdata" />
+            <param name="settings|setting" value="gcdefault" />
+            <param name="settings|options_rtrange|option" value="hide" />
+            <param name="settings|options_db|option" value="show" />
+            <param name="settings|db_input" value="W4M0004_database_small.msp" ftype="msp" />
             <param name="settings|options_ri|option" value="hide" />
             <output name="peaktable" file="peaktable.tsv" lines_diff="6"/>
             <output name="sampleMetadata" file="sampleMetadata.tsv" />
@@ -192,9 +202,12 @@
 TODO : Verify the differents tests
 TODO : Update the help section-->
 
-.. class:: warningmark 
-WORK IN PROGRESS 
 .. class:: warningmark
+
+WORK IN PROGRESS
+
+.. class:: warningmark
+
 
 .. class:: infomark
 
