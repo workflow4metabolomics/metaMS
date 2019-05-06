@@ -162,7 +162,7 @@
         <data name="dataMatrix" format="tabular" from_work_dir="dataMatrix.tsv" label="dataMatrix.tsv" />
         <data name="peakspectra" format="txt" from_work_dir="peakspectra.msp" label="peakspectra.msp" />
         <data name="rungcRData" format="rdata" from_work_dir="runGC.RData" label="runGC.RData" />
-        <data name="log" format="txt" from_work_dir="log.txt" label="metams.log" />
+        <data name="log" format="txt" from_work_dir="log.txt" label="metaMS_runGC.log" />
 
     </outputs>
     

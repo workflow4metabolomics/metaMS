@@ -5,7 +5,7 @@
 #use make.names in sampleMetadata to avoid issues with files names 
 
 # ----- LOG FILE -----
-log_file <- file("metams.log", open = "wt")
+log_file <- file("log.txt", open = "wt")
 sink(log_file)
 sink(log_file, type = "output")
 

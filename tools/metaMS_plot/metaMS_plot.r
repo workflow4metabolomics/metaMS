@@ -6,7 +6,7 @@
 
 
 # ----- LOG FILE -----
-log_file <- file("plot_metaMS.log", open = "wt")
+log_file <- file("log.txt", open = "wt")
 sink(log_file)
 sink(log_file, type = "output")
 
@@ -115,6 +115,8 @@ if(!is.null(singlefile)) {
             cat(length(unknarg),"unknown(s) will be process !\n")
             plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBarg, fileFrom="singlefile")
             cat("EIC(s) created...\n")
+            #Merge pdf
+            system(paste('gs  -o GCMS_EIC.pdf  -sDEVICE=pdfwrite  -dPDFSETTINGS=/prepress  Unknown_*.pdf'))
         }
     } else {
         #TODO add error message
@@ -139,6 +141,8 @@ if(!is.null(zipfile)) {
             cat(length(unknarg),"unknown(s) will be process !\n")
             plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBarg, fileFrom="zipfile")
             cat("EIC(s) created...\n")
+            #Merge pdf
+            system(paste('gs  -o GCMS_EIC.pdf  -sDEVICE=pdfwrite  -dPDFSETTINGS=/prepress  Unknown_*.pdf'))
         }
     } else {
         #TODO add error message
@@ -146,8 +150,6 @@ if(!is.null(zipfile)) {
     } 
 }
 
-#test
-system(paste('gs  -o TICsBPCs_merged.pdf  -sDEVICE=pdfwrite  -dPDFSETTINGS=/prepress  *Cs_raw.pdf'))
-system(paste('gs  -o GCMS_EIC.pdf  -sDEVICE=pdfwrite  -dPDFSETTINGS=/prepress  Unknown_*'))
+
 
 cat("\nEnd of '", modNamC, "' Galaxy module call: ", as.character(Sys.time()), "\n", sep = "")
