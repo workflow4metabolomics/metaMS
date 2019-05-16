@@ -16,7 +16,6 @@ before_install:
   - pip install planemo==0.58.1
   - pip install ghostscript
   - pip install bgs
-  - which ghostscript
   - gs -h
 
 # @TODO: remove ASAP

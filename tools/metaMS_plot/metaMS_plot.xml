@@ -87,15 +87,6 @@
     
     <tests>
 
-        <!-- Test logs -->
-        <!--<test>
-            <param name="metaMS" value="runGC_test.RData" ftype="rdata" />
-            <param name="selectedtic|TIC" value="true"/>
-            <param name="selectedbpc|BPC" value="true"/>
-            <param name="selectedeic|EIC" value="true"/>
-            <output name="log" value="plot_metaMS.log"/>
-        </test>
-        --><!-- Test without DB comparison -->
         <!-- Test TIC -->
         <test>
             <param name="metaMS" value="runGC_test.RData"  ftype="rdata" />
