@@ -16,6 +16,7 @@ before_install:
   - pip install planemo==0.58.1
   - pip install Ghostscript
   - pip install bgs
+  - gs -h
 
 # @TODO: remove ASAP
 # The issue: https://github.com/galaxyproject/planemo/issues/865
