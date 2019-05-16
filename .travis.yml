@@ -15,6 +15,7 @@ before_install:
   - . planemo-venv/bin/activate
   - pip install planemo==0.58.1
   - pip install ghostscript
+  - pip install bgs
 
 # @TODO: remove ASAP
 # The issue: https://github.com/galaxyproject/planemo/issues/865
