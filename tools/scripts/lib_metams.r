@@ -480,9 +480,10 @@ plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
             an <- resGC$xset[[c]]
 			if(fileFrom == "zipfile") {
 				an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
-			} else {
-				an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
-			}
+			} #else {
+        #print(an@xcmsSet@filepaths)
+				#an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
+			#}
 
 		    
 

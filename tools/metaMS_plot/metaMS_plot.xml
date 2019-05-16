@@ -26,6 +26,8 @@
             unkn "none"
         #end if
 
+        @COMMAND_FILE_LOAD@
+
         @COMMAND_LOG_EXIT@
 
     ]]></command>
@@ -61,6 +63,8 @@
             <when value="false"/>
         </conditional>
 
+        <expand macro="input_file_load"/>
+
     </inputs>
     
     <outputs>
@@ -82,24 +86,58 @@
     </outputs>
     
     <tests>
+
+        <!-- Test logs -->
+        <!--<test>
+            <param name="metaMS" value="runGC_test.RData" ftype="rdata" />
+            <param name="selectedtic|TIC" value="true"/>
+            <param name="selectedbpc|BPC" value="true"/>
+            <param name="selectedeic|EIC" value="true"/>
+            <output name="log" value="plot_metaMS.log"/>
+        </test>
+        --><!-- Test without DB comparison -->
         <!-- Test TIC -->
         <test>
-            <param name="metaMS" value="runGC_noDB.RData"  ftype="rdata" />
+            <param name="metaMS" value="runGC_test.RData"  ftype="rdata" />
+            <expand macro="test_file_load_alg_symlink" />
             <param name="selectedtic|TIC" value="true"/>
             <output name="ticsRawPdf" value="TICs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
         <!-- Test BPC -->
         <test>
             <param name="metaMS" value="runGC_noDB.RData"  ftype="rdata" />
+            <expand macro="test_file_load_alg_symlink" />
             <param name="selectedbpc|BPC" value="true"/>
             <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
         <!-- Test EICs -->
         <test>
             <param name="metaMS" value="runGC_noDB.RData"  ftype="rdata" />
+            <expand macro="test_file_load_alg_symlink" />
+            <param name="selectedeic|EIC" value="true"/>
+            <output name="unknownPdf" value="GCMS_EIC_noDB.pdf" ftype="pdf" compare="sim_size" delta="600"/>
+        </test>
+
+        <!-- Tests with DB comparison -->
+        <!-- Test TIC -->
+        <!--<test>
+            <param name="metaMS" value="runGC.RData"  ftype="rdata" />
+            <param name="selectedtic|TIC" value="true"/>
+            <output name="ticsRawPdf" value="TICs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
+        </test>
+        --><!-- Test BPC -->
+        <!--<test>
+            <param name="metaMS" value="runGC.RData"  ftype="rdata" />
+            <param name="selectedbpc|BPC" value="true"/>
+            <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
+        </test>
+        --><!-- Test EICs -->
+        <!--<test>
+            <param name="metaMS" value="runGC.RData"  ftype="rdata" />
             <param name="selectedeic|EIC" value="true"/>
             <output name="unknownPdf" value="GCMS_EIC.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
+-->
     </tests>
     
     <help>
