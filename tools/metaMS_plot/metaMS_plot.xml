@@ -102,14 +102,14 @@
             <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
         <!-- Test EICs -->
-        <test>
+        <!--<test>
             <param name="metaMS" value="runGC_noDB.RData"  ftype="rdata" />
             <expand macro="test_file_load_alg_symlink" />
             <param name="selectedeic|EIC" value="true"/>
             <output name="unknownPdf" value="GCMS_EIC_noDB.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
 
-        <!-- Tests with DB comparison -->
+        --><!-- Tests with DB comparison -->
         <!-- Test TIC -->
         <!--<test>
             <param name="metaMS" value="runGC.RData"  ftype="rdata" />
@@ -134,9 +134,7 @@
     <help>
 	
 <!--
-TODO : plotEIC not correct : we can't track the good unknown when we make EICs
-TODO : Update the different tests
-TODO : Verify the differents tests
+TODO : Add test on EICs (problem with gs not found whereas I added pip install ghostscript and bgs in .travis.yml)
 TODO : Update the help section
 -->
 

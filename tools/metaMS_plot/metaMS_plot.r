@@ -142,7 +142,7 @@ if(!is.null(zipfile)) {
             plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBarg, fileFrom="zipfile")
             cat("EIC(s) created...\n")
             #Merge pdf
-            #system(paste('gs -sOutputFile=GCMS_EIC.pdf -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress Unknown_*.pdf'))
+            system(paste('gs -sOutputFile=GCMS_EIC.pdf -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress Unknown_*.pdf'))
         }
     } else {
         #TODO add error message
