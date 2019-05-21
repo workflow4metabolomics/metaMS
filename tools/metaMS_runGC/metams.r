@@ -4,187 +4,80 @@
 #use RI options + add try on plotUnknown add session Info
 #use make.names in sampleMetadata to avoid issues with files names 
 
-#Redirect all stdout to the log file
-log_file=file("metams.log", open = "wt")
+# ----- LOG FILE -----
+log_file=file("log.txt", open = "wt")
 sink(log_file)
-sink(log_file, type = "out")
+sink(log_file, type = "output")
 
-library(metaMS)
-library(batch) #necessary for parseCommandArgs function
 
+# ----- PACKAGE -----
+cat("\tSESSION INFO\n\n")
+
+#Import the different functions and packages
 source_local <- function(fname) {
     argv <- commandArgs(trailingOnly = FALSE)
     base_dir <- dirname(substring(argv[grep("--file=", argv)], 8))
     source(paste(base_dir, fname, sep="/"))
 }
-# print("step1")
+source_local("lib_metams.r")
 
+pkgs <- c("metaMS","stringr","batch","CAMERA") #"batch" necessary for parseCommandArgs function
+loadAndDisplayPackages(pkgs)
 
-listArguments = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
-# print("new version 2.0")
-## constants
-##----------
+cat("\n\n")
 
 modNamC <- "metaMS:runGC" ## module name
+cat("\nStart of the '", modNamC, "' Galaxy module call: ", format(Sys.time(), "%a %d %b %Y %X"), "\n", sep="")
 
 
-## log file
-##---------
-cat("\nStart of the '", modNamC, "' Galaxy module call: ",
-format(Sys.time(), "%a %d %b %Y %X"), "\n", sep="")
+# ----- PROCESSING INFILE -----
+cat("\n\n\tARGUMENTS PROCESSING INFO\n\n")
+args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
+#write.table(as.matrix(args), col.names=F, quote=F, sep='\t\t')
+print(cbind(value = unlist(args)))
 
 
-cat("\n1) Parameters:\n")
-print(listArguments)
+# ----- PROCESSING INFILE -----
+cat("\n\n\tARGUMENTS PROCESSING INFO\n\n")
 
-
-if (listArguments[["ri"]]!="NULL"){
-    RIarg=read.table(listArguments[["ri"]])
-	if (ncol(RIarg) < 2) RIarg=read.table(listArguments[["ri"]], h=T, sep=";")
-	if (ncol(RIarg) < 2) RIarg=read.table(listArguments[["ri"]], h=T, sep="\t")
-	if (ncol(RIarg) < 2) RIarg=read.table(listArguments[["ri"]], h=T, sep=",")
+# Saving the specific parameters
+#RI parameter
+if (args[["ri"]]!="NULL"){
+    RIarg=read.table(args[["ri"]])
+	if (ncol(RIarg) < 2) RIarg=read.table(args[["ri"]], h=T, sep=";")
+	if (ncol(RIarg) < 2) RIarg=read.table(args[["ri"]], h=T, sep="\t")
+	if (ncol(RIarg) < 2) RIarg=read.table(args[["ri"]], h=T, sep=",")
 	if (ncol(RIarg) < 2) {
 		error_message="Your RI file seems not well formatted. The column separators accepted are ; , and tabulation"
 		print(error_message)
 		stop(error_message)
 	}
-#to do check real column names
+    #to do check real column names
     colnames(RIarg)<-c("rt","RI")
-    # print(RIarg)
 } else {
     RIarg = NULL
-    # cat("Ri= ",RIarg)
 }
 
-if (listArguments[["rishift"]]!="none"){
-    RIshift=listArguments[["rishift"]]
-   cat("Rishift used= ",RIshift, "\n")
+#RIshift parameter
+if (args[["rishift"]]!="none"){
+    RIshift=args[["rishift"]]
 } else {
     RIshift = "none"
-    cat("Rishift NONE= ",RIshift, "\n")
 }
 
-DBarg=listArguments[["db"]]
-# if (listArguments[["use_db"]]!="NULL"){
-if (DBarg!="NULL"){
-    DBarg=listArguments[["db"]]
-    cat("Db= ",DBarg, "\n")
+#Personal database parameter
+if (args[["db"]]!="NULL"){
+    DBarg=args[["db"]]
 } else {
     DBarg = NULL
-    cat("NO Db : ",DBarg, "\n")
-}
-
-
-
-#for unknown EIC printing
-
-if (listArguments[["unkn"]][1]!="NULL") {
-    unknarg<-listArguments[["unkn"]]
-} else { 
-    unknarg<-""
-}
-
-print(paste("Unkn:",unknarg))
-
-#remove unused arguments
-listArguments[["unkn"]]<-NULL
-listArguments[["db"]] <- NULL
-listArguments[["ri"]] <- NULL
-listArguments[["rishift"]] <- NULL
-
-print(" step2")
-
-#runGC accept either a list of files a zip folder or an xset object from xcms.xcmsSet tool
-
-#CASE 2  from zip file
-#necessary to unzip .zip file uploaded to Galaxy
-#thanks to .zip file it's possible to upload many file as the same time conserving the tree hierarchy of directories
-
-if (!is.null(listArguments[["zipfile"]])){
-    print("CASE 2 from zip file")
-    directory=unzip(listArguments[["zipfile"]])
-    listArguments=append(list(directory), listArguments)
-
-    metams_zip_file= listArguments[["zipfile"]]
-    listArguments[["zipfile"]]=NULL
-
-    filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]","[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
-    filepattern <- paste(paste("\\.", filepattern, "$", sep = ""),collapse = "|") 
-    #samples<-list.files(path=directory, pattern=filepattern, all.files=FALSE,recursive=TRUE,full.names=TRUE,ignore.case=FALSE)
-    samples<-directory[grep(filepattern, directory)]
-    # cat(samples) #debugg
-    #create sampleMetadata, get sampleMetadata and class
-    sampleMetadata<-xcms:::phenoDataFromPaths(samples)
-    sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
-    row.names(sampleMetadata)<-NULL
-} else {
-	metams_zip_file=""
-}
-
-#CASE 3 from xset is an .RData file necessary to use the xcmsSet object generated by xcms.xcmsSet given by previous tools
-if (!is.null(listArguments[["xset"]])){
-    print("CASE 3 from xset")
-    require(CAMERA, quietly = TRUE)
-    load(listArguments[["xset"]])
-    cat(class(xset))
-    xsetparam=listArguments[["xset"]]
-    listArguments[["xset"]]=NULL #remove xset from arguments
-    
-    #xset from xcms.xcmsSet is not well formatted for metaMS this function do the formatting
-    if (class(xset)=="xcmsSet"){
-    
-        #treat case where Rdata came from xcmsSet with zip file entry
-    	if(exists("zip_file")){
-            if (zip_file!=""){
-                directory=unzip(zip_file)
-                print("CASE 3 from xset and with ZIP input")
-                
-            } else {
-                print("CASE 3 from xset and with LIBRARY input")
-            }
-        }
-        #end zip file case
-        if (length(xset@rt$raw)>1){
-            #create an exceptable list of xset for metaMS
-            xset.l<-vector("list",length(xset@rt$raw))
-            for (i in 1:length(xset@rt$raw)){
-                xset.l[[i]]<-new("xcmsSet")
-                xset.l[[i]]@peaks<-xset@peaks[which(xset@peaks[,"sample"]==i),]
-                df<-data.frame(class=xset@phenoData[i,])
-                rownames(df)<-rownames(xset@phenoData)[i]
-                xset.l[[i]]@phenoData<-df
-                xset.l[[i]]@rt$raw<-xset@rt$raw[[i]]
-                xset.l[[i]]@rt$corrected<-xset@rt$corrected[[i]]
-                xset.l[[i]]@filepaths<-xset@filepaths[i]
-                xset.l[[i]]@profinfo<-xset@profinfo
-             }
-        } else {
-            xset.l<-xset
-        }
-           
-    }
-    #create sampleMetadata, get sampleMetadata and class
-    sampleMetadata<-xset@phenoData
-    sampleMetadata<-cbind(sampleMetadata=make.names(rownames(sampleMetadata)),sampleMetadata)
-    row.names(sampleMetadata)<-NULL
-    samples<-xset@filepaths
-} else {
-   xsetparam<-NULL
-}     
-
-
-
-#Import the different functions
-source_local("lib_metams.r")
-
-#load function for ploting EICs and pspectra
-# source_local("plotUnknown.r")
+}   
 
 #settings process
-if (listArguments[["settings"]]=="default") {
+if (args[["settings"]]=="default") {
+    cat("Usingdefault parameters")
 	data(FEMsettings) 
-    if (listArguments[["rtrange"]][1]!="NULL") {
-        rtrange=listArguments[["rtrange"]]
+    if (args[["rtrange"]][1]!="NULL") {
+        rtrange=args[["rtrange"]]
     } else {
         rtrange=NULL
     }
@@ -201,49 +94,26 @@ if (listArguments[["settings"]]=="default") {
 		TSQXLS.GC@betweenSamples.timeComparison<-"RI"
 		TSQXLS.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
 	}
-	
-   nSlaves=listArguments[["nSlaves"]]
-	
-	
-    if(!metams_zip_file=="") {
-        resGC<-runGC(files=samples,settings=TSQXLS.GC, rtrange=rtrange, DB= DBarg, removeArtefacts = TRUE, findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves) #default settings for GC from Wehrens et al
-    }
-    if(!is.null(xsetparam)){
-        settingslist=TSQXLS.GC
-        if (class(xset.l[[1]])!="xsAnnotate"){
-            cat("Process xsAnnotate")
-            xset<-lapply(xset.l,
-                 function(x) {
-                   y <- xsAnnotate(x, sample = 1)
-                   capture.output(z <- groupFWHM(y, perfwhm = settingslist@CAMERA$perfwhm),
-                                  file = NULL)
-                   z})
-           
-        }
-             
-        resGC<-runGC(xset=xset,settings=TSQXLS.GC, rtrange=rtrange, DB= DBarg, removeArtefacts = TRUE, findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves) #default settings for GC from Wehrens et al
-    }
+    nSlaves=args[["nSlaves"]]
 }
 
-if (listArguments[["settings"]]=="User_defined") {
-	listArguments[["settings"]]=NULL #delete from the list of arguments
-	fwhmparam=listArguments[["fwhm"]]
-	rtdiffparam=listArguments[["rtdiff"]]
-	minfeatparam=listArguments[["minfeat"]]
-	simthreshparam=listArguments[["simthreshold"]]
-    minclassfractionparam=listArguments[["minclassfraction"]]
-    minclasssizeparam=listArguments[["minclasssize"]]
+if (args[["settings"]]=="User_defined") {
+	fwhmparam=args[["fwhm"]]
+	rtdiffparam=args[["rtdiff"]]
+	minfeatparam=args[["minfeat"]]
+	simthreshparam=args[["simthreshold"]]
+    minclassfractionparam=args[["minclassfraction"]]
+    minclasssizeparam=args[["minclasssize"]]
 	
-    if (listArguments[["rtrange"]]!="NULL") {
-        rtrange=listArguments[["rtrange"]]
+    if (args[["rtrange"]]!="NULL") {
+        rtrange=args[["rtrange"]]
         cat("rtrange= ",rtrange)
     } else {
         rtrange=NULL
         cat("rtrange= ",rtrange)
     }
 	
-	
-    nSlaves=listArguments[["nSlaves"]]
+    nSlaves=args[["nSlaves"]]
 	
 	GALAXY.GC <- metaMSsettings("protocolName" = "GALAXY.GC",
 								"chrom" = "GC",
@@ -294,120 +164,163 @@ if (listArguments[["settings"]]=="User_defined") {
 		GALAXY.GC@betweenSamples.timeComparison<-"RI"
 		GALAXY.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
 	}
-        # files, xset, settings, rtrange = NULL, DB = NULL,
-       # removeArtefacts = TRUE, findUnknowns = nexp > 1,
-       # returnXset = FALSE, RIstandards = NULL, nSlaves = 0
+    
 	if (!is.null(DBarg)){
 		manual <- read.msp(DBarg)
 		DBarg <- createSTDdbGC(stdInfo = NULL, settings = GALAXY.GC, manualDB = manual)
 	}
-    if (!metams_zip_file=="") {
-        resGC<-runGC(files=samples,settings=GALAXY.GC,rtrange = rtrange, DB= DBarg , removeArtefacts = TRUE, findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
+}
+
+
+# ----- INFILE PROCESSING -----
+cat("\n\n\n\tINFILE PROCESSING INFO\n\n")
+
+# Handle infiles
+if (!exists("singlefile")) singlefile <- NULL
+if (!exists("zipfile")) zipfile <- NULL
+rawFilePath <- getRawfilePathFromArguments(singlefile, zipfile, args)
+zipfile <- rawFilePath$zipfile
+singlefile <- rawFilePath$singlefile
+directory <- retrieveRawfileInTheWorkingDirectory(singlefile, zipfile)
+
+
+# ----- MAIN PROCESSING INFO -----
+cat("\n\tMAIN PROCESSING INFO\n")
+
+cat("\t\tCOMPUTE\n\n")
+
+#runGC accept either a list of files a zip folder or an xset object from xcms.xcmsSet tool
+#From xset is an .RData file necessary to use the xcmsSet object generated by xcms.xcmsSet given by previous tools
+if (!is.null(args[["singlefile_galaxyPath"]])){
+    cat("Loading datas from XCMS file(s)...\n")
+    load(args[["singlefile_galaxyPath"]])
+    
+    #Transform XCMS object if needed
+    if(!exists("xset")) {
+        if(exists("xdata")) {
+            xset<-getxcmsSetObject(xdata)
+        } else {
+            error_message="no xset and no xdata... Probably a problem"
+            print(error_message)
+            stop(error_message)
+        }
     }
-    if(!is.null(xsetparam)) {
-        settingslist=GALAXY.GC
-        if (class(xset.l[[1]])!="xsAnnotate") {
-            print("Process xsAnnotate")
-            xset<-lapply(xset.l,
+
+    #xset from xcms.xcmsSet is not well formatted for metaMS this function do the formatting
+    if (class(xset)=="xcmsSet"){
+        if (length(xset@rt$raw)>1){
+            #create an exceptable list of xset for metaMS
+            xset.l<-vector("list",length(xset@rt$raw))
+            for (i in 1:length(xset@rt$raw)){
+                xset.l[[i]]<-new("xcmsSet")
+                xset.l[[i]]@peaks<-xset@peaks[which(xset@peaks[,"sample"]==i),]
+                df<-data.frame(class=xset@phenoData[i,])
+                rownames(df)<-rownames(xset@phenoData)[i]
+                xset.l[[i]]@phenoData<-df
+                xset.l[[i]]@rt$raw<-xset@rt$raw[[i]]
+                xset.l[[i]]@rt$corrected<-xset@rt$corrected[[i]]
+                xset.l[[i]]@filepaths<-xset@filepaths[i]
+                xset.l[[i]]@profinfo<-xset@profinfo
+             }
+        } else {
+            xset.l<-xset
+        }
+    
+        #create sampleMetadata, get sampleMetadata and class
+        sampleMetadata<-xset@phenoData
+        colnames(sampleMetadata) <- c("sampleMetadata","sample_group","class")
+        sampleMetadata<-sampleMetadata[,-2]
+        row.names(sampleMetadata)<-NULL
+        samples<-xset@filepaths
+    } else {
+        xset<-NULL
+    }
+    if(args[["settings"]] == "default") {
+        settingslist=TSQXLS.GC
+        if (class(xset.l[[1]])!="xsAnnotate"){
+            cat("Process xsAnnotate with CAMERA package...\n")
+            xsetCAM<-lapply(xset.l,
                  function(x) {
                    y <- xsAnnotate(x, sample = 1)
                    capture.output(z <- groupFWHM(y, perfwhm = settingslist@CAMERA$perfwhm),
                                   file = NULL)
                    z})
+
+        }
+        
+        #default settings for GC from Wehrens et al
+        cat("Process runGC with metaMS package...\n\n")
+        print(str(TSQXLS.GC))   
+        resGC<-runGC(xset=xsetCAM,settings=TSQXLS.GC, rtrange=rtrange, DB= DBarg, removeArtefacts = TRUE, 
+                    findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves) #default settings for GC from Wehrens et al
+    } else {
+        if(args[["settings"]] == "User_defined") {
+            settingslist=GALAXY.GC
+            if (class(xset.l[[1]])!="xsAnnotate") {
+                cat("Process xsAnnotate with CAMERA package...\n")
+                xsetCAM<-lapply(xset.l,
+                    function(x) {
+                    y <- xsAnnotate(x, sample = 1)
+                    capture.output(z <- groupFWHM(y, perfwhm = settingslist@CAMERA$perfwhm),
+                                  file = NULL)
+                    z})
            
         }
-        resGC<-runGC(xset=xset,settings=GALAXY.GC,rtrange = rtrange, DB= DBarg, removeArtefacts = TRUE, findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
+        cat("Process runGC with metaMS package...\n\n")
+        print(str(GALAXY.GC))
+        resGC<-runGC(xset=xsetCAM,settings=GALAXY.GC,rtrange = rtrange, DB= DBarg, removeArtefacts = TRUE, 
+                    findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
+        } else {
+            error_message <- "There is no xset"
+            print(error_message)
+            stop(error_message)
+        } 
     }
+} else {
+    #TODO update error message
+    error_message <- "No galaxy path entered"
+    print(error_message)
+    stop(error_message)
 }
 
+
+# ----- EXPORT -----
 #peakTable ordered by rt
-peaktable<-resGC$PeakTable<-resGC$PeakTable[order(resGC$PeakTable[,"rt"]),]
+cat("\nGenerating peakTable file")
+peaktable<-getCorrectFileName(resGC$PeakTable,sampleMetadata)
+cat("\t.\t.")
 write.table(peaktable, file="peaktable.tsv", sep="\t", row.names=FALSE)
+cat("\t.\tOK")
 
 #peakTable for PCA 
 #dataMatrix
-dataMatrix<-cbind(Name=resGC$PeakTable[,"Name"],resGC$PeakTable[,(colnames(resGC$PeakTable) %in% sampleMetadata[,1])])
+cat("\nGenerating dataMatrix file")
+dataMatrix<-cbind(Name=peaktable[,"Name"],peaktable[,(colnames(peaktable) %in% sampleMetadata[,1])])
 rownames(dataMatrix)<-NULL
+cat("\t.\t.")
 write.table(dataMatrix, file="dataMatrix.tsv", sep="\t", row.names=FALSE, quote=FALSE)
+cat("\t.\tOK")
 
 #variableMetadata
-variableMetadata<-resGC$PeakTable[,!(colnames(resGC$PeakTable) %in% sampleMetadata[,1])]
+cat("\nGenerating variableMetadata file")
+variableMetadata<-peaktable[,!(colnames(peaktable) %in% sampleMetadata[,1])]
 rownames(variableMetadata)<-NULL
+cat("\t.")
 write.table(variableMetadata, file="variableMetadata.tsv", sep="\t", row.names=FALSE, quote=FALSE)
+cat("\t.\tOK")
 
 #sampleMetadata
+cat("\nGenerating sampleMetadata file")
+cat("\t.\t.")
 write.table(sampleMetadata, file="sampleMetadata.tsv", sep="\t", row.names=FALSE, quote=FALSE)
+cat("\t.\tOK")
 
 #peak spectrum as MSP for DB search
+cat("\nGenerating",length(resGC$PseudoSpectra),"peakspectra in peakspectra.msp file\n")
 write.msp(resGC$PseudoSpectra, file="peakspectra.msp", newFile = TRUE)
 
-#TIC/BPC picture generation
- # use files as entry not xset that do not exist   
-
-print("TICs")
-#Use getTIC2s and getBPC2s because getTICs and getBPCs can exists due to transfert of function in Rdata
-b<-getTIC2s(files = samples, pdfname="TICs_raw.pdf", rt="raw")
-
-print("BPCs")
-c<-getBPC2s(files=samples, rt="raw", pdfname="BPCs_raw.pdf")  
-       
-print("Step QC plot")
-
-#to do check if no peaks found
-#Quality controls plots but only working in R (don't know why)
-a<-try(plotUnknowns(resGC=resGC, unkn=unknarg)); #use unknparam value
-if(class(a) == "try-error") {
-   pdf("Unknown_Error.pdf")
-	plot.new()
-	text(x=0.5,y=1,pos=1, labels="Error generating EICs\n please use none instead of a vector in plotUnknown")
-   dev.off()
-}
-# create a mergpdf
-
-#test
-system(paste('gs  -o TICsBPCs_merged.pdf  -sDEVICE=pdfwrite  -dPDFSETTINGS=/prepress  *Cs_raw.pdf'))
-system(paste('gs  -o GCMS_EIC.pdf  -sDEVICE=pdfwrite  -dPDFSETTINGS=/prepress  Unknown_*'))
-
-
-############################################TEST FUNCTION START#################################################################
-
-############################################TEST FUNCTION END#################################################################
-
-
-
-
-#zip files of all runGC outputs
-
-system(paste('ls . | grep -e "tsv$"  -e "msp$"  -e "GCMS_" | zip -r -@ "rungc.zip"'))
-
-
-#delete the parameters to avoid the passage to the next tool in .RData image
-rm(listArguments)
-
 #saving R data in .Rdata file to save the variables used in the present tool
-save.image(paste("runGC","RData",sep="."))
+objects2save <- c("resGC", "xset", "singlefile", "zipfile", "DBarg")
+save(list = objects2save[objects2save %in% ls()], file = "runGC.RData")
 
-## Closing
-##--------
-
-cat("\nEnd of '", modNamC, "' Galaxy module call: ",
-    as.character(Sys.time()), "\n", sep = "")
-
-cat("\n\n\n============================================================================")
-cat("\nAdditional information about the call:\n")
-# cat("\n1) Parameters:\n")
-# print(cbind(value = argVc))
-
-cat("\n1) Session Info:\n")
-sessioninfo <- sessionInfo()
-cat(sessioninfo$R.version$version.string,"\n")
-cat("Main packages:\n")
-for (pkg in names(sessioninfo$otherPkgs)) { cat(paste(pkg,packageVersion(pkg)),"\t") }; cat("\n")
-cat("Other loaded packages:\n")
-for (pkg in names(sessioninfo$loadedOnly)) { cat(paste(pkg,packageVersion(pkg)),"\t") }; cat("\n")
-
-cat("============================================================================\n")
-
-sink()
-
-rm(list = ls())
+cat("\nEnd of '", modNamC, "' Galaxy module call: ", as.character(Sys.time()), "\n", sep = "")
