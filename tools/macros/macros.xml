@@ -44,7 +44,7 @@
         <section name="file_load_section">
             <conditional name="file_load_conditional">
                 <param name="file_load_select" value="yes" />
-                <param name="input" value="RawFilesTest_alg2.mzData,RawFilesTest_alg3.mzData,RawFilesTest_alg7.mzData,RawFilesTest_alg8.mzData,RawFilesTest_alg9.mzData,RawFilesTest_alg11.mzData" ftype="mzdata" />
+                <param name="input" value="alg2.mzData,alg3.mzData,alg7.mzData,alg8.mzData,alg9.mzData,alg11.mzData" ftype="mzdata" />
             </conditional>
         </section>
 	</xml>
