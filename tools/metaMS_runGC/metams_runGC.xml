@@ -166,25 +166,46 @@
         <data name="peakspectra" format="txt" from_work_dir="peakspectra.msp" label="peakspectra.msp" />
         <data name="rungcRData" format="rdata" from_work_dir="runGC.RData" label="runGC.RData" />
         <data name="log" format="txt" from_work_dir="log.txt" label="metaMS_runGC.log" />
-        
+
     </outputs>
     
     <tests>
+        <!-- Test without DB -->
         <test>
-            <param name="inputs|input" value="zip_file" />
-            <param name="inputs|zip_file" value="W4M_GCMS_Dataset.zip"  ftype="zip" />
+            <param name="input" value="xset_merged.RData"  ftype="rdata" />
             <param name="settings|setting" value="gcdefault" />
             <param name="settings|options_rtrange|option" value="hide" />
             <param name="settings|options_db|option" value="hide" />
             <param name="settings|options_ri|option" value="hide" />
-            <output name="sampleMetadata" file="sampleMetadata.tsv" />
-            <output name="variableMetadata" file="variableMetadata.tsv" />
-            <output name="dataMatrix" file="dataMatrix.tsv" lines_diff="6" />
+            <!--<output name="peaktable" file="peaktable_noDB.tsv" lines_diff="4"/>-->
+            <output name="sampleMetadata" file="sampleMetadata_noDB.tsv" lines_diff="4"/>
+            <output name="variableMetadata" file="variableMetadata_noDB.tsv" lines_diff="4"/>
+            <!--<output name="dataMatrix" file="dataMatrix_noDB.tsv" lines_diff="4" />-->
+            <output name="peakspectra" file="peakspectra_noDB.msp" lines_diff="4"/>
+        </test>
+        <!-- Test with DB -->
+        <test>
+            <param name="input" value="xset_merged.RData"  ftype="rdata" />
+            <param name="settings|setting" value="gcdefault" />
+            <param name="settings|options_rtrange|option" value="hide" />
+            <conditional name="settings">
+                <param name="options_db|option" value="show" />
+                <param name="options_db|db_input" value="W4M0004_database_small.msp" ftype="msp" />
+            </conditional>
+            <param name="settings|options_ri|option" value="hide" />
+            <!--<output name="peaktable" file="peaktable.tsv" lines_diff="4"/>-->
+            <output name="sampleMetadata" file="sampleMetadata.tsv" lines_diff="4"/>
+            <output name="variableMetadata" file="variableMetadata.tsv" lines_diff="4"/>
+            <!--<output name="dataMatrix" file="dataMatrix.tsv" lines_diff="4" />-->
+            <output name="peakspectra" file="peakspectra.msp" lines_diff="4"/>
         </test>
     </tests>
     
     <help>
-	
+        
+<!--TODO : Update the different tests
+TODO : Verify the differents tests
+TODO : Update the help section-->
 	
 .. class:: infomark
 
