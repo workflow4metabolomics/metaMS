@@ -10,7 +10,7 @@
     <expand macro="stdio"/>
     
     <command><![CDATA[
-    LC_ALL=C Rscript $__tool_directory__/metaMS_plot.R
+    LC_ALL=C Rscript $__tool_directory__/metaMS_plot.r
         
         metaMS $metaMS
 
