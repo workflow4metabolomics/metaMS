@@ -1,25 +1,19 @@
- <tool id="metams_runGC" name="metaMS.runGC" version="2.1.1">
+ <tool id="metams_rungc" name="metams_rungc" version="3.0.0">
        
     <description>GC-MS data preprocessing using metaMS package</description>
+
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+
+    <expand macro="requirements"/>
+    <expand macro="stdio"/>
     
-    <requirements>
-        <requirement type="package" version="1.8.0">bioconductor-metams</requirement>
-        <requirement type="package" version="1.46.0">bioconductor-xcms</requirement>
-        <requirement type="package" version="1.1_4">r-batch</requirement>
-    </requirements>
-    
-    <stdio>
-        <exit_code range="1:" level="fatal" />
-    </stdio>
-    
-    <command>
-        Rscript $__tool_directory__/metams.r
-        
-        #if $inputs.input == "zip_file":
-                zipfile $zip_file
-        #elif $inputs.input == "xset":
-                xset  $inputs.xset
-        #end if
+    <command><![CDATA[
+    @COMMAND_RSCRIPT@//metaMS_runGC.r
+
+        singlefile_galaxyPath '$input' 
+        singlefile_sampleName '$input.name'
         
    		#if $settings.setting == "gcdefault":
 		    settings "default"
@@ -57,27 +51,14 @@
             db "NULL"
         #end if
         nSlaves \${GALAXY_SLOTS:-1}
-        #if $unkn == "none":
-		   unkn "none"
-		#elif $unkn != "none":
-		   unkn "c($unkn)"
-		#end if
+        
+        @COMMAND_LOG_EXIT@
          
-    </command>
+    ]]></command>
     
     <inputs>
-        <conditional name="inputs">
-            <param name="input" type="select" label="Choose your inputs" help="Choose your input method" >
-                <option value="zip_file" selected="true">Zip file containing your chromatograms</option>
-                <option value="xset" >Rdata file from xcms.xcmsSet </option>
-            </param>
-            <when value="zip_file">
-                <param name="zip_file" type="data" format="no_unzip.zip,zip" label="Zip file" help="Zip file containing your chromatograms for analysis" />
-            </when>
-            <when value="xset">
-                <param name="xset" type="data" format="rdata.xcms.raw,rdata.xcms.group,rdata.xcms.retcor,rdata" label="Rdata from xcms.xcmsSet" help="Rdata file containing a xset object" />
-		    </when>
-	    </conditional>
+
+        <param name="input" type="data" format="rdata,rdata.xcms.findchrompeaks,rdata.xcms.group" label="Rdata from xcms and merged" help="Rdata file containing a xset object"/>
 	    <conditional name="settings">
             <param name="setting" type="select" label="Settings" help="Choose the settings used for finding peaks" >
 			    <option value="gcdefault" selected="true">GC_Default</option>
@@ -162,7 +143,6 @@
                 
             </when>
 	     </conditional>
-         <param name="unkn" type="text" value="1:5" label="EIC_Unknown" help="vector of peaks number to be plotted, for example 1:5 (mean 1 to 5) or 1,4,12  means 1 4 and 12). For all EIC use 0. none for no EIC plot" />
          <conditional name="options_rifilter">
 					<param name="option" type="select" label="Use RI as filter" >
 						<option value="false" selected="true">FALSE</option>
@@ -180,18 +160,13 @@
     <outputs>
     
         <data name="peaktable" format="tabular" from_work_dir="peaktable.tsv" label="peaktable.tsv" />
-        <!--  <data name="peaktable_PCA" format="tabular" from_work_dir="peaktable_PCA.tsv" label="peaktable_PCA.tsv" />
-        -->
         <data name="sampleMetadata" format="tabular" from_work_dir="sampleMetadata.tsv" label="sampleMetadata.tsv" />
         <data name="variableMetadata" format="tabular" from_work_dir="variableMetadata.tsv" label="variableMetadata.tsv" />
         <data name="dataMatrix" format="tabular" from_work_dir="dataMatrix.tsv" label="dataMatrix.tsv" />
         <data name="peakspectra" format="txt" from_work_dir="peakspectra.msp" label="peakspectra.msp" />
-        <data name="ticsRawPdf"   format="pdf" from_work_dir="TICs_raw.pdf" label="TICs_raw.pdf" />
-        <data name="bpcsRawPdf"   format="pdf" from_work_dir="BPCs_raw.pdf" label="BPCs_raw.pdf" />
-        <data name="unknownPdf"   format="pdf" from_work_dir="GCMS_EIC.pdf" label="GCMS_EIC.pdf" />
-        <data name="rungcRData" format="rdata" from_work_dir="runGC.RData" label="rungc.RData" />
-        <data name="log" format="txt" from_work_dir="metams.log" label="rungc.log.txt" />
-        <data name="zip" format="zip"   from_work_dir="rungc.zip"   label="rungc.zip" />
+        <data name="rungcRData" format="rdata" from_work_dir="runGC.RData" label="runGC.RData" />
+        <data name="log" format="txt" from_work_dir="log.txt" label="metaMS_runGC.log" />
+        
     </outputs>
     
     <tests>
