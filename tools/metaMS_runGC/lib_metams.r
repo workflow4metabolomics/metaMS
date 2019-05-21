@@ -1,1 +1,1 @@
-/home/jsaintvanne/W4M/metaMS/tools/scripts/lib_metams.r
+../scripts/lib_metams.r
