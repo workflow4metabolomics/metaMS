@@ -19,7 +19,7 @@ loadAndDisplayPackages <- function(pkgs) {
     for (pkg in names(sessioninfo$loadedOnly)) { cat(paste(pkg,packageVersion(pkg)),"\t") }; cat("\n")
 }
 
-This function list the compatible files within the directory as xcms did
+#This function list the compatible files within the directory as xcms did
 #@author Gildas Le Corguille lecorguille@sb-roscoff.fr ABiMS TEAM
 getMSFiles <- function (directory) {
     filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]","[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
