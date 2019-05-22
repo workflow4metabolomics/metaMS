@@ -51,7 +51,7 @@ Changelog/News
 --------------
 **Version 3.0 - 20/05/2019**
 
-- Divided tool into two new. One will be metaMS_plot and this one stay the same without plotting chromatograms
+- Divided tool into two new. One will be metaMS_plot and this one stay the same without plotting chromatograms and without zip files
 
 **Version 2.0 - 15/05/2017**
 
