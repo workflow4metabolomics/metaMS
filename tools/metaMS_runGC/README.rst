@@ -29,7 +29,7 @@ GC-MS data processing version 2.1.1
 
 5) Installation :
 
-   4 files are required for installation:
+   4 files are required for installation :
 
    - 'README.rst'
          Instructions for installation
@@ -61,11 +61,9 @@ Changelog/News
 
 - TEST: refactoring to pass planemo test using conda dependencies
 
-
 **Version 1.0 - 01/06/2015**
 
 - NEW: new tool
-
 
 Test Status
 -----------

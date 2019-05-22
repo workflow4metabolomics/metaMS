@@ -2,7 +2,7 @@
 GC-MS data processing version 2.1.1
 ====================================
 
-1) Date : 2017-10-16
+1) Date : 2019-05-20
 
 2) Author and maintainer :
 
@@ -41,7 +41,7 @@ GC-MS data processing version 2.1.1
    - 'metaMS_plot.r'
          Wrapper code written in R aimed at launching the runGC function from the metaMS package given the arguments entered by the user through the Galaxy interface
    
-   4) 'metaMS R package '
+   - 'metaMS R package '
          The 'metaMS' package requires dependencies and can be installed with source("http://bioconductor.org/biocLite.R") or `biocLite("metaMS")`
  
          This code is for installation of the Galaxy module on the Workflow4metabolomics.org MetaboHUB-IFB platform only and must not be distributed without the author agreement
@@ -51,8 +51,7 @@ Changelog/News
 --------------
 **Version 1.0 - 20/05/2019**
 
-- NEW: new tool extract from previous metaMS_runGC tool
-
+- NEW : new tool extract from previous metaMS_runGC tool. EICs have been corrected.
 
 Test Status
 -----------
