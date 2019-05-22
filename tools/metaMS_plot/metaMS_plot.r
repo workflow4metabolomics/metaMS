@@ -29,8 +29,7 @@ cat("\n")
 
 modNamC <- "plot_metaMS" ## module name
 
-cat("\nStart of the '", modNamC, "' Galaxy module call: ", 
-    format(Sys.time(), "%a %d %b %Y %X"), "\n\n", sep="")
+cat("\nStart of the '", modNamC, "' Galaxy module call: ", format(Sys.time(), "%a %d %b %Y %X"), "\n\n", sep="")
 
 
 # ----- ARGUMENTS -----
@@ -87,13 +86,12 @@ zipfile <- rawFilePath$zipfile
 singlefile <- rawFilePath$singlefile
 directory <- retrieveRawfileInTheWorkingDirectory(singlefile, zipfile)
 
+
 # ----- MAIN PROCESSING INFO -----
 cat("\n\n\tMAIN PROCESSING INFO\n")
 
 
 cat("\t\tCOMPUTE\n")
-
-#TIC/BPC picture generation
 
 #Use getTIC2s and getBPC2s because getTICs and getBPCs can exists due to transfert of function in Rdata
 
@@ -119,8 +117,9 @@ if(!is.null(singlefile)) {
             system(paste('gs  -o GCMS_EIC.pdf  -sDEVICE=pdfwrite  -dPDFSETTINGS=/prepress  Unknown_*.pdf'))
         }
     } else {
-        #TODO add error message
-        print("Error files is empty")
+        error_message <- "Can't find",files"!")
+        print(error_message)
+        stop(error_message)
     }
 }
 if(!is.null(zipfile)) {
@@ -145,11 +144,10 @@ if(!is.null(zipfile)) {
             system(paste('gs -sOutputFile=GCMS_EIC.pdf -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress Unknown_*.pdf'))
         }
     } else {
-        #TODO add error message
-        print("Error files is empty")
+        error_message <- "Can't find",files"!")
+        print(error_message)
+        stop(error_message)
     } 
 }
-
-
 
 cat("\nEnd of '", modNamC, "' Galaxy module call: ", as.character(Sys.time()), "\n", sep = "")

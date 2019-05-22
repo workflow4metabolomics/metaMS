@@ -4,6 +4,7 @@
 #use RI options + add try on plotUnknown add session Info
 #use make.names in sampleMetadata to avoid issues with files names 
 
+
 # ----- LOG FILE -----
 log_file=file("log.txt", open = "wt")
 sink(log_file)
@@ -142,12 +143,12 @@ if (args[["settings"]]=="User_defined") {
 				
     #to used if contaminant filter
 	
-		# metaSetting(GALAXY.GC, "matchIrrelevants") <- list(
-					# irrelevantClasses = c("Bleeding", "Plasticizers"),
-					# timeComparison = "RI",
-					# RIdiff = RIdiffparam,    
-					# rtdiff = rtdiffparam,
-					# simthresh = simthreshparam)
+	# metaSetting(GALAXY.GC, "matchIrrelevants") <- list(
+				# irrelevantClasses = c("Bleeding", "Plasticizers"),
+				# timeComparison = "RI",
+				# RIdiff = RIdiffparam,    
+				# rtdiff = rtdiffparam,
+				# simthresh = simthreshparam)
 	
 	metaSetting(GALAXY.GC, "betweenSamples") <- list(
 				min.class.fraction = minclassfractionparam,
@@ -221,7 +222,7 @@ if (!is.null(args[["singlefile_galaxyPath"]])){
                 xset.l[[i]]@rt$corrected<-xset@rt$corrected[[i]]
                 xset.l[[i]]@filepaths<-xset@filepaths[i]
                 xset.l[[i]]@profinfo<-xset@profinfo
-             }
+            }
         } else {
             xset.l<-xset
         }
@@ -245,14 +246,13 @@ if (!is.null(args[["singlefile_galaxyPath"]])){
                    capture.output(z <- groupFWHM(y, perfwhm = settingslist@CAMERA$perfwhm),
                                   file = NULL)
                    z})
-
         }
         
         #default settings for GC from Wehrens et al
         cat("Process runGC with metaMS package...\n\n")
         print(str(TSQXLS.GC))   
         resGC<-runGC(xset=xsetCAM,settings=TSQXLS.GC, rtrange=rtrange, DB= DBarg, removeArtefacts = TRUE, 
-                    findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves) #default settings for GC from Wehrens et al
+                    findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
     } else {
         if(args[["settings"]] == "User_defined") {
             settingslist=GALAXY.GC
@@ -263,13 +263,14 @@ if (!is.null(args[["singlefile_galaxyPath"]])){
                     y <- xsAnnotate(x, sample = 1)
                     capture.output(z <- groupFWHM(y, perfwhm = settingslist@CAMERA$perfwhm),
                                   file = NULL)
-                    z})
-           
-        }
-        cat("Process runGC with metaMS package...\n\n")
-        print(str(GALAXY.GC))
-        resGC<-runGC(xset=xsetCAM,settings=GALAXY.GC,rtrange = rtrange, DB= DBarg, removeArtefacts = TRUE, 
-                    findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
+                    z}) 
+            }
+
+            #default settings for GC from Wehrens et al
+            cat("Process runGC with metaMS package...\n\n")
+            print(str(GALAXY.GC))
+            resGC<-runGC(xset=xsetCAM,settings=GALAXY.GC,rtrange = rtrange, DB= DBarg, removeArtefacts = TRUE, 
+                        findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
         } else {
             error_message <- "There is no xset"
             print(error_message)
@@ -277,7 +278,6 @@ if (!is.null(args[["singlefile_galaxyPath"]])){
         } 
     }
 } else {
-    #TODO update error message
     error_message <- "No galaxy path entered"
     print(error_message)
     stop(error_message)
