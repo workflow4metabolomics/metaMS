@@ -380,7 +380,7 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
 #metaMS EIC and pspectra plotting option
 #version 20190520
 #only for Galaxy 
-plotUnknowns<-function(resGC, unkn=""){
+plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
 
     ##Annotation table each value is a pcgrp associated to the unknown 
     ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
