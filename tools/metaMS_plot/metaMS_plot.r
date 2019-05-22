@@ -117,7 +117,7 @@ if(!is.null(singlefile)) {
             system(paste('gs  -o GCMS_EIC.pdf  -sDEVICE=pdfwrite  -dPDFSETTINGS=/prepress  Unknown_*.pdf'))
         }
     } else {
-        error_message <- "Can't find",files,"!")
+        error_message <- paste("Can't find",files,"!")
         print(error_message)
         stop(error_message)
     }
@@ -144,7 +144,7 @@ if(!is.null(zipfile)) {
             system(paste('gs -sOutputFile=GCMS_EIC.pdf -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress Unknown_*.pdf'))
         }
     } else {
-        error_message <- "Can't find",files,"!")
+        error_message <- paste("Can't find",files,"!")
         print(error_message)
         stop(error_message)
     } 
