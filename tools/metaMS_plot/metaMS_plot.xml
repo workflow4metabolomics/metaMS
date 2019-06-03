@@ -10,9 +10,9 @@
     <expand macro="stdio"/>
     
     <command><![CDATA[
-    LC_ALL=C Rscript $__tool_directory__/metaMS_plot.r
+    @COMMAND_RSCRIPT@/metaMS_plot.r
         
-        metaMS $metaMS
+        metaMS "$metaMS"
 
         selecttic $selectedtic.TIC
 
@@ -27,8 +27,6 @@
         #end if
 
         @COMMAND_FILE_LOAD@
-
-        @COMMAND_LOG_EXIT@
 
     ]]></command>
     
@@ -81,7 +79,6 @@
         <data name="unknownPdf"   format="pdf" from_work_dir="GCMS_EIC.pdf" label="GCMS_EIC.pdf">
             <filter>selectedeic['EIC'] is True</filter>
         </data>
-        <data name="log" format="txt" from_work_dir="log.txt" label="plot_metaMS.log" />
         
     </outputs>
     
@@ -135,10 +132,7 @@
 	
 <!--
 TODO : Add test on EICs (problem with gs not found whereas I added pip install ghostscript and bgs in .travis.yml)
-TODO : Update the help section
 -->
-
-/!\\ WORK IN PROGRESS /!\\ 
 
 .. class:: infomark
 
@@ -146,7 +140,7 @@ TODO : Update the help section
 
 .. class:: infomark
 
-**Galaxy wrapper and scripts developpers** Guitton Yann LABERCA yann.guitton@oniris-nantes.fr
+**Galaxy wrapper and scripts developpers** Guitton Yann LABERCA yann.guitton@oniris-nantes.fr and Saint-Vanne Julien julien.saint-vanne@sb-roscoff.fr
 
 .. class:: infomark
 

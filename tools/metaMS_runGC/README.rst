@@ -1,5 +1,5 @@
 ====================================
-GC-MS data processing version 2.1.1
+GC-MS data processing version 3.0.0
 ====================================
 
 1) Date : 2019-05-20

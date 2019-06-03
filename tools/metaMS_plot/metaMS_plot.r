@@ -1,4 +1,3 @@
-#!/usr/local/public/bin/Rscript --vanilla --slave --no-site-file
 # metams.r version="2.1.2"
 #created by Yann GUITTON 
 #use RI options + add try on plotUnknown add session Info
@@ -35,31 +34,32 @@ cat("\nStart of the '", modNamC, "' Galaxy module call: ", format(Sys.time(), "%
 # ----- ARGUMENTS -----
 cat("\tARGUMENTS INFO\n\n")
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
-write.table(as.matrix(args), col.names=F, quote=F, sep='\t\t')
+#write.table(as.matrix(args), col.names=F, quote=F, sep='\t\t')
+print(cbind(value = unlist(args)))
 
 
 # ----- PROCESSING INFILE -----
 cat("\n\n\tARGUMENTS PROCESSING INFO\n\n")
 
 # Loading RData file
-load(args[["metaMS"]])
+load(args$metaMS)
 if (!exists("resGC")) stop("\n\nERROR: The RData doesn't contain any object called 'resGC' which is provided by the tool: new_metaMS.runGC")
 
-if(args[["selecteic"]]) {
+if(args$selecteic) {
     #Unknown EIC parameter
-    if (args[["unkn"]][1] != "NULL") {
+    if (args$unkn[1] != "NULL") {
         #When unkn = 0 user want to process all unknowns
-        if(args[["unkn"]][1] == 0) {
-            args[["unkn"]] <- c(1:nrow(resGC$PeakTable))
+        if(args$unkn[1] == 0) {
+            args$unkn <- c(1:nrow(resGC$PeakTable))
             print("User want to process on all unknown(s) found in metaMS process")
         }
         #TODO find the biggest number of unkn ask by user cause it can write "1,15,9,8" with a max of 11 unkn. With this code it finds the 8 and it will pass
         #Verify that there is not more user's unkn than metaMS unkn (find in resGC$PeakTable)
         cat("Number of unknown after metaMS process :",nrow(resGC$PeakTable),"\n")
-        cat("Number of the last unknown ask by user :",args[["unkn"]][length(args[["unkn"]])],"\n")
-        cat("Number of unknown ask by user :",length(args[["unkn"]]),"\n")
-        if(args[["unkn"]][length(args[["unkn"]])] <= nrow(resGC$PeakTable)) {
-            unknarg <- args[["unkn"]]
+        cat("Number of the last unknown ask by user :",args$unkn[length(args$unkn)],"\n")
+        cat("Number of unknown ask by user :",length(args$unkn),"\n")
+        if(args$unkn[length(args$unkn)] <= nrow(resGC$PeakTable)) {
+            unknarg <- args$unkn
         } else {
             error_message="Too much unkn compare metaMS results"
             print(error_message)
@@ -98,17 +98,17 @@ cat("\t\tCOMPUTE\n")
 if(!is.null(singlefile)) {
     files <- paste("./",names(singlefile),sep="")
     if(!is.null(files)){
-        if(args[["selectbpc"]]){
+        if(args$selectbpc){
             cat("\n\tProcessing BPC(s) from XCMS files...\n")
             c <- getBPC2s(files = files, xset = xset, rt="raw", pdfname="BPCs_raw.pdf")
             cat("BPC(s) created...\n")
         }
-        if(args[["selecttic"]]){
+        if(args$selecttic){
             cat("\n\tProcessing TIC(s) from XCMS files...\n")
             b <- getTIC2s(files = files, xset = xset, rt="raw", pdfname="TICs_raw.pdf")
             cat("TIC(s) created...\n")
         }
-        if(args[["selecteic"]]){
+        if(args$selecteic){
             cat("\n\tProcessing EIC(s) from XCMS files...\n")
             cat(length(unknarg),"unknown(s) will be process !\n")
             plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBarg, fileFrom="singlefile")
@@ -125,17 +125,17 @@ if(!is.null(singlefile)) {
 if(!is.null(zipfile)) {
     files <- getMSFiles(directory)
     if(!is.null(files)) {
-        if(args[["selectbpc"]]) {
+        if(args$selectbpc) {
             cat("\n\tProcessing BPC(s) from raw files...\n")
             c <- getBPC2s(files = files, rt="raw", pdfname="BPCs_raw.pdf")
             cat("BPC(s) created...\n")
         }
-        if(args[["selecttic"]]) {
+        if(args$selecttic) {
             cat("\n\tProcessing TIC(s) from raw files...\n")
             b <- getTIC2s(files = files, rt="raw", pdfname="TICs_raw.pdf")  
             cat("TIC(s) created...\n")
         }
-        if(args[["selecteic"]]) {
+        if(args$selecteic) {
             cat("\n\tProcessing EIC(s) from XCMS files...\n")
             cat(length(unknarg),"unknown(s) will be process !\n")
             plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBarg, fileFrom="zipfile")
