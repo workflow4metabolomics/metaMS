@@ -44,14 +44,14 @@ cat("\n\n\tARGUMENTS PROCESSING INFO\n\n")
 #RI parameter
 if (args$ri!="NULL"){
     RIarg=read.table(args$ri)
-	if (ncol(RIarg) < 2) RIarg=read.table(args$ri, h=T, sep=";")
-	if (ncol(RIarg) < 2) RIarg=read.table(args$ri, h=T, sep="\t")
-	if (ncol(RIarg) < 2) RIarg=read.table(args$ri, h=T, sep=",")
-	if (ncol(RIarg) < 2) {
-		error_message="Your RI file seems not well formatted. The column separators accepted are ; , and tabulation"
-		print(error_message)
-		stop(error_message)
-	}
+    if (ncol(RIarg) < 2) RIarg=read.table(args$ri, h=T, sep=";")
+    if (ncol(RIarg) < 2) RIarg=read.table(args$ri, h=T, sep="\t")
+    if (ncol(RIarg) < 2) RIarg=read.table(args$ri, h=T, sep=",")
+    if (ncol(RIarg) < 2) {
+        error_message="Your RI file seems not well formatted. The column separators accepted are ; , and tabulation"
+        print(error_message)
+        stop(error_message)
+    }
     #to do check real column names
     colnames(RIarg)<-c("rt","RI")
 } else {
@@ -75,36 +75,36 @@ if (args$db!="NULL"){
 #settings process
 if (args$settings=="default") {
     cat("Usingdefault parameters")
-	data(FEMsettings) 
+    data(FEMsettings) 
     if (args$rtrange[1]!="NULL") {
         rtrange=args$rtrange
     } else {
         rtrange=NULL
     }
-	
-	if (!is.null(DBarg)){
-		manual <- read.msp(DBarg)
-		DBarg <- createSTDdbGC(stdInfo = NULL, settings = TSQXLS.GC, manualDB = manual)
-	}
-	
-	#use RI instead of rt for time comparison vs DB
-	if (RIshift!="none"){
-		TSQXLS.GC@match2DB.timeComparison<-"RI"
-		TSQXLS.GC@match2DB.RIdiff<-as.numeric(RIshift)
-		TSQXLS.GC@betweenSamples.timeComparison<-"RI"
-		TSQXLS.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
-	}
+
+    if (!is.null(DBarg)){
+        manual <- read.msp(DBarg)
+        DBarg <- createSTDdbGC(stdInfo = NULL, settings = TSQXLS.GC, manualDB = manual)
+    }
+
+    #use RI instead of rt for time comparison vs DB
+    if (RIshift!="none"){
+        TSQXLS.GC@match2DB.timeComparison<-"RI"
+        TSQXLS.GC@match2DB.RIdiff<-as.numeric(RIshift)
+        TSQXLS.GC@betweenSamples.timeComparison<-"RI"        
+        TSQXLS.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
+    }
     nSlaves=args$nSlaves
 }
 
 if (args$settings=="User_defined") {
-	fwhmparam=args$fwhm
-	rtdiffparam=args$rtdiff
-	minfeatparam=args$minfeat
-	simthreshparam=args$simthreshold
+    fwhmparam=args$fwhm
+    rtdiffparam=args$rtdiff
+    minfeatparam=args$minfeat
+    simthreshparam=args$simthreshold
     minclassfractionparam=args$minclassfraction
     minclasssizeparam=args$minclasssize
-	
+
     if (args$rtrange!="NULL") {
         rtrange=args$rtrange
         cat("rtrange= ",rtrange)
@@ -112,64 +112,64 @@ if (args$settings=="User_defined") {
         rtrange=NULL
         cat("rtrange= ",rtrange)
     }
-	
+
     nSlaves=args$nSlaves
-	
+
     GALAXY.GC <- 
         metaMSsettings("protocolName" = "GALAXY.GC",
-				   "chrom" = "GC",
-				   PeakPicking = list(
-						method = "matchedFilter",
-						step = 0.5,
-						steps = 2,
-						mzdiff = .5,
-						fwhm = fwhmparam,
-						snthresh = 2,
-						max = 500),
-				   CAMERA = list(perfwhm = 1))
+                       "chrom" = "GC",
+                       PeakPicking = list(
+                        method = "matchedFilter",
+                        step = 0.5,
+                        steps = 2,
+                        mzdiff = .5,
+                        fwhm = fwhmparam,
+                        snthresh = 2,
+                        max = 500),
+                       CAMERA = list(perfwhm = 1))
    
-	metaSetting(GALAXY.GC, "DBconstruction") <- list(
-				minintens = 0.0,
-				rttol = rtdiffparam,
-				intensityMeasure = "maxo",
-				DBthreshold = .80, 
-				minfeat = minfeatparam)
-	metaSetting(GALAXY.GC, "match2DB") <- list(
-				simthresh = simthreshparam,
-				timeComparison = "rt",
-				rtdiff = rtdiffparam,
-				RIdiff = 5,
-				minfeat = minfeatparam)
-				
-    #to used if contaminant filter
-	
-	# metaSetting(GALAXY.GC, "matchIrrelevants") <- list(
-				# irrelevantClasses = c("Bleeding", "Plasticizers"),
-				# timeComparison = "RI",
-				# RIdiff = RIdiffparam,    
-				# rtdiff = rtdiffparam,
-				# simthresh = simthreshparam)
-	
-	metaSetting(GALAXY.GC, "betweenSamples") <- list(
-				min.class.fraction = minclassfractionparam,
-				min.class.size = minclasssizeparam,
-				timeComparison = "rt",
-				rtdiff = rtdiffparam,
-				RIdiff = 2,    
-				simthresh = simthreshparam)
+    metaSetting(GALAXY.GC, "DBconstruction") <- list(
+                minintens = 0.0,
+                rttol = rtdiffparam,
+                intensityMeasure = "maxo",
+                DBthreshold = .80, 
+                minfeat = minfeatparam)
+    metaSetting(GALAXY.GC, "match2DB") <- list(
+                simthresh = simthreshparam,
+                timeComparison = "rt",
+                rtdiff = rtdiffparam,
+                RIdiff = 5,
+                minfeat = minfeatparam)
 
-	#ONLY use RI instead of rt for time comparison vs DB or samples
-	if (RIshift!="none"){
-		GALAXY.GC@match2DB.timeComparison<-"RI"
-		GALAXY.GC@match2DB.RIdiff<-as.numeric(RIshift)
-		GALAXY.GC@betweenSamples.timeComparison<-"RI"
-		GALAXY.GC@betweenSamples.RIdiff<-as.numeric(RIshift)
-	}
+    #to used if contaminant filter
+
+    # metaSetting(GALAXY.GC, "matchIrrelevants") <- list(
+                # irrelevantClasses = c("Bleeding", "Plasticizers"),
+                # timeComparison = "RI",
+                # RIdiff = RIdiffparam,    
+                # rtdiff = rtdiffparam,
+                # simthresh = simthreshparam)
+
+    metaSetting(GALAXY.GC, "betweenSamples") <- list(
+                min.class.fraction = minclassfractionparam,
+                min.class.size = minclasssizeparam,
+                timeComparison = "rt",
+                rtdiff = rtdiffparam,
+                RIdiff = 2,    
+                simthresh = simthreshparam)
+
+    #ONLY use RI instead of rt for time comparison vs DB or samples
+    if (RIshift!="none"){
+        GALAXY.GC@match2DB.timeComparison<-"RI"
+        GALAXY.GC@match2DB.RIdiff<-as.numeric(RIshift)
+        GALAXY.GC@betweenSamples.timeComparison<-"RI"
+        GALAXY.GC@betweenSamples.RIdiff<-as.numeric(RIshift)    
+    }
     
-	if (!is.null(DBarg)){
-		manual <- read.msp(DBarg)
-		DBarg <- createSTDdbGC(stdInfo = NULL, settings = GALAXY.GC, manualDB = manual)
-	}
+    if (!is.null(DBarg)){
+        manual <- read.msp(DBarg)
+        DBarg <- createSTDdbGC(stdInfo = NULL, settings = GALAXY.GC, manualDB = manual)
+    }
 }
 
 
