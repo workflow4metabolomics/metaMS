@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+	<repositories>
+	<!--metaMS tools -->
+        <repository name="metams_rungc" owner="jsaintvanne"/>
+		<repository name="metams_plot" owner="jsaintvanne"/>
+	</repositories>

@@ -10,10 +10,6 @@ GC-MS data processing version 2.1.1
 
    LABERCA - PFCA Metabolomics Platform
 
-   Route de Gachet, 44307 NANTES, FRANCE
-
-   Phone: +33 2 40 48 78 80
-
    E-mail: yann.guitton@oniris-nantes.fr / yann.guitton@gmail.com
 
 3) Funding :
