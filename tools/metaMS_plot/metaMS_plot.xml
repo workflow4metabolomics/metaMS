@@ -1,5 +1,5 @@
  <tool id="metams_plot" name="metams_plot" version="3.0.0">
-       
+
     <description>GC-MS data preprocessing using metaMS package</description>
 
     <macros>
@@ -8,15 +8,15 @@
     
     <expand macro="requirements"/>
     <expand macro="stdio"/>
-    
+
     <command><![CDATA[
     @COMMAND_RSCRIPT@/metaMS_plot.r
         
-        metaMS "$metaMS"
+        metaMS '$metaMS'
 
-        selecttic $selectedtic.TIC
+        selecttic $selectedtic
 
-        selectbpc $selectedbpc.BPC
+        selectbpc $selectedbpc
 
         selecteic $selectedeic.EIC
         
@@ -29,27 +29,13 @@
         @COMMAND_FILE_LOAD@
 
     ]]></command>
-    
+
     <inputs>
 
         <param name="metaMS" type="data" format="rdata" label="Rdata from new_metaMS_runGC" help="Rdata file containing a metaMS preprocess object" />
+        <param name="selectedtic" type="boolean" checked="false" falsevalue="false" truevalue="true" label="Do you want to process for TIC(s) ?" />
+        <param name="selectedbpc" checked="false" falsevalue="false" truevalue="true" label="Do you want to process for BPC(s) ?"  type="boolean" />
 
-        <conditional name="selectedtic">
-            <param name="TIC" checked="false" falsevalue="false" truevalue="true" label="Do you want to process for TIC(s) ?"  type="boolean">
-                <option value="false">no</option>
-                <option value="true">yes</option>
-            </param>
-            <when value="true"/>
-            <when value="false"/>
-        </conditional>
-        <conditional name="selectedbpc">
-            <param name="BPC" checked="false" falsevalue="false" truevalue="true" label="Do you want to process for BPC(s) ?"  type="boolean">
-                <option value="false">no</option>
-                <option value="true">yes</option>
-            </param>
-            <when value="true"/>
-            <when value="false"/>
-        </conditional>
         <conditional name="selectedeic">
             <param name="EIC" checked="false" falsevalue="false" truevalue="true" label="Do you want to process for EIC(s) ?"  type="boolean">
                 <option value="false">no</option>
@@ -64,49 +50,49 @@
         <expand macro="input_file_load"/>
 
     </inputs>
-    
+
     <outputs>
     
         <!-- Only when user selected TIC option -->
         <data name="ticsRawPdf"   format="pdf" from_work_dir="TICs_raw.pdf" label="TICs_raw.pdf">
-            <filter>selectedtic['TIC'] is True</filter>
+            <filter>selectedtic is True</filter>
         </data>
         <!-- Only when user selected BPC option -->
         <data name="bpcsRawPdf"   format="pdf" from_work_dir="BPCs_raw.pdf" label="BPCs_raw.pdf">
-            <filter>selectedbpc['BPC'] is True</filter>
+            <filter>selectedbpc is True</filter>
         </data>
         <!-- Only when user selected EIC option -->
         <data name="unknownPdf"   format="pdf" from_work_dir="GCMS_EIC.pdf" label="GCMS_EIC.pdf">
             <filter>selectedeic['EIC'] is True</filter>
         </data>
-        
+
     </outputs>
-    
+
     <tests>
 
         <!-- Test TIC -->
         <test>
             <param name="metaMS" value="runGC_test.RData"  ftype="rdata" />
             <expand macro="test_file_load_alg_symlink" />
-            <param name="selectedtic|TIC" value="true"/>
+            <param name="selectedtic" value="true"/>
             <output name="ticsRawPdf" value="TICs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
         <!-- Test BPC -->
         <test>
             <param name="metaMS" value="runGC_noDB.RData"  ftype="rdata" />
             <expand macro="test_file_load_alg_symlink" />
-            <param name="selectedbpc|BPC" value="true"/>
+            <param name="selectedbpc" value="true"/>
             <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
         <!-- Test EICs -->
-        <!--<test>
+        <test>
             <param name="metaMS" value="runGC_noDB.RData"  ftype="rdata" />
             <expand macro="test_file_load_alg_symlink" />
             <param name="selectedeic|EIC" value="true"/>
             <output name="unknownPdf" value="GCMS_EIC_noDB.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
 
-        --><!-- Tests with DB comparison -->
+        <!-- Tests with DB comparison -->
         <!-- Test TIC -->
         <!--<test>
             <param name="metaMS" value="runGC.RData"  ftype="rdata" />
@@ -129,7 +115,7 @@
     </tests>
     
     <help>
-	
+
 <!--
 TODO : Add test on EICs (problem with gs not found whereas I added pip install ghostscript and bgs in .travis.yml)
 -->

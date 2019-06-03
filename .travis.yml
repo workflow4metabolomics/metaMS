@@ -14,6 +14,7 @@ before_install:
  - virtualenv planemo-venv
  - . planemo-venv/bin/activate
  - pip install planemo==0.58.1
+ - conda install -c conda-forge ghostscript 
   #- wget https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs927/ghostscript-9.27-linux-x86_64.tgz
   #- 
   #- pip install ghostscript
