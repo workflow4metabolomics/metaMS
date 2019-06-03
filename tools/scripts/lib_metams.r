@@ -161,17 +161,12 @@ retrieveRawfileInTheWorkingDirectory <- function(singlefile, zipfile) {
 
 ##ADDITIONS FROM Y. Guitton
 getBPC <- function(file,rtcor=NULL, ...) {
-    print("dans getBPC")
-    print(file)
-    
     object <- xcmsRaw(file)
 	sel <- profRange(object, ...)
 	cbind(if (is.null(rtcor)) object@scantime[sel$scanidx] else rtcor ,xcms:::colMax(object@env$profile[sel$massidx,sel$scanidx,drop=FALSE]))
 }
 
 getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corrected"), scanrange=NULL) {
-    print("dans getBPC2s")
-    print(files)
     require(xcms)
                    
     #create sampleMetadata, get sampleMetadata and class
