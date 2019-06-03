@@ -115,8 +115,8 @@ if (args$settings=="User_defined") {
 	
     nSlaves=args$nSlaves
 	
-	GALAXY.GC <- 
-    metaMSsettings("protocolName" = "GALAXY.GC",
+    GALAXY.GC <- 
+        metaMSsettings("protocolName" = "GALAXY.GC",
 				   "chrom" = "GC",
 				   PeakPicking = list(
 						method = "matchedFilter",
