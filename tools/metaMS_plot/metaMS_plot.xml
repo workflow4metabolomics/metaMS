@@ -4,6 +4,7 @@
 
     <macros>
         <import>macros.xml</import>
+        <requirement type="package" version="9.22">ghostscript</requirement>
     </macros>
     
     <expand macro="requirements"/>
