@@ -86,7 +86,7 @@
             <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
         </test>
         <!-- Test EICs -->
-        <!--<test>
+        <test>
             <param name="metaMS" value="runGC_noDB.RData"  ftype="rdata" />
             <expand macro="test_file_load_alg_symlink" />
             <conditional name="selectedeic">
@@ -94,7 +94,7 @@
                 <param name="unkn" value="1:5"/>
             </conditional>
             <output name="unknownPdf" value="GCMS_EIC_noDB.pdf" ftype="pdf" compare="sim_size" delta="600"/>
-        </test>-->
+        </test>
 
         <!-- Tests with DB comparison -->
         <!-- Test TIC -->
