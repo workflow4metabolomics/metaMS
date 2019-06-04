@@ -45,7 +45,7 @@
             rishift "none"
         #end if
         #if $settings.options_db.option == "show":
-            db $settings.options_db.db_input
+            db '$settings.options_db.db_input'
         #end if 
         #if $settings.options_db.option == "hide":
             db "NULL"

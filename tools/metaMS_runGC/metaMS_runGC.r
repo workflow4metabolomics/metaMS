@@ -74,7 +74,7 @@ if (args$db!="NULL"){
 
 #settings process
 if (args$settings=="default") {
-    cat("Usingdefault parameters")
+    cat("Using default parameters")
     data(FEMsettings) 
     if (args$rtrange[1]!="NULL") {
         rtrange=args$rtrange
@@ -84,7 +84,7 @@ if (args$settings=="default") {
 
     if (!is.null(DBarg)){
         manual <- read.msp(DBarg)
-        DBarg <- createSTDdbGC(stdInfo = NULL, settings = TSQXLS.GC, manualDB = manual)
+        DBgc <- createSTDdbGC(stdInfo = NULL, settings = TSQXLS.GC, manualDB = manual)
     }
 
     #use RI instead of rt for time comparison vs DB
@@ -98,6 +98,7 @@ if (args$settings=="default") {
 }
 
 if (args$settings=="User_defined") {
+    cat("Using user's parameters")
     fwhmparam=args$fwhm
     rtdiffparam=args$rtdiff
     minfeatparam=args$minfeat
@@ -168,7 +169,7 @@ if (args$settings=="User_defined") {
     
     if (!is.null(DBarg)){
         manual <- read.msp(DBarg)
-        DBarg <- createSTDdbGC(stdInfo = NULL, settings = GALAXY.GC, manualDB = manual)
+        DBgc <- createSTDdbGC(stdInfo = NULL, settings = GALAXY.GC, manualDB = manual)
     }
 }
 
@@ -252,8 +253,8 @@ if (!is.null(args$singlefile_galaxyPath)){
         
         #default settings for GC from Wehrens et al
         cat("Process runGC with metaMS package...\n\n")
-        print(str(TSQXLS.GC))   
-        resGC<-runGC(xset=xsetCAM,settings=TSQXLS.GC, rtrange=rtrange, DB= DBarg, removeArtefacts = TRUE, 
+        print(str(TSQXLS.GC))  
+        resGC<-runGC(xset=xsetCAM,settings=TSQXLS.GC, rtrange=rtrange, DB= DBgc, removeArtefacts = TRUE, 
                     findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
     } else {
         if(args$settings == "User_defined") {
@@ -273,7 +274,7 @@ if (!is.null(args$singlefile_galaxyPath)){
             #user settings for GC
             cat("Process runGC with metaMS package...\n\n")
             print(str(GALAXY.GC))
-            resGC<-runGC(xset=xsetCAM,settings=GALAXY.GC,rtrange = rtrange, DB= DBarg, removeArtefacts = TRUE, 
+            resGC<-runGC(xset=xsetCAM,settings=GALAXY.GC,rtrange = rtrange, DB= DBgc, removeArtefacts = TRUE, 
                         findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
         } else {
             error_message <- "There is no xset"
@@ -324,7 +325,7 @@ cat("\nGenerating",length(resGC$PseudoSpectra),"peakspectra in peakspectra.msp f
 write.msp(resGC$PseudoSpectra, file="peakspectra.msp", newFile = TRUE)
 
 #saving R data in .Rdata file to save the variables used in the present tool
-objects2save <- c("resGC", "xset", "singlefile", "zipfile", "DBarg")
+objects2save <- c("resGC", "xset", "singlefile", "zipfile", "DBgc")
 save(list = objects2save[objects2save %in% ls()], file = "runGC.RData")
 
 cat("\nEnd of '", modNamC, "' Galaxy module call: ", as.character(Sys.time()), "\n", sep = "")
