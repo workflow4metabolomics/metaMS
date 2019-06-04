@@ -111,7 +111,7 @@ if(!is.null(singlefile)) {
         if(args$selecteic){
             cat("\n\tProcessing EIC(s) from XCMS files...\n")
             cat(length(unknarg),"unknown(s) will be process !\n")
-            plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBarg, fileFrom="singlefile")
+            plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBgc, fileFrom="singlefile")
             cat("EIC(s) created...\n")
             #Merge pdf
             system(paste('gs  -o GCMS_EIC.pdf  -sDEVICE=pdfwrite  -dPDFSETTINGS=/prepress  Unknown_*.pdf'))
@@ -138,7 +138,7 @@ if(!is.null(zipfile)) {
         if(args$selecteic) {
             cat("\n\tProcessing EIC(s) from XCMS files...\n")
             cat(length(unknarg),"unknown(s) will be process !\n")
-            plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBarg, fileFrom="zipfile")
+            plotUnknowns(resGC=resGC, unkn=unknarg, DB=DBgc, fileFrom="zipfile")
             cat("EIC(s) created...\n")
             #Merge pdf
             system(paste('gs -sOutputFile=GCMS_EIC.pdf -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress Unknown_*.pdf'))
