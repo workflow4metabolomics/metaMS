@@ -67,9 +67,9 @@ if (args$rishift!="none"){
 
 #Personal database parameter
 if (args$db!="NULL"){
-    DBarg=args$db
+    DBgc=args$db
 } else {
-    DBarg = NULL
+    DBgc = NULL
 }   
 
 #settings process
@@ -82,8 +82,8 @@ if (args$settings=="default") {
         rtrange=NULL
     }
 
-    if (!is.null(DBarg)){
-        manual <- read.msp(DBarg)
+    if (!is.null(DBgc)){
+        manual <- read.msp(DBgc)
         DBgc <- createSTDdbGC(stdInfo = NULL, settings = TSQXLS.GC, manualDB = manual)
     }
 
@@ -167,8 +167,8 @@ if (args$settings=="User_defined") {
         GALAXY.GC@betweenSamples.RIdiff<-as.numeric(RIshift)    
     }
     
-    if (!is.null(DBarg)){
-        manual <- read.msp(DBarg)
+    if (!is.null(DBgc)){
+        manual <- read.msp(DBgc)
         DBgc <- createSTDdbGC(stdInfo = NULL, settings = GALAXY.GC, manualDB = manual)
     }
 }
