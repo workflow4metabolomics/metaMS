@@ -168,15 +168,6 @@
             <param name="input" value="xset_merged.RData"  ftype="rdata" />
             <conditional name="settings">
                 <param name="setting" value="gcdefault" />
-                <conditional name="options_rtrange">
-                    <param name="option" value="hide" />
-                </conditional>
-                <conditional name="options_db">
-                    <param name="option" value="hide" />
-                </conditional>
-                <conditional name="options_ri">
-                    <param name="option" value="hide" />
-                </conditional>
             </conditional>
             <!--<output name="peaktable" file="peaktable_noDB.tsv" lines_diff="4"/>-->
             <output name="sampleMetadata" file="sampleMetadata_noDB.tsv" lines_diff="4"/>
@@ -189,15 +180,9 @@
             <param name="input" value="xset_merged.RData"  ftype="rdata" />
             <conditional name="settings">
                 <param name="setting" value="gcdefault" />
-                <conditional name="options_rtrange">
-                    <param name="option" value="hide" />
-                </conditional>
                 <conditional name="options_db">
                     <param name="option" value="show" />
                     <param name="db_input" value="W4M0004_database_small.msp" ftype="msp" />
-                </conditional>
-                <conditional name="options_ri">
-                    <param name="option" value="hide" />
                 </conditional>
             </conditional>
             <!--<output name="peaktable" file="peaktable.tsv" lines_diff="4"/>-->
