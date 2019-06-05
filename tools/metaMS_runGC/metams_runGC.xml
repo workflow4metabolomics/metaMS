@@ -274,7 +274,7 @@ xcms.xcmsSet              xset.RData RData     RData   file
 
 **General schema of the metabolomic workflow for GCMS**
 
-.. image:: static/images/workflow_metaMS_runGC.png
+.. image:: workflow_metaMS_runGC.png
 
 -----------
 Input files

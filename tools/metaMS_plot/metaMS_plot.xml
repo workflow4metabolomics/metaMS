@@ -178,7 +178,7 @@ metaMS_runGC              runGC.RData           RData   file
 
 **General schema of the metabolomic workflow for GCMS**
 
-.. image:: static/images/workflow_metaMS_plot.png
+.. image:: workflow_metaMS_plot.png
 
 -----------
 Input files
@@ -238,15 +238,15 @@ Output files
 
     | **1) TICs_raw.pdf (Total Ion Chromatogram) :**
 
-    .. image:: test-data/BPCs_raw.pdf
+    .. image:: BPCs_raw.pdf
 
     | **2) BPCs_raw.pdf (Base Peak Chromatograms) :**
 
-    .. image:: ./test-data/TICs_raw.pdf
+    .. image:: TICs_raw.pdf
 
     | **3) GCMS_EIC.pdf (Extracted Ion Chromatogram) :**
 
-    .. image:: ./test-data/GCMS_EIC.pdf
+    .. image:: GCMS_EIC.pdf
 
 
 ---------------------------------------------------
