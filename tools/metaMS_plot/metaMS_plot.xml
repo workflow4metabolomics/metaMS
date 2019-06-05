@@ -83,7 +83,7 @@
             <param name="metaMS" value="runGC_noDB.RData"  ftype="rdata" />
             <expand macro="test_file_load_alg_symlink" />
             <param name="selectedbpc" value="true"/>
-            <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="600"/>
+            <output name="bpcsRawPdf" value="BPCs_raw.pdf" ftype="pdf" compare="sim_size" delta="2000"/>
         </test>
         <!-- Test EICs -->
         <test>
@@ -93,7 +93,7 @@
                 <param name="EIC" value="true"/>
                 <param name="unkn" value="1:5"/>
             </conditional>
-            <output name="unknownPdf" value="GCMS_EIC_noDB.pdf" ftype="pdf" compare="sim_size" delta="600"/>
+            <output name="unknownPdf" value="GCMS_EIC_noDB.pdf" ftype="pdf" compare="sim_size" delta="1200"/>
         </test>
 
         <!-- Tests with DB comparison -->

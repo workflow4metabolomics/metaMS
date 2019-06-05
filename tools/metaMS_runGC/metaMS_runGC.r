@@ -1,6 +1,6 @@
-#!/usr/local/public/bin/Rscript --vanilla --slave --no-site-file
-# metams.r version="2.1.2"
-#created by Yann GUITTON 
+#!/usr/bin/env Rscript
+# metaMS_runGC.r version="3.0.0"
+#created by Yann GUITTON and updated by Julien SAINT-VANNE
 #use RI options + add try on plotUnknown add session Info
 #use make.names in sampleMetadata to avoid issues with files names 
 
