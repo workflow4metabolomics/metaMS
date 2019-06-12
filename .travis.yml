@@ -14,7 +14,6 @@ before_install:
  - virtualenv planemo-venv
  - . planemo-venv/bin/activate
  - pip install planemo==0.58.1
- - sudo apt-get install ghostscript
   
 # @TODO: remove ASAP
 # The issue: https://github.com/galaxyproject/planemo/issues/865
