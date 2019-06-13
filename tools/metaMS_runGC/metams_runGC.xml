@@ -201,7 +201,7 @@
 
 .. class:: infomark
 
-**Galaxy wrapper and scripts developpers** Guitton Yann LABERCA yann.guitton@oniris-nantes.fr
+**Galaxy wrapper and scripts developpers** Guitton Yann LABERCA yann.guitton@oniris-nantes.fr and Saint-Vanne Julien julien.saint-vanne@sb-roscoff.fr
 
 .. class:: infomark
 
@@ -224,7 +224,7 @@ metaMS.runGC
 Description
 -----------
 metaMS.runGC is a function dedicated to GCMS data processing from converted files to the generation of pseudospectra (compounds) table.
-Current version for metaMS R package: 1.14.0
+Current version for metaMS R package: 1.18.1
 
 **Process:** 
 Each of the converted data (cdf, mzML...)  is profiled by a combination of xcms and CAMERA functions. Then all the mass spectra of detected peaks are compared and clustered.
@@ -246,7 +246,7 @@ Workflow position
 
 **Upstream tools**
 
-You can start from here or use result file from :
+You can start from here (XCMS 1.x) or use result file from (XCMS 3.x) :
 
 ========================= ==================== ======= ==========
 Name                      output file          format  parameter
