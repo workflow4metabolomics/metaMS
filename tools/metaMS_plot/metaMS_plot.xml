@@ -1,4 +1,4 @@
- <tool id="metams_plot" name="metams_plot" version="3.0.0">
+ <tool id="metams_plot" name="metaMS.plot" version="1.0.0">
 
     <description>GC-MS data preprocessing using metaMS package</description>
 
@@ -141,8 +141,6 @@ TODO : Add test on EICs (problem with gs not found whereas I added pip install g
 
  xcms :   Smith, C. A.; Want, E. J.; O’Maille, G.; Abagyan, R.; Siuzdak, G. Anal. Chem. 2006, 78, 779–787.
 
- CAMERA :   Kuhl, C.; Tautenhahn, R.; Böttcher, C.; Larson, T. R.; Neumann, S. Analytical Chemistry 2012, 84, 283–289.
-
 
 ---------------------------------------------------
 
@@ -167,7 +165,7 @@ Workflow position
 
 **Upstream tools**
 
-You can start from here or use result file from :
+You must use result file from :
 
 ========================= ==================== ======= ==========
 Name                      output file          format  parameter

@@ -98,7 +98,7 @@ if (args$settings=="default") {
 }
 
 if (args$settings=="User_defined") {
-    cat("Using user's parameters")
+    cat("Using user's parameters\n")
     fwhmparam=args$fwhm
     rtdiffparam=args$rtdiff
     minfeatparam=args$minfeat
