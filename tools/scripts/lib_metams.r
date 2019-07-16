@@ -168,7 +168,22 @@ getBPC <- function(file,rtcor=NULL, ...) {
 
 getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corrected"), scanrange=NULL) {
     require(xcms)
-                   
+    
+    #Verification for cdf files
+    stop=FALSE
+    for(i in 1:length(files)){
+        extension <- unlist(strsplit(basename(files[i]),"\\."))[length(unlist(strsplit(basename(files[i]),"\\.")))]
+        if(extension == "CDF" || extension == "cdf"){
+            stop = TRUE
+            break
+        }
+    }
+    if(stop){
+        error_message <- "You have a CDF file and there is an issue to resolve on them for chromatograms.... !"
+        print(error_message)
+        stop(error_message)
+    }
+
     #create sampleMetadata, get sampleMetadata and class
     if(!is.null(xset)) {
     	#When files come from XCMS3 directly before metaMS
@@ -279,6 +294,21 @@ getTIC <- function(file,rtcor=NULL) {
 getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected")) {
     require(xcms)
 
+    #Verification for cdf files
+    stop=FALSE
+    for(i in 1:length(files)){
+        extension <- unlist(strsplit(basename(files[i]),"\\."))[length(unlist(strsplit(basename(files[i]),"\\.")))]
+        if(extension == "CDF" || extension == "cdf"){
+            stop = TRUE
+            break
+        }
+    }
+    if(stop){
+        error_message <- "You have a CDF file and there is an issue to resolve on them for chromatograms.... !"
+        print(error_message)
+        stop(error_message)
+    }
+
     #create sampleMetadata, get sampleMetadata and class
     if(!is.null(xset)){
 		#When files come from XCMS3 before metaMS treatment
@@ -381,6 +411,21 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
 #version 20190520
 #only for Galaxy 
 plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
+
+    #Verification for cdf files
+    stop=FALSE
+    for(i in 1:length(names(resGC$annotation))){
+        extension <- unlist(strsplit(basename(names(resGC$annotation)[i]),"\\."))[length(unlist(strsplit(basename(names(resGC$annotation)[i]),"\\.")))]
+        if(extension == "CDF" || extension == "cdf"){
+            stop = TRUE
+            break
+        }
+    }
+    if(stop){
+        error_message <- "You have a CDF file and there is an issue to resolve on them for chromatograms.... !"
+        print(error_message)
+        stop(error_message)
+    }
 
     ##Annotation table each value is a pcgrp associated to the unknown 
     ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
