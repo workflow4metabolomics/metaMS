@@ -286,7 +286,7 @@ if (!is.null(args$singlefile_galaxyPath)){
         
         #default settings for GC from Wehrens et al
         cat("Process runGC with metaMS package...\n\n")
-        print(str(TSQXLS.GC))  
+        print(str(TSQXLS.GC))
         resGC<-runGC(xset=xsetCAM,settings=TSQXLS.GC, rtrange=rtrange, DB= DBgc, removeArtefacts = TRUE, 
                     findUnknowns = TRUE, returnXset = TRUE, RIstandards = RIarg, nSlaves = nSlaves)
     } else {
