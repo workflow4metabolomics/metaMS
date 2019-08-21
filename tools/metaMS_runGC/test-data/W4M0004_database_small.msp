@@ -185,7 +185,8 @@ Num Peaks: 236
 Name: Glycine, 3TMS
 DB.idx: 5
 RI: 1302.682
-monoMW: 291.610
+Formula: C11H29NO2Si3
+MW: 291.610
 rt: 13.965
 std.rt: 0.0033
 Class: Standard
