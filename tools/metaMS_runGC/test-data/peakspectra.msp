@@ -1,11 +1,11 @@
 Name: Glycine, 3TMS
-DB.idx: 5
+DB.idx: 4
 RI: 1302.682
 Formula: C11H29NO2Si3
-MW: 291.61
+monoMW: 291.61
 std.rt: 13.965
 Class: Standard
-DB.idx: 5
+DB.idx: 4
 Num Peaks: 78
  57  316293;  58  608407;  59  2360607;  60  298845;  61  196310; 
  70  169295;  71  161384;  72  648791;  73  11721138;  74  1113027; 
@@ -25,13 +25,13 @@ Num Peaks: 78
  278  137402;  279  34431;  367  3442; 
 
 Name: Pyroglutamic acid, 2TMS
-DB.idx: 6
+DB.idx: 5
 RI: 1650.417
 Formula: C11H23NO3Si2
-MW: 273.477
+monoMW: 273.477
 std.rt: 19.513
 Class: Standard
-DB.idx: 6
+DB.idx: 5
 Num Peaks: 158
  51  338626;  52  575985;  53  464956;  54  649153;  55  3336412; 
  56  1197195;  57  2169449;  58  6685191;  59  9081136;  60  1387309; 
@@ -67,13 +67,13 @@ Num Peaks: 158
  346  77810;  348  24720;  420  13841; 
 
 Name: Alanine, 3TMS
-DB.idx: 7
+DB.idx: 6
 RI: 1360.504
 Formula: C12H31NO2Si3
-MW: 305.637
+monoMW: 305.637
 std.rt: 15.323
 Class: Manual
-DB.idx: 7
+DB.idx: 6
 Num Peaks: 124
  54  89758;  55  274561;  56  190979;  57  472743;  58  1227701; 
  59  8857202;  60  769050;  61  572383;  62  41693;  66  257757; 
@@ -102,13 +102,13 @@ Num Peaks: 124
  292  225705;  293  58740;  305  25278;  306  8768; 
 
 Name: Aspartic acid, 2TMS
-DB.idx: 8
+DB.idx: 7
 RI: 1422.39
 Formula: C10H23NO4Si2
-MW: 277.465
+monoMW: 277.465
 std.rt: 17.071
 Class: Manual
-DB.idx: 8
+DB.idx: 7
 Num Peaks: 116
  53  110556;  54  70748;  55  491989;  56  176719;  57  429061; 
  58  867565;  59  1844082;  60  680229;  61  1783651;  62  153287; 
@@ -136,13 +136,13 @@ Num Peaks: 116
  442  2912; 
 
 Name: Tryptamine, 2TMS
-DB.idx: 9
+DB.idx: 8
 RI: 2224.531
 Formula: C16H28N2Si2
-MW: 304.578
+monoMW: 304.578
 std.rt: 19.044
 Class: Manual
-DB.idx: 9
+DB.idx: 8
 Num Peaks: 125
  53  103908;  54  92348;  55  359811;  56  220319;  57  234375; 
  58  577937;  59  3625396;  60  353747;  61  203780;  65  56054; 
