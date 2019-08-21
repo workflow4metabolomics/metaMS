@@ -1,8 +1,11 @@
 Name: Citric acid, 4TMS
-DB.idx: 2
+DB.idx: 1
+RI: 1803.92
+Formula: C18H40O7Si4
+monoMW: 480.848
 rt: 26.388
-Class: Standard
 std.rt: 0.0033
+Class: Standard
 Num Peaks: 306
  51  182440;  53  944503;  54  369474;  55  3340984;  56  631621; 
  57  1917866;  58  4022998;  59  7124250;  60  1136187;  61  3360226; 
@@ -68,10 +71,13 @@ Num Peaks: 306
  449  29707; 
 
 Name: D-Mannitol, 6TMS
-DB.idx: 3
+DB.idx: 2
+RI: 1916
+Formula: C24H62O6Si6
+monoMW: 620
 rt: 28.581
-Class: Standard
 std.rt: 0.003
+Class: Standard
 Num Peaks: 262
  53  489021;  54  603836;  55  1296110;  56  240694;  57  468516; 
  58  1361419;  59  5385271;  60  600415;  61  685447;  62  50899; 
@@ -128,10 +134,13 @@ Num Peaks: 262
  435  116595;  437  17236; 
 
 Name: Ribitol, 5TMS
-DB.idx: 4
+DB.idx: 3
+RI: 1712.74
+Formula: C20H52O5Si5
+monoMW: 512.052
 rt: 24.487
-Class: Standard
 std.rt: 0.0029
+Class: Standard
 Num Peaks: 236
  53  484493;  54  695945;  55  1354523;  56  372585;  57  610381; 
  58  1975838;  59  7252890;  60  668667;  61  963183;  62  72158; 
@@ -183,10 +192,10 @@ Num Peaks: 236
  427  4882;
 
 Name: Glycine, 3TMS
-DB.idx: 5
+DB.idx: 4
 RI: 1302.682
 Formula: C11H29NO2Si3
-MW: 291.610
+monoMW: 291.610
 rt: 13.965
 std.rt: 0.0033
 Class: Standard
@@ -209,10 +218,10 @@ Num Peaks: 78
  278  137402;  279  34431;  367  3442; 
 
 Name: Pyroglutamic acid, 2TMS
-DB.idx: 6
+DB.idx: 5
 RI: 1650.417
 Formula: C11H23NO3Si2
-MW: 273.477
+monoMW: 273.477
 rt: 19.513
 std.rt: 0.0035
 Class: Standard
@@ -251,10 +260,10 @@ Num Peaks: 158
  346  77810;  348  24720;  420  13841; 
 
 Name: Alanine, 3TMS
-DB.idx: 7
+DB.idx: 6
 RI: 1360.504
 Formula: C12H31NO2Si3
-MW: 305.637
+monoMW: 305.637
 rt: 15.323
 std.rt: 0.0026
 Num Peaks: 124
@@ -285,10 +294,10 @@ Num Peaks: 124
  292  225705;  293  58740;  305  25278;  306  8768; 
 
 Name: Aspartic acid, 2TMS
-DB.idx: 8
+DB.idx: 7
 RI: 1422.39
 Formula: C10H23NO4Si2
-MW: 277.465
+monoMW: 277.465
 rt: 17.071
 std.rt: 0.0042
 Num Peaks: 116
@@ -318,10 +327,10 @@ Num Peaks: 116
  442  2912; 
 
 Name: Tryptamine, 2TMS
-DB.idx: 9
+DB.idx: 8
 RI: 2224.531
 Formula: C16H28N2Si2
-MW: 304.578
+monoMW: 304.578
 rt: 19.044
 std.rt: 0.0032
 Num Peaks: 125
