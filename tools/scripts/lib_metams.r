@@ -382,7 +382,6 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
 #only for Galaxy 
 plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
 
-
     ##Annotation table each value is a pcgrp associated to the unknown 
     ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
     ##R. Wehrens give me some clues on that and we found a correction

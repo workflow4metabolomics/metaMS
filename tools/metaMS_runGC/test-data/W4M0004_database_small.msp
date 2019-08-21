@@ -211,7 +211,7 @@ Name: Pyroglutamic acid, 2TMS
 DB.idx: 6
 RI: 1650.417
 Formula: C11H23NO3Si2
-monoMW: 273.477
+MW: 273.477
 rt: 19.513
 std.rt: 0.0035
 Class: Standard
@@ -253,7 +253,7 @@ Name: Alanine, 3TMS
 DB.idx: 7
 RI: 1360.504
 Formula: C12H31NO2Si3
-monoMW: 305.637
+MW: 305.637
 rt: 15.323
 std.rt: 0.0026
 Num Peaks: 124
@@ -287,7 +287,7 @@ Name: Aspartic acid, 2TMS
 DB.idx: 8
 RI: 1422.39
 Formula: C10H23NO4Si2
-monoMW: 277.465
+MW: 277.465
 rt: 17.071
 std.rt: 0.0042
 Num Peaks: 116
@@ -320,7 +320,7 @@ Name: Tryptamine, 2TMS
 DB.idx: 9
 RI: 2224.531
 Formula: C16H28N2Si2
-monoMW: 304.578
+MW: 304.578
 rt: 19.044
 std.rt: 0.0032
 Num Peaks: 125
