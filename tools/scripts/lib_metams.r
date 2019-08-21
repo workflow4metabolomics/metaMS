@@ -161,6 +161,7 @@ retrieveRawfileInTheWorkingDirectory <- function(singlefile, zipfile) {
 
 ##ADDITIONS FROM Y. Guitton
 getBPC <- function(file,rtcor=NULL, ...) {
+    #Error with chromatogram function with CDF file (only on Galaxy, not in R command...)
     if(MSnbase:::isCdfFile(file)){
         xdata <- readMSData(file,mode="onDisk")
         chromBPC <- bpi(xdata,initial=FALSE)
@@ -279,6 +280,7 @@ getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corr
 }
 
 getTIC <- function(file,rtcor=NULL) {
+    #Error with chromatogram function with CDF file (only on Galaxy, not in R command...)
     if(MSnbase:::isCdfFile(file)){
         xdata <- readMSData(file,mode="onDisk")
         chromTIC <- tic(xdata,initial=FALSE)
@@ -397,21 +399,24 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
 #version 20190520
 #only for Galaxy 
 plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
+    print("la")
+    xdata <- readMSData(rownames(resGC$xset[[1]]@xcmsSet@phenoData),mode="onDisk")
+    print(xdata)
+    print(class(xdata))
+    print(head(xdata@featureData@data))
+    xdata@featureData@data$polarity <- NA
+    print(head(xdata@featureData@data))
+    chromatogram(xdata)
 
+    print("ici")
     #Verification for cdf files
-    stop=FALSE
-    for(i in 1:length(names(resGC$annotation))){
-        extension <- unlist(strsplit(basename(names(resGC$annotation)[i]),"\\."))[length(unlist(strsplit(basename(names(resGC$annotation)[i]),"\\.")))]
-        if(extension == "CDF" || extension == "cdf"){
-            stop = TRUE
-            break
-        }
-    }
-    if(stop){
-        error_message <- "You have a CDF file and there is an issue to resolve on them for chromatograms.... !"
-        print(error_message)
-        stop(error_message)
-    }
+    #for(i in 1:length(names(resGC$annotation))){
+    #    if(MSnbase:::isCdfFile(names(resGC$annotation)[i])){
+    #        error_message <- "You have a CDF file and there is an issue to resolve it for EICs !"
+    #        print(error_message)
+    #        stop(error_message)
+    #    }
+    #}
 
     ##Annotation table each value is a pcgrp associated to the unknown 
     ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
@@ -456,10 +461,12 @@ plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
         helpannotation[[j]] <- cbind(helpannotation[[j]],pspvector)
         names(helpannotation)[j] <- names(resGC$annotation[j])
     }
+    print("sort du for")
     peaktable <- resGC$PeakTable
 		
 	par (mar=c(5, 4, 4, 2) + 0.1)
 	#For each unknown
+    print("debut autre for")
 	for (l in 1:length(unkn)){
 		#recordPlot
 		perpage=3 #if change change layout also!
@@ -473,6 +480,7 @@ plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
 		o.par <- par(mar = rep.int(0, 4))
 		on.exit(par(o.par))
 		#For each sample
+        print("for each sample")
 		for (c in 1:length(resGC$xset)) {	
 			#get sample name
 			sampname<-basename(resGC$xset[[c]]@xcmsSet@filepaths)
@@ -483,6 +491,7 @@ plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
 			sampname<-gsub(filepattern, "",sampname)					 
 			title1<-paste(peaktable[unkn[l],1],"from",sampname, sep = " ")
 			an<-resGC$xset[[c]]
+            print(an)
     		if(fileFrom == "zipfile") {
 				an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
 				}#else {
@@ -490,14 +499,35 @@ plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
 					#an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
 				#}
 			#Find the good annotation for this sample
+            print("for each annotation")
             for(a in 1:length(helpannotation)){    
                 if(gsub(filepattern, "", names(helpannotation)[a]) == paste0("./",sampname)){
                     #Find the unkn or the matched std in this sample
                     findunkn <- FALSE
+                    print("for dedans")
+                    print(names(helpannotation)[a])
+                    xdata <- readMSData(names(helpannotation)[a],mode="onDisk")
+                    print(head(xdata@featureData@data))
+                    xdata@featureData@data$polarity <- NA
+                    print(head(xdata@featureData@data))
+                    xdata@featureData@data <- xdata@featureData@data[,c(1:26,28,27)]
+                    print(head(xdata@featureData@data))
                     for(r in 1:nrow(helpannotation[[a]])){
                         if(helpannotation[[a]][r,"annotation"] == peaktable[unkn[l],1]){
+                            print("dans if")
                             findunkn <- TRUE
                             pcgrp <- helpannotation[[a]][r,"pspvector"]
+                            print(pcgrp)
+                            print(head(an@xcmsSet@peaks[an@pspectra[[pcgrp]],]))
+                            print(nrow(an@xcmsSet@peaks[an@pspectra[[pcgrp]],]))
+                            mzmatrix <- cbind(an@xcmsSet@peaks[an@pspectra[[pcgrp]],"mzmin"],an@xcmsSet@peaks[an@pspectra[[pcgrp]],"mzmax"])
+                            rownames(mzmatrix) <- NULL
+                            print(mzmatrix)
+                            rtmatrix <- cbind(an@xcmsSet@peaks[an@pspectra[[pcgrp]],"rtmin"],an@xcmsSet@peaks[an@pspectra[[pcgrp]],"rtmax"])
+                            rownames(rtmatrix) <- NULL
+                            print(rtmatrix)
+                            chromEIC <- chromatogram(xdata, mz=mzmatrix, rt=rtmatrix)
+                            print(c)
 							par (mar=c(0, 0, 0, 0) + 0.1)
 							#Write title
 							plot.new()
@@ -505,11 +535,14 @@ plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
 							text(0.5, 0.5, title1, cex=2)						
 							par (mar=c(3, 2.5, 3, 1.5) + 0.1)
 							#Window for EIC
+                            print("plotEIC")
 							plotEICs(an, pspec=pcgrp, maxlabel=2)
+                            print("apres plotEIC")
 							#Window for pseudospectra
 							plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
 						}
 					}
+                    print("fin for dedans")
 					if(!findunkn) {
 						par (mar=c(0, 0, 0, 0) + 0.1)
                    		#Write title
