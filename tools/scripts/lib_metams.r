@@ -195,6 +195,7 @@ getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corr
     TIC <- vector("list",N)
 
     for (j in 1:N) {
+        cat(files[j],"\n")
         TIC[[j]] <- getBPC(files[j])
         #good for raw 
         # seems strange for corrected

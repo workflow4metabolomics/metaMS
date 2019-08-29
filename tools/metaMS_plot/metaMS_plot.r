@@ -50,7 +50,7 @@ if(args$selecteic) {
         #When unkn = 0 user want to process all unknowns
         if(args$unkn[1] == 0) {
             args$unkn <- c(1:nrow(resGC$PeakTable))
-            print("User want to process on all unknown(s) found in metaMS process")
+            print("User wants to process on all unknown(s) found in metaMS process")
         }
         #TODO find the biggest number of unkn ask by user cause it can write "1,15,9,8" with a max of 11 unkn. With this code it finds the 8 and it will pass
         #Verify that there is not more user's unkn than metaMS unkn (find in resGC$PeakTable)
