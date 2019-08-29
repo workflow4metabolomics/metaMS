@@ -30,34 +30,6 @@ cat("\n\n")
 modNamC <- "metaMS:runGC" ## module name
 cat("\nStart of the '", modNamC, "' Galaxy module call: ", format(Sys.time(), "%a %d %b %Y %X"), "\n", sep="")
 
-
-source("/home/jsaintvanne/W4M/metaMS_package/R/matchSamples2DB.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/addRI.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/alignmentLC.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/annotate.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/annotations2tab.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/constructExpPseudoSpectra.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/createSTDdbGC.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/createSTDdbLC.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/generateStdDBGC.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/generateStdDBLC.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/getAnnotationLC.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/getAnnotationMat.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/getFeatureInfo.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/getPeakTable.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/matchfuns.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/matchSamples2Samples.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/metaMSsettings.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/msp.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/peakDetection.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/plotPseudoSpectrum.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/processStandards.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/readStdInfo.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/relInt.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/runCAMERA.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/runLC.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/runGC.R")
-source("/home/jsaintvanne/W4M/metaMS_package/R/printString.R")
 # ----- PROCESSING INFILE -----
 cat("\n\n\tARGUMENTS PROCESSING INFO\n\n")
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
@@ -352,6 +324,7 @@ cat("\nGenerating",length(resGC$PseudoSpectra),"peakspectra in peakspectra.msp f
 write.msp(resGC$PseudoSpectra, file="peakspectra.msp", newFile = TRUE)
 
 #saving R data in .Rdata file to save the variables used in the present tool
+xset <- xsetCAM
 objects2save <- c("resGC", "xset", "singlefile", "zipfile", "DBgc")
 save(list = objects2save[objects2save %in% ls()], file = "runGC.RData")
 

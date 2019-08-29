@@ -399,25 +399,6 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
 #only for Galaxy 
 plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
 
-    print("la")
-    xdata <- readMSData(rownames(resGC$xset[[1]]@xcmsSet@phenoData),mode="onDisk")
-    print(xdata)
-    print(class(xdata))
-    print(head(xdata@featureData@data))
-    xdata@featureData@data$polarity <- NA
-    print(head(xdata@featureData@data))
-    chromatogram(xdata)
-
-    print("ici")
-    #Verification for cdf files
-    #for(i in 1:length(names(resGC$annotation))){
-    #    if(MSnbase:::isCdfFile(names(resGC$annotation)[i])){
-    #        error_message <- "You have a CDF file and there is an issue to resolve it for EICs !"
-    #        print(error_message)
-    #        stop(error_message)
-    #    }
-    #}
-
     ##Annotation table each value is a pcgrp associated to the unknown 
     ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
     ##R. Wehrens give me some clues on that and we found a correction
@@ -461,12 +442,10 @@ plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
         helpannotation[[j]] <- cbind(helpannotation[[j]],pspvector)
         names(helpannotation)[j] <- names(resGC$annotation[j])
     }
-    print("sort du for")
     peaktable <- resGC$PeakTable
 		
 	par (mar=c(5, 4, 4, 2) + 0.1)
 	#For each unknown
-    print("debut autre for")
 	for (l in 1:length(unkn)){
 		#recordPlot
 		perpage=3 #if change change layout also!
@@ -480,88 +459,285 @@ plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
 		o.par <- par(mar = rep.int(0, 4))
 		on.exit(par(o.par))
 		#For each sample
-        print("for each sample")
-		for (c in 1:length(resGC$xset)) {	
-			#get sample name
-			sampname<-basename(resGC$xset[[c]]@xcmsSet@filepaths)
-			#remove .cdf, .mzXML filepattern
-			filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", 
-									"[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
-			filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), collapse = "|")
-			sampname<-gsub(filepattern, "",sampname)					 
-			title1<-paste(peaktable[unkn[l],1],"from",sampname, sep = " ")
-			an<-resGC$xset[[c]]
-            print(an)
-    		if(fileFrom == "zipfile") {
-				an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
-				}#else {
-        			#print(an@xcmsSet@filepaths)
-					#an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
-				#}
-			#Find the good annotation for this sample
-            print("for each annotation")
-            for(a in 1:length(helpannotation)){    
-                if(gsub(filepattern, "", names(helpannotation)[a]) == paste0("./",sampname)){
-                    #Find the unkn or the matched std in this sample
-                    findunkn <- FALSE
-                    print("for dedans")
-                    print(names(helpannotation)[a])
-                    xdata <- readMSData(names(helpannotation)[a],mode="onDisk")
-                    print(head(xdata@featureData@data))
-                    xdata@featureData@data$polarity <- NA
-                    print(head(xdata@featureData@data))
-                    xdata@featureData@data <- xdata@featureData@data[,c(1:26,28,27)]
-                    print(head(xdata@featureData@data))
-                    for(r in 1:nrow(helpannotation[[a]])){
-                        if(helpannotation[[a]][r,"annotation"] == peaktable[unkn[l],1]){
-                            print("dans if")
-                            findunkn <- TRUE
-                            pcgrp <- helpannotation[[a]][r,"pspvector"]
-                            print(pcgrp)
-                            print(head(an@xcmsSet@peaks[an@pspectra[[pcgrp]],]))
-                            print(nrow(an@xcmsSet@peaks[an@pspectra[[pcgrp]],]))
-                            mzmatrix <- cbind(an@xcmsSet@peaks[an@pspectra[[pcgrp]],"mzmin"],an@xcmsSet@peaks[an@pspectra[[pcgrp]],"mzmax"])
-                            rownames(mzmatrix) <- NULL
-                            print(mzmatrix)
-                            rtmatrix <- cbind(an@xcmsSet@peaks[an@pspectra[[pcgrp]],"rtmin"],an@xcmsSet@peaks[an@pspectra[[pcgrp]],"rtmax"])
-                            rownames(rtmatrix) <- NULL
-                            print(rtmatrix)
-                            chromEIC <- chromatogram(xdata, mz=mzmatrix, rt=rtmatrix)
-                            print(c)
-							par (mar=c(0, 0, 0, 0) + 0.1)
-							#Write title
-							plot.new()
-							box()
-							text(0.5, 0.5, title1, cex=2)						
-							par (mar=c(3, 2.5, 3, 1.5) + 0.1)
-							#Window for EIC
-                            print("plot EIC")
-							plotEICs(an, pspec=pcgrp, maxlabel=2)
-                            print("apres plotEIC")
-							#Window for pseudospectra
-							plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
-						}
-					}
-                    print("fin for dedans")
-					if(!findunkn) {
-						par (mar=c(0, 0, 0, 0) + 0.1)
-                   		#Write title
-						plot.new()
-						box()
-						text(0.5, 0.5, title1, cex=2)
-                   		#Window for EIC
-                   		plot.new()
-                   		box()
-						text(0.5, 0.5, "NOT FOUND", cex=2)
-						#Window for pseudospectra
-						plot.new()
-						box()
-						text(0.5, 0.5, "NOT FOUND", cex=2)
-					}
-					break
-				}
-    		}
-		}
-		graphics.off()
-	}#end  for unkn[l]
+		for (c in 1:length(resGC$xset)) {
+            #get sample name
+            sampname<-basename(resGC$xset[[c]]@xcmsSet@filepaths)
+            #remove .cdf, .mzXML filepattern
+            filepattern <- c("[Cc][Dd][Ff]", "[Nn][Cc]", "([Mm][Zz])?[Xx][Mm][Ll]", 
+                                    "[Mm][Zz][Dd][Aa][Tt][Aa]", "[Mm][Zz][Mm][Ll]")
+            filepattern <- paste(paste("\\.", filepattern, "$", sep = ""), collapse = "|")
+            sampname<-gsub(filepattern, "",sampname)                     
+            
+            an<-resGC$xset[[c]]
+            if(fileFrom == "zipfile") {
+                an@xcmsSet@filepaths <- paste0("./",an@xcmsSet@phenoData[,"class"],"/",basename(an@xcmsSet@filepaths))
+            }#else {
+                #print(an@xcmsSet@filepaths)
+                #an@xcmsSet@filepaths <- paste0("./",basename(an@xcmsSet@filepaths))
+            #}
+            #Make different plot according to type of file (CDF file)
+            if(MSnbase:::isCdfFile(resGC$xset[[c]]@xcmsSet@filepaths)) {
+                plotEICsCDF(an, helpannotation, filepattern, peaktable[unkn[l],1], sampname)
+            }else{
+                plotEICsOthers(an, helpannotation, filepattern, peaktable[unkn[l],1], sampname)
+            }
+        }
+        graphics.off()
+    }#end  for unkn[l]
 }#end function
+
+plotEICsOthers <- function(an, helpannotation, filepattern, name, sampname){
+    title1<-paste(name,"from",sampname, sep = " ")
+    #Find the good annotation for this sample
+    for(a in 1:length(helpannotation)){
+        if(gsub(filepattern, "", names(helpannotation)[a]) == paste0("./",sampname)){
+            #Find the unkn or the matched std in this sample
+            findunkn <- FALSE
+            for(r in 1:nrow(helpannotation[[a]])){
+                #Recherche du bon inconnu
+                if(helpannotation[[a]][r,"annotation"] == name){
+                    findunkn <- TRUE
+                    pcgrp <- helpannotation[[a]][r,"pspvector"]
+                    par (mar=c(0, 0, 0, 0) + 0.1)
+                    #Write title
+                    plot.new()
+                    box()
+                    text(0.5, 0.5, title1, cex=2)                       
+                    par (mar=c(3, 2.5, 3, 1.5) + 0.1)
+                    #Window for EIC
+                    plotEICs(an, pspec=pcgrp, maxlabel=2)
+                    #Window for pseudospectra
+                    plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
+                }
+            }
+            if(!findunkn) {
+                par (mar=c(0, 0, 0, 0) + 0.1)
+                #Write title
+                plot.new()
+                box()
+                text(0.5, 0.5, title1, cex=2)
+                #Window for EIC
+                plot.new()
+                box()
+                text(0.5, 0.5, "NOT FOUND", cex=2)
+                #Window for pseudospectra
+                plot.new()
+                box()
+                text(0.5, 0.5, "NOT FOUND", cex=2)
+            }
+            break
+        }
+    } 
+}
+			
+
+#Inspire from plotEICs function "https://github.com/sneumann/CAMERA/blob/master/R/xsVisualise.R"
+#Modify by J.Saint-Vanne to be able to run it on CDF files
+plotEICsCDF <- function(an, helpannotation, filepattern, name, sampname){
+    title1<-paste(name,"from",sampname, sep = " ")
+    #Find the good annotation for this sample
+    for(a in 1:length(helpannotation)){
+        if(gsub(filepattern, "", names(helpannotation)[a]) == paste0("./",sampname)){
+            #Find the unkn or the matched std in this sample
+            findunkn <- FALSE
+            for(r in 1:nrow(helpannotation[[a]])){
+                #Recherche du bon inconnu
+                if(helpannotation[[a]][r,"annotation"] == name){
+                    findunkn <- TRUE
+                    pcgrp <- helpannotation[[a]][r,"pspvector"]
+                    par (mar=c(0, 0, 0, 0) + 0.1)
+                    #Write title
+                    plot.new()
+                    box()
+                    text(0.5, 0.5, title1, cex=2)                       
+                    par (mar=c(3, 2.5, 3, 1.5) + 0.1)
+                  
+                    #####################
+                    #Remake plotEIC function for CDF
+                    #####################
+                    maxlabel=2
+                    sleep=0
+                    method="bin"
+                    #Which different samples need to be addressed for extracting raw data
+                    smpls <- unique(an@psSamples[pcgrp])
+
+                    xeic  <- new("xcmsEIC");
+                    xeic@rtrange <- matrix(nrow=length(pcgrp), ncol=2)
+                    xeic@mzrange <- matrix(nrow=length(pcgrp), ncol=2)
+                    #iterator for ps-grp
+                    pcpos <- 1
+                    #one second overlap
+                    rtmargin <- 1
+  
+                    for (a in seq(along=smpls)) { ## sample-wise EIC collection
+                        #read rawData into one xcmsRaw
+                        xraw <- xcmsRaw(an@xcmsSet@filepaths[smpls[a]], profmethod=method, profstep=0)
+                        pspecS <- pcgrp[which(an@psSamples[pcgrp] == smpls[a])]
+                        ## getting ALL peaks from the current sample (not that bad)
+                        peaks <- CAMERA:::getPeaks(an@xcmsSet, smpls[a])  
+                        eic <- lapply (pspecS, function(pc) {
+                            pidx <- an@pspectra[[pc]]
+                            pks <- peaks[pidx, , drop=FALSE]
+                            gks <- an@groupInfo[pidx, , drop=FALSE]
+                            nap <- which(is.na(pks[, 1]))
+                            pks[nap, ] <- cbind(gks[nap, c(1:6), drop=FALSE], matrix(nrow=length(nap), ncol=5, 0))
+                            bbox <- c(rtmin = min(pks[, "rtmin"])-rtmargin,
+                                      rtmax = max(pks[, "rtmax"])+rtmargin,
+                                      mzmin = min(pks[, "mzmin"]),
+                                      mzmax = max(pks[, "mzmax"]))
+                            eic <- lapply(1:nrow(pks), function(x){
+                                reic <- xcms::rawEIC(xraw,rtrange=pks[x,c("rtmin","rtmax"),drop=FALSE],
+                                                     mzrange=pks[x,c("mzmin","mzmax"),drop=FALSE])
+                                new <- cbind("rt"=xraw@scantime[reic$scan],"intensity"=reic$intensity)  
+                            })
+                            mzrange <- apply(pks, 1,function(x){
+                                x[c("mzmin","mzmax")]
+                            })
+                            #Transposition
+                            mzrange <- t(mzrange)
+                            rtrange <- apply(pks, 1, function(x){
+                                x[c("rtmin","rtmax")]
+                            })
+                            #Transposition
+                            rtrange <- t(rtrange)
+                            #Create EIC object
+                            eic <- new("xcmsEIC", eic = list(xcmsRaw=eic), rt = "raw", 
+                                       rtrange=rtrange, mzrange=mzrange, groupnames = character(0))
+
+                            #write resulting bounding box into xcmsEIC
+                            xeic@rtrange[pcpos, ] <<- bbox[c("rtmin","rtmax")]
+                            xeic@mzrange[pcpos, ] <<- bbox[c("mzmin","mzmax")]
+
+                            cat("-->", pcpos, "\n")
+                            pcpos <<- pcpos+1
+                            eic@eic[[1]]
+                        })
+                        xeic@eic <- c(xeic@eic, eic)
+                    }
+                    names(xeic@eic) <- paste("Pseudospectrum ", pcgrp, sep="")
+
+                    if(maxlabel > 0){
+                        col <- rainbow(maxlabel);
+                    } else {
+                        col <- c();
+                    }
+  
+                    ##
+                    ## Loop through all pspectra
+                    ##
+
+                    for (ps in seq(along=pcgrp)) {
+                        EIC <- xeic@eic[[ps]];
+                        pidx <- an@pspectra[[pcgrp[ps]]];
+                        peaks <- CAMERA:::getPeaks(an@xcmsSet,an@psSamples[pcgrp[ps]])[pidx,,drop=FALSE]
+                        grps <- an@groupInfo[pidx, ]
+                        nap <- which(is.na(peaks[, 1]))
+                        naps <- rep(FALSE, nrow(peaks))
+
+                        if(length(nap) > 0){  
+                            naps[nap] <- TRUE;
+                            peaks[nap,] <- cbind(grps[nap,c(1:6), drop=FALSE], matrix(nrow=length(nap), ncol=5,0))
+                        }
+    
+                        main <- paste("Pseudospectrum ", pcgrp[ps], sep="")
+    
+                        ## Calculate EICs and plot ranges
+                        neics     <- length(pidx)
+                        lmaxlabel <- min(maxlabel, neics)
+                        eicidx <- 1:neics
+                        maxint <- numeric(length(eicidx))
+                        for (j in eicidx) {
+                            maxint[j] <- max(EIC[[j]][, "intensity"])
+                        }
+                        o  <- order(maxint, decreasing = TRUE)
+                        rt <- xeic@rtrange[ps, ]
+                        rt.min <- round(mean(peaks[, "rtmin"]), digits=3)
+                        rt.med <- round(peaks[o[1], "rt"], digits=3)
+                        rt.max <- round(mean(peaks[, "rtmax"]), digits=3)
+    
+                        ## Open Plot
+                        plot(0, 0, type = "n", xlim = rt, ylim = c(0, max(maxint)),xaxs='i',
+                            xlab = "Retention Time (seconds)", ylab = "Intensity",
+                            main = paste("Extracted Ion Chromatograms for ", main,"\nTime: From",rt.min,"to",rt.max,", mean",rt.med))
+  
+                        ## Plot Peak and surrounding
+                        lcol <- rgb(0.6, 0.6, 0.6)
+                        lcol <- c(col, rep(lcol, max(nrow(peaks) - maxlabel, 0)))
+                        cnt  <- 1
+                        for (j in eicidx[o]) {
+                            pts <- xeic@eic[[ps]][[j]]
+                            points(pts, type = "l", col = lcol[cnt]);
+                            cnt <- cnt + 1;
+                            peakrange <- peaks[,c("rtmin","rtmax"), drop=FALSE]
+                            ptsidx <- pts[,"rt"] >= peakrange[j,1] & pts[,"rt"] <= peakrange[j,2]
+                            if (naps[j]){ 
+                                points(pts[ptsidx, ], type = "l", col = col[j], lwd=1.3, lty=3)
+                            } else {
+                                points(pts[ptsidx, ], type = "l", col = col[j], lwd=1.3)
+                            }
+                        }
+                        ## Plot Annotation Legend
+                        pspectrum <- getpspectra(an, grp=pcgrp[ps])
+                        mz <- pspectrum[o, "mz"];
+                        #Check adduct annotation
+                        if (lmaxlabel > 0 & "adduct" %in% colnames(pspectrum)) {
+                            adduct <- sub("^ ", "", pspectrum[o, "adduct"]) #Remove Fronting Whitespaces
+                            mass   <- sapply(strsplit(adduct, " "), function(x) {x[2]})
+                            adduct <- sapply(strsplit(adduct, " "), function(x) {x[1]})
+                            umass <- unique(na.omit(mass[1:maxlabel]));
+                            adduct[is.na(adduct)] <- "";
+                            test <- vector("list",length=length(mz));
+                            mz <- format(pspectrum[o[1:lmaxlabel], "mz"], digits=5);
+        
+                            if(length(umass) > 0){
+                                for(i in 1:length(umass)){
+                                    ini <- which(mass==umass[i]);
+                                    for(ii in 1:length(ini)){
+                                        firstpart  <- strsplit(adduct[ini[ii]], "M")[[1]][1]
+                                        secondpart <- strsplit(adduct[ini[ii]], "M")[[1]][2]
+                                        masspart   <- mz[ini[ii]];
+                                        test[[ini[ii]]] <- substitute(paste(masspart, " ", firstpart, M[i], secondpart), 
+                                                            list(firstpart=firstpart, i=i, secondpart=secondpart,
+                                                                 masspart = masspart))
+                                    }
+                                }
+                            }
+        
+                            for(i in seq(along=lmaxlabel)){
+                                if(is.null(test[[i]])){
+                                    test[[i]] <- mz[i];
+                                }
+                            }
+        
+                            leg <- as.expression(test[1:lmaxlabel]);  
+                            legend("topright", legend=leg, col=lcol, lty=1)
+                        }
+            
+                        if (sleep > 0) {
+                            Sys.sleep(sleep)
+                        }
+                    }
+
+                    #Window for pseudospectra
+                    plotPsSpectrum(an, pspec=pcgrp, maxlabel=2)
+                }
+            }
+            if(!findunkn) {
+                par (mar=c(0, 0, 0, 0) + 0.1)
+                #Write title
+                plot.new()
+                box()
+                text(0.5, 0.5, title1, cex=2)
+                #Window for EIC
+                plot.new()
+                box()
+                text(0.5, 0.5, "NOT FOUND", cex=2)
+                #Window for pseudospectra
+                plot.new()
+                box()
+                text(0.5, 0.5, "NOT FOUND", cex=2)
+            }
+            break
+        }
+    }
+}
