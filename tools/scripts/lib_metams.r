@@ -568,13 +568,13 @@ plotEICsCDF <- function(an, helpannotation, filepattern, name, sampname){
                     pcpos <- 1
                     #one second overlap
                     rtmargin <- 1
-  
-                    for (a in seq(along=smpls)) { ## sample-wise EIC collection
+
+                    for (d in seq(along=smpls)) { ## sample-wise EIC collection
                         #read rawData into one xcmsRaw
-                        xraw <- xcmsRaw(an@xcmsSet@filepaths[smpls[a]], profmethod=method, profstep=0)
-                        pspecS <- pcgrp[which(an@psSamples[pcgrp] == smpls[a])]
+                        xraw <- xcmsRaw(an@xcmsSet@filepaths[smpls[d]], profmethod=method, profstep=0)
+                        pspecS <- pcgrp[which(an@psSamples[pcgrp] == smpls[d])]
                         ## getting ALL peaks from the current sample (not that bad)
-                        peaks <- CAMERA:::getPeaks(an@xcmsSet, smpls[a])  
+                        peaks <- CAMERA:::getPeaks(an@xcmsSet, smpls[d])  
                         eic <- lapply (pspecS, function(pc) {
                             pidx <- an@pspectra[[pc]]
                             pks <- peaks[pidx, , drop=FALSE]
