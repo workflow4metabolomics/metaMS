@@ -30,7 +30,6 @@ cat("\n\n")
 modNamC <- "metaMS:runGC" ## module name
 cat("\nStart of the '", modNamC, "' Galaxy module call: ", format(Sys.time(), "%a %d %b %Y %X"), "\n", sep="")
 
-
 # ----- PROCESSING INFILE -----
 cat("\n\n\tARGUMENTS PROCESSING INFO\n\n")
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
@@ -322,7 +321,11 @@ cat("\t.\tOK")
 
 #peak spectrum as MSP for DB search
 cat("\nGenerating",length(resGC$PseudoSpectra),"peakspectra in peakspectra.msp file\n")
-write.msp(resGC$PseudoSpectra, file="peakspectra.msp", newFile = TRUE)
+if(is.null(resGC$Pseudospectra)){
+    write("No results", file="peakspectra.msp")
+}else{
+    write.msp(resGC$PseudoSpectra, file="peakspectra.msp", newFile = TRUE)
+}
 
 #saving R data in .Rdata file to save the variables used in the present tool
 objects2save <- c("resGC", "xset", "singlefile", "zipfile", "DBgc")
