@@ -446,7 +446,6 @@ plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
         helpannotation[[j]] <- cbind(helpannotation[[j]],pspvector)
         names(helpannotation)[j] <- names(resGC$annotation[j])
     }
-    print("sort")
     peaktable <- resGC$PeakTable
 		
 	par (mar=c(5, 4, 4, 2) + 0.1)
