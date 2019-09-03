@@ -328,11 +328,7 @@ cat("\t.\tOK")
 
 #peak spectrum as MSP for DB search
 cat("\nGenerating",length(resGC$PseudoSpectra),"peakspectra in peakspectra.msp file\n")
-if(is.null(resGC$Pseudospectra)){
-    write("No results", file="peakspectra.msp")
-}else{
-    write.msp(resGC$PseudoSpectra, file="peakspectra.msp", newFile = TRUE)
-}
+write.msp(resGC$PseudoSpectra, file="peakspectra.msp", newFile = TRUE)
 
 #saving R data in .Rdata file to save the variables used in the present tool
 objects2save <- c("resGC", "xset", "singlefile", "zipfile", "DBgc")
