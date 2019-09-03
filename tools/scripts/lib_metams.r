@@ -184,11 +184,10 @@ getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corr
     }
 
     N <- dim(sampleMetadata)[1]
-    BPC <- vector("list",N)
+    TIC <- vector("list",N)
 
     for (j in 1:N) {
-        cat(files[j],"\n")
-        BPC[[j]] <- getBPC(files[j])
+        TIC[[j]] <- getBPC(files[j])
         #good for raw 
         # seems strange for corrected
         #errors if scanrange used in xcmsSetgeneration
@@ -197,7 +196,7 @@ getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corr
         }else{
             rtcor <- NULL
         }
-        BPC[[j]] <- getBPC(files[j],rtcor=rtcor)
+        TIC[[j]] <- getBPC(files[j],rtcor=rtcor)
     }
 
     pdf(pdfname,w=16,h=10)
@@ -205,8 +204,10 @@ getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corr
     lty = 1:N
     pch = 1:N
     #search for max x and max y in BPCs
+
     xlim = range(sapply(BPC, function(x) range(x[,1])))
     ylim = range(sapply(BPC, function(x) range(x[,2])))
+
     ylim = c(-ylim[2], ylim[2])
 
     ##plot start
@@ -217,15 +218,15 @@ getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corr
                 plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k]," vs ",class[l], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
                 colvect<-NULL
                 for (j in 1:length(classnames[[k]])) {
-                    bpc <- BPC[[classnames[[k]][j]]]
-                    # points(bpc[,1]/60, bpc[,2], col = cols[i], pch = pch[i], type="l")
-                    points(bpc[,1]/60, bpc[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
+                    tic <- TIC[[classnames[[k]][j]]]
+                    # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
+                    points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
                     colvect<-append(colvect,cols[classnames[[k]][j]])
                 }
                 for (j in 1:length(classnames[[l]])) {
                     # i=class2names[j]
-                    bpc <- BPC[[classnames[[l]][j]]]
-                    points(bpc[,1]/60, -bpc[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
+                    tic <- TIC[[classnames[[l]][j]]]
+                    points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
                     colvect<-append(colvect,cols[classnames[[l]][j]])
                 }
                 legend("topright",paste(gsub("(^.+)\\..*$","\\1",basename(files[c(classnames[[k]],classnames[[l]])]))), col = colvect, lty = lty, pch = pch)
@@ -240,15 +241,15 @@ getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corr
         plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k],"vs",class[l], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
 
         for (j in 1:length(classnames[[k]])) {
-            bpc <- BPC[[classnames[[k]][j]]]
-            # points(bpc[,1]/60, bpc[,2], col = cols[i], pch = pch[i], type="l")
-            points(bpc[,1]/60, bpc[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
+            tic <- TIC[[classnames[[k]][j]]]
+            # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
+            points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
             colvect<-append(colvect,cols[classnames[[k]][j]])
         }
         for (j in 1:length(classnames[[l]])) {
             # i=class2names[j]
-            bpc <- BPC[[classnames[[l]][j]]]
-            points(bpc[,1]/60, -bpc[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
+            tic <- TIC[[classnames[[l]][j]]]
+            points(tic[,1]/60, -tic[,2], col = cols[classnames[[l]][j]], pch = pch[classnames[[l]][j]], type="l")
             colvect<-append(colvect,cols[classnames[[l]][j]])
         }
         legend("topright",paste(gsub("(^.+)\\..*$","\\1",basename(files[c(classnames[[k]],classnames[[l]])]))), col = colvect, lty = lty, pch = pch)
@@ -256,14 +257,16 @@ getBPC2s <- function (files, xset = NULL, pdfname="BPCs.pdf", rt = c("raw","corr
     
     if (length(class)==1){
         k=1
+
 		ylim = range(sapply(BPC, function(x) range(x[,2])))
+
         colvect<-NULL
         plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Base Peak Chromatograms \n","BPCs_",class[k], sep=""), xlab = "Retention Time (min)", ylab = "BPC")
 
         for (j in 1:length(classnames[[k]])) {
-            bpc <- BPC[[classnames[[k]][j]]]
-            # points(bpc[,1]/60, bpc[,2], col = cols[i], pch = pch[i], type="l")
-            points(bpc[,1]/60, bpc[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
+            tic <- TIC[[classnames[[k]][j]]]
+            # points(tic[,1]/60, tic[,2], col = cols[i], pch = pch[i], type="l")
+            points(tic[,1]/60, tic[,2], col = cols[classnames[[k]][j]], pch = pch[classnames[[k]][j]], type="l")
             colvect<-append(colvect,cols[classnames[[k]][j]])
         }
         legend("topright",paste(gsub("(^.+)\\..*$","\\1",basename(files[c(classnames[[k]])]))), col = colvect, lty = lty, pch = pch)
@@ -382,7 +385,6 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
 #version 20190520
 #only for Galaxy 
 plotUnknowns<-function(resGC, unkn="", DB=NULL, fileFrom=NULL){
-    
 
     ##Annotation table each value is a pcgrp associated to the unknown 
     ##NOTE pcgrp index are different between xcmsSet and resGC due to filtering steps in metaMS
