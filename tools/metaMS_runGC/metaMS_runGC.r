@@ -328,10 +328,22 @@ cat("\t.\tOK")
 
 #peak spectrum as MSP for DB search
 cat("\nGenerating",length(resGC$PseudoSpectra),"peakspectra in peakspectra.msp file\n")
-write.msp(resGC$PseudoSpectra, file="peakspectra.msp", newFile = TRUE)
+if(is.null(resGC$Pseudospectra)){
+    write("No results", file="peakspectra.msp")
+}else{
+    write.msp(resGC$PseudoSpectra, file="peakspectra.msp", newFile = TRUE)
+}
 
 #saving R data in .Rdata file to save the variables used in the present tool
 objects2save <- c("resGC", "xset", "singlefile", "zipfile", "DBgc")
 save(list = objects2save[objects2save %in% ls()], file = "runGC.RData")
 
 cat("\nEnd of '", modNamC, "' Galaxy module call: ", as.character(Sys.time()), "\n", sep = "")
+
+#WARNING if user has CDF files (not yet good for plotting)
+files <- paste("./",names(singlefile),sep="")
+if(MSnbase:::isCdfFile(files)){
+    warning_message <- "You have CDF files, for the moment you can't obtain plot after runGC! A new update will follow with the good correction"
+    warning(warning_message)
+    cat(paste("\n","/!\\Warning/!\\",warning_message,sep="\n"))
+}

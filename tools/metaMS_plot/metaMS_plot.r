@@ -96,6 +96,12 @@ cat("\t\tCOMPUTE\n")
 
 if(!is.null(singlefile)) {
     files <- paste("./",names(singlefile),sep="")
+    #WARNING if user has CDF files (not yet good for plotting)
+    if(MSnbase:::isCdfFile(files)){
+        warning_message <- "You have CDF files, for the moment you can't obtain plot after runGC! A new update will follow with the good correction\n"
+        warning(warning_message)
+        cat(paste("\n","/!\\Warning/!\\",warning_message,sep="\n"))
+    }
     if(!is.null(files)){
         if(args$selectbpc){
             cat("\n\tProcessing BPC(s) from XCMS files...\n")

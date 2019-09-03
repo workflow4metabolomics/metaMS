@@ -301,7 +301,6 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
     TIC <- vector("list",N)
 
     for (i in 1:N) {
-        cat(files[i],"\n")
         if (!is.null(xcmsSet) && rt == "corrected")
             rtcor <- xcmsSet@rt$corrected[[i]]
         else
@@ -322,7 +321,7 @@ getTIC2s <- function(files, xset=NULL, pdfname="TICs.pdf", rt=c("raw","corrected
     if (length(class)>2){
         for (k in 1:(length(class)-1)){
             for (l in (k+1):length(class)){
-                print(paste(class[k],"vs",class[l],sep=" ")) 
+                cat(paste(class[k],"vs",class[l],"\n",sep=" ")) 
                 plot(0, 0, type="n", xlim = xlim/60, ylim = ylim, main = paste("Total Ion Chromatograms \n","TICs_",class[k]," vs ",class[l], sep=""), xlab = "Retention Time (min)", ylab = "TIC")
                 colvect<-NULL
                 for (j in 1:length(classnames[[k]])) {
