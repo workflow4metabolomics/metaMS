@@ -335,3 +335,11 @@ objects2save <- c("resGC", "xset", "singlefile", "zipfile", "DBgc")
 save(list = objects2save[objects2save %in% ls()], file = "runGC.RData")
 
 cat("\nEnd of '", modNamC, "' Galaxy module call: ", as.character(Sys.time()), "\n", sep = "")
+
+#WARNING if user has CDF files (not yet good for plotting)
+files <- paste("./",names(singlefile),sep="")
+if(MSnbase:::isCdfFile(files)){
+    warning_message <- "You have CDF files, for the moment you can't obtain plot after runGC! A new update will follow with the good correction"
+    warning(warning_message)
+    cat(paste("\n","/!\\Warning/!\\",warning_message,sep="\n"))
+}
