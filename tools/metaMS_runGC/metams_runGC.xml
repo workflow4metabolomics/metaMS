@@ -19,7 +19,6 @@
             settings "default"
         #elif $settings.setting == "usersettings":
             settings "User_defined"
-            fwhm $settings.fwhm
             rtdiff $settings.rtdiff
             minfeat $settings.minfeat
             simthreshold $settings.simthreshold
@@ -97,7 +96,6 @@
                 </conditional>
             </when>
             <when value="usersettings">
-                <param name="fwhm" type="integer" value="5" label="FWHM" help="The FWHM of your peaks (matchedFilter method is used)" />
                 <conditional name="options_rtrange">
                     <param name="option" type="select" label="RT range option " >
                         <option value="show">show</option>
