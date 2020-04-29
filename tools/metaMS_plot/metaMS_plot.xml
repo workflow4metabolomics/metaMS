@@ -1,4 +1,4 @@
- <tool id="metams_plot" name="metaMS.plot" version="1.0.0+metaMS@TOOL_VERSION+galaxy0">
+ <tool id="metams_plot" name="metaMS.plot" version="@TOOL_VERSION@+galaxy0">
 
     <description>GC-MS data preprocessing using metaMS package</description>
 
