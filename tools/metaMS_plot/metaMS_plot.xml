@@ -121,10 +121,6 @@
     
     <help><![CDATA[
 
-<!--
-TODO : Add test on EICs (problem with gs not found whereas I added pip install ghostscript and bgs in .travis.yml)
--->
-
 @HELP_AUTHORS@
 
 ====================
