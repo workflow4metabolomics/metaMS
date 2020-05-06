@@ -1,4 +1,4 @@
- <tool id="metams_runGC" name="metaMS.runGC" version="3.0.0">
+ <tool id="metams_runGC" name="metaMS.runGC" version="3.0.0+metaMS@TOOL_VERSION@-galaxy0">
 
     <description>GC-MS data preprocessing using metaMS package</description>
 
@@ -191,28 +191,9 @@
         </test>
     </tests>
     
-    <help>
+    <help><![CDATA[
 
-.. class:: infomark
-
-**Author(s)**  Ron Wehrens (ron.wehrens@gmail.com), Georg Weingart, Fulvio Mattivi
-
-.. class:: infomark
-
-**Galaxy wrapper and scripts developpers** Guitton Yann LABERCA yann.guitton@oniris-nantes.fr and Saint-Vanne Julien julien.saint-vanne@sb-roscoff.fr
-
-.. class:: infomark
-
-**Please cites**  
- 
- metaMS : Wehrens, R.; Weingart, G.; Mattivi, F. Journal of Chromatography B.
-
- xcms :   Smith, C. A.; Want, E. J.; O’Maille, G.; Abagyan, R.; Siuzdak, G. Anal. Chem. 2006, 78, 779–787.
-
- CAMERA :	Kuhl, C.; Tautenhahn, R.; Böttcher, C.; Larson, T. R.; Neumann, S. Analytical Chemistry 2012, 84, 283–289.
-
-
----------------------------------------------------
+@HELP_AUTHORS@
 
 ====================
 metaMS.runGC
@@ -360,11 +341,8 @@ Changelog/News
 
 - NEW: new tool
 
-    </help>
-
-    <citations>
-        <citation type="doi">10.1016/j.jchromb.2014.02.051</citation>
-        <citation type="doi">10.1093/bioinformatics/btu813</citation>
-    </citations>
+    ]]></help>
+    
+    <expand macro="citation" />
 
 </tool>
