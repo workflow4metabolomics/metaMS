@@ -114,16 +114,16 @@ if (args$settings=="User_defined") {
     }
 
     nSlaves=args$nSlaves
-
+# peakpicking parameters are not needed anymore xcms does it before runGC but keep it for protocolName and chrom type (2020-06-18 Yann Guitton)
     GALAXY.GC <- 
-        metaMSsettings("protocolName" = "GALAXY.GC",
+       metaMSsettings("protocolName" = "GALAXY.GC",
                        "chrom" = "GC",
                        PeakPicking = list(
                         method = "matchedFilter",
                         step = 0.5,
                         steps = 2,
                         mzdiff = .5,
-                        fwhm = fwhmparam,
+                        fwhm = 5,
                         snthresh = 2,
                         max = 500),
                        CAMERA = list(perfwhm = 1))
