@@ -2,8 +2,8 @@
 
 <macros>
 
-    <token name="@TOOL_VERSION@">1.24.0</token>
-
+    <token name="@TOOL_VERSION@">1.30.0</token>
+    <token name="@VERSION_SUFFIX@">0</token>
 	<xml name="stdio">
         <stdio>
             <exit_code range="1" level="fatal" />
