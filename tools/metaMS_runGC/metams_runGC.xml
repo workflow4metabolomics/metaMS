@@ -1,4 +1,4 @@
- <tool id="metams_runGC" name="metaMS.runGC" version="3.0.0+metaMS@TOOL_VERSION@+galaxy@VERSION_SUFFIX@">
+ <tool id="metams_runGC" name="metaMS.runGC" version="3.0.1+metaMS@TOOL_VERSION@+galaxy@VERSION_SUFFIX@">
 
     <description>GC-MS data preprocessing using metaMS package</description>
 
@@ -203,7 +203,7 @@ metaMS.runGC
 Description
 -----------
 metaMS.runGC is a function dedicated to GCMS data processing from converted files to the generation of pseudospectra (compounds) table.
-Current version for metaMS R package: 1.18.1
+Current version for metaMS R package: @TOOL_VERSION@
 
 **Process:** 
 Each of the converted data (cdf, mzML...)  is profiled by a combination of xcms and CAMERA functions. Then all the mass spectra of detected peaks are compared and clustered.
@@ -322,6 +322,9 @@ Output files
 
 Changelog/News
 --------------
+**Version 3.0.1 - 22/09/2022**
+
+- Remove r-batch package dependencie
 
 **Version 3.0 - 20/05/2019**
 

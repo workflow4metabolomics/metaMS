@@ -1,7 +1,8 @@
-# lib_metams.r version 2.1.1
+# lib_metams.r version 2.1.2
 # R function for metaMS runGC under W4M
 # author Yann GUITTON CNRS IRISA/LINA Idealg project 2014-2015
-# author Yann GUITTON Oniris Laberca 2015-2017
+# author Yann GUITTON Oniris Laberca 2015-2021
+# author Yann GUITTON Oniris INRAE Laberca 2021-2022
 
 
 #@author G. Le Corguille

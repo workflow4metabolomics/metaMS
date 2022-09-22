@@ -1,4 +1,4 @@
- <tool id="metams_plot" name="metaMS.plot" version="@TOOL_VERSION@+galaxy0">
+ <tool id="metams_plot" name="metaMS.plot" version="1.0.1+@TOOL_VERSION@+galaxy@VERSION_SUFFIX@">
 
     <description>GC-MS data preprocessing using metaMS package</description>
 
@@ -231,6 +231,10 @@ Output files
 
 Changelog/News
 --------------
+**Version 1.0.1 - 22/09/2022**
+
+- Remove r-batch package dependencie
+
 **Version 1.0 - 20/05/2019**
 
 - NEW: new tool extract from previous metaMS_runGC tool
