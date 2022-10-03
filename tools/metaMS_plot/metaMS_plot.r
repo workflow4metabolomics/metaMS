@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# metaMS_plot.r version="1.0.0"
+# metaMS_plot.r version="1.0.1"
 #created by Yann GUITTON and updated by Julien SAINT-VANNE
 
 
@@ -18,9 +18,24 @@ source_local <- function(fname) {
     base_dir <- dirname(substring(argv[grep("--file=", argv)], 8))
     source(paste(base_dir, fname, sep="/"))
 }
+
+#This function is made to replace r-batch package dependencie
+#@author L. Pavot
+parse_args <- function() {
+  args <- commandArgs()
+  start <- which(args == "--args")[1] + 1
+  if (is.na(start)) {
+	return(list())
+  }
+  seq_by2 <- seq(start, length(args), by = 2)
+  result <- as.list(args[seq_by2 + 1])
+  names(result) <- args[seq_by2]
+  return(result)
+}
+
 source_local("lib_metams.r")
 
-pkgs <- c("metaMS","batch") #"batch" necessary for parseCommandArgs function
+pkgs <- c("metaMS") #remove "batch" dependencies
 loadAndDisplayPackages(pkgs)
 
 cat("\n")
@@ -32,7 +47,7 @@ cat("\nStart of the '", modNamC, "' Galaxy module call: ", format(Sys.time(), "%
 
 # ----- ARGUMENTS -----
 cat("\tARGUMENTS INFO\n\n")
-args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
+args <- parse_args() #interpretation of arguments given in command line as an R list of objects
 #write.table(as.matrix(args), col.names=F, quote=F, sep='\t\t')
 print(cbind(value = unlist(args)))
 
